@@ -1,2 +1,3 @@
-# mapr-movielens
-MovieLens Demonstration using MapR Converged Data Platform
+MapR Demonstration Project
+
+See Wiki
