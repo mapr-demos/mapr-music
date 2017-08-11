@@ -1,0 +1,29 @@
+<div class="home-page">
+  <div class="container">
+    <div class="controls-container">
+      <ngb-pagination
+        [collectionSize]="totalAlbums"
+        [(page)]="pageNumber"
+        [maxSize] = 5
+        [pageSize] = 12
+        (pageChange)="onChangePage()"
+      ></ngb-pagination>
+    </div>
+  </div>
+  <div class="container albums-container">
+    <div class="row">
+      <div *ngFor="let album of albums" class="col-md-3">
+        <div class="albums-container">
+          <div style="text-align: center">
+            <a routerLink="/album/{{album.id}}">
+              <img src={{album.imageURL}} width="150" height="150">
+            </a>
+          </div>
+          <div class="album-title">
+            {{album.name}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

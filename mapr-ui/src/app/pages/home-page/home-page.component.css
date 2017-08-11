@@ -1,0 +1,23 @@
+.controls-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.album-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.albums-container {
+  /*background-color: #ebebeb;*/
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.album-title {
+  text-align: center;
+  padding: 5px 0 0 5px;
+  color: #0033BB;
+  text-overflow: ellipsis;
+}
