@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import 'rxjs/add/operator/switchMap';
-import {Album} from "../../models/Album";
+import {Album} from "../../models/album";
 import {AlbumService} from "../../services/album.service";
 
 @Component({

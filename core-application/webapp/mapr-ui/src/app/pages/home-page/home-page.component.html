@@ -1,10 +1,34 @@
 <div class="home-page">
-  <div class="container">
-    <ngb-pagination
-      [collectionSize]="totalAlbums"
-      [page]="pageNumber"
-      (pageChange)="onChangePage($event)"
-    ></ngb-pagination>
+  <div class="container controls-container">
+    <div>
+      <ngb-pagination
+        [collectionSize]="totalAlbums"
+        [page]="pageNumber"
+        [maxSize]="5"
+        [pageSize]="12"
+        (pageChange)="onChangePage($event)"
+      ></ngb-pagination>
+    </div>
+    <div class="sort-selector-container">
+      <div>Sort by:</div>
+      <div>
+        <select class="form-control" id="sort" (change)="onSortChange($event.target.value)">
+          <option
+            value="NO_SORTING"
+            [attr.selected]="sortType === '-1' ? '': null"
+          >
+            No sorting
+          </option>
+          <option
+            *ngFor="let option of sortOptions"
+            value="{{option.value}}"
+            [attr.selected]="option.value === sortType ? '': null"
+          >
+            {{option.label}}
+          </option>
+        </select>
+      </div>
+    </div>
   </div>
   <div class="container albums-container">
     <div class="row">
@@ -12,11 +36,19 @@
         <div class="album-container">
           <div style="text-align: center">
             <a routerLink="/album/{{album.id}}">
-              <img src={{album.imageURL}} width="150" height="150">
+              <img src={{album.coverImageURL}} width="150" height="150">
             </a>
           </div>
           <div class="album-title">
-            {{album.name}}
+            Title: {{album.title}}
+          </div>
+          <div class="album-title">
+            Artist(s):
+            <span
+              *ngFor="let artist of album.artists"
+            >
+              {{artist.name}}
+            </span>
           </div>
         </div>
       </div>
