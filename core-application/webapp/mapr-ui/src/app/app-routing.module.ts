@@ -5,7 +5,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { HomePage } from './pages/home-page/home-page.component';
 import { AlbumDetailPage } from './pages/album-detail-page/album-detail-page.component';
+import { ArtistPage } from './pages/artist-page/artist-page.component';
 import { NotFoundPage } from './pages/not-found-page/not-found-page.component';
+
 
 const appRoutes: Routes = [
   {
@@ -17,6 +19,10 @@ const appRoutes: Routes = [
     component: AlbumDetailPage
   },
   {
+    path: 'artist/:artistId',
+    component: ArtistPage
+  },
+  {
     path: '**',
     component: NotFoundPage
   }
@@ -26,7 +32,8 @@ const appRoutes: Routes = [
   declarations: [
     HomePage,
     NotFoundPage,
-    AlbumDetailPage
+    AlbumDetailPage,
+    ArtistPage
   ],
   imports: [
     NgbModule,

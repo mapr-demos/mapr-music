@@ -15,14 +15,16 @@ export class AlbumDetailPage implements OnInit{
     private albumService: AlbumService
   ) {}
 
-  album: Album = null;
+  album: Album;
 
   ngOnInit(): void {
     this.router.paramMap
       .switchMap((params: ParamMap) => {
         return this.albumService.getById(params.get('albumId'))
       })
-      .subscribe((album) => this.album = album);
+      .subscribe((album) => {
+        this.album = album;
+      });
   }
 
 }

@@ -6,6 +6,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AlbumService } from './services/album.service';
+import { ArtistService } from './services/artist.service';
+
 
 @NgModule({
   declarations: [
@@ -18,7 +20,8 @@ import { AlbumService } from './services/album.service';
     NgbModule.forRoot()
   ],
   providers: [
-    AlbumService
+    AlbumService,
+    ArtistService
   ],
   bootstrap: [
     AppComponent

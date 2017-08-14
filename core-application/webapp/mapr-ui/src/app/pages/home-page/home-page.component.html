@@ -40,15 +40,16 @@
             </a>
           </div>
           <div class="album-title">
-            Title: {{album.title}}
+            Title: <a routerLink="/album/{{album.id}}">{{album.title}}</a>
           </div>
           <div class="album-title">
             Artist(s):
-            <span
+            <a
               *ngFor="let artist of album.artists"
+              routerLink="/artist/{{artist.id}}"
             >
               {{artist.name}}
-            </span>
+            </a>
           </div>
         </div>
       </div>
