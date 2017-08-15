@@ -43,7 +43,7 @@
             Title: <a routerLink="/album/{{album.id}}">{{album.title}}</a>
           </div>
           <div class="album-title">
-            Artist(s):
+            Artist{{album.artists > 1 ? 's' : ''}}:
             <a
               *ngFor="let artist of album.artists"
               routerLink="/artist/{{artist.id}}"

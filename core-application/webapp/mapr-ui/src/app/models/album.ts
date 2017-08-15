@@ -7,6 +7,7 @@ export interface Album {
   id: string,
   title: string,
   coverImageURL: string,
+  country: string,
   artists: Array<Artist>
 }
 

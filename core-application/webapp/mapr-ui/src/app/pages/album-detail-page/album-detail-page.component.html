@@ -1,8 +1,22 @@
-<div class="container">
-  <div>
-    Album Page
-  </div>
-  <div *ngIf="album">
-    {{album.title}}
+<div class="container album-detail-page">
+  <div *ngIf="album" style="display: flex">
+    <div>
+      <img src="{{album.coverImageURL}}" width="150" height="150">
+    </div>
+    <div style="padding: 5px">
+      <div>{{album.title}}</div>
+      <div>
+        Artist{{album.artists > 1 ? 's' : ''}}:
+        <a
+          *ngFor="let artist of album.artists"
+          routerLink="/artist/{{artist.id}}"
+        >
+          {{artist.name}}
+        </a>
+      </div>
+      <div>
+        Country: {{album.country}}
+      </div>
+    </div>
   </div>
 </div>

@@ -1,8 +1,26 @@
-<div class="container">
+<div class="container artist-page">
   <div
     *ngIf="artist !== undefined"
   >
-    <div>Artist: {{artist.name}}</div>
-    <div>{{artist.gender}}</div>
+    <div><img src="{{artist.avatarURL}}" width="150" height="150"><span style="padding: 5px">{{artist.name}}</span></div>
+    <div style="padding-top: 5px">Gender: {{artist.gender}}</div>
+    <div style="padding-top: 5px">
+      <div>Releases:</div>
+      <div
+        *ngFor="let album of artist.albums"
+        style="display: flex"
+        class="artist-album-item"
+      >
+        <div>
+          <img src="{{album.coverImageURL}}" width="50" height="50">
+        </div>
+        <div
+          class="artist-album-item-title"
+          routerLink="/album/{{album.id}}"
+        >
+          {{album.title}}
+        </div>
+      </div>
+    </div>
   </div>
 </div>

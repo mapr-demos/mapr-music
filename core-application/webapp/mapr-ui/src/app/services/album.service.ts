@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import {AlbumsPage, Album} from '../models/album';
-import cloneDeep from 'lodash/cloneDeep';
-import find from 'lodash/find';
 import sortBy from 'lodash/sortBy';
 import reverse from 'lodash/reverse';
 import identity from 'lodash/identity';
@@ -9,8 +7,7 @@ import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/map';
-
-import {getAlbums} from './mocked-data';
+import {AppConfig} from "../app.config";
 
 const PAGE_SIZE = 12;
 
@@ -25,11 +22,12 @@ interface PageRequest {
   sortType: string
 }
 
-function mapToAlbum(item): Album {
+function mapToAlbum({id, title, thumb, country}): Album {
   return {
-    id: item.id,
-    title: item.title,
-    coverImageURL: item.thumb,
+    id,
+    title,
+    coverImageURL: thumb,
+    country,
     artists: []
   };
 }
@@ -40,12 +38,13 @@ const headers = new HttpHeaders().set('Authorization', 'Discogs token=uwBGTHIwIU
 export class AlbumService {
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private config: AppConfig
   ) {
   }
 
   getPage({pageNumber, sortType}: PageRequest): Promise<AlbumsPage> {
-    return this.http.get('https://api.discogs.com/database/search', {
+    return this.http.get(`${this.config.apiURL}/database/search`, {
         headers,
         params: new HttpParams()
           .set('type', 'release')
@@ -63,9 +62,8 @@ export class AlbumService {
   }
 
   getById(albumId: string):Promise<Album> {
-    return this.http.get(`https://api.discogs.com/releases/${albumId}`, {headers})
+    return this.http.get(`${this.config.apiURL}/releases/${albumId}`, {headers})
       .map((response: any) => {
-        console.log(response);
         const album = mapToAlbum(response);
         album.artists = response.artists.map(({id, name}) => ({id, name}));
         return album;
