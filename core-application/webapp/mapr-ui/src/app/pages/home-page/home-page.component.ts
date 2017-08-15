@@ -38,6 +38,7 @@ export class HomePage implements OnInit{
     this.route.queryParams
       .switchMap(({page = 1, sort = 'NO_SORTING'}: {page:number, sort: string}) => {
         this.sortType = sort;
+        this.albums = [];
         return this.albumService.getPage({pageNumber: page, sortType: this.sortType})
           .then((albumsPage: AlbumsPage) => ({albumsPage, page}));
       })

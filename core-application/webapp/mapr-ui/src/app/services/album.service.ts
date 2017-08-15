@@ -5,6 +5,10 @@ import find from 'lodash/find';
 import sortBy from 'lodash/sortBy';
 import reverse from 'lodash/reverse';
 import identity from 'lodash/identity';
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+
+import 'rxjs/add/operator/toPromise';
+import 'rxjs/add/operator/map';
 
 import {getAlbums} from './mocked-data';
 
@@ -21,25 +25,51 @@ interface PageRequest {
   sortType: string
 }
 
+function mapToAlbum(item): Album {
+  return {
+    id: item.id,
+    title: item.title,
+    coverImageURL: item.thumb,
+    artists: []
+  };
+}
+
+const headers = new HttpHeaders().set('Authorization', 'Discogs token=uwBGTHIwIUVQftGUciVuEFVFHoyINAYqHjWEHGta');
+
 @Injectable()
 export class AlbumService {
 
+  constructor(
+    private http: HttpClient
+  ) {
+  }
+
   getPage({pageNumber, sortType}: PageRequest): Promise<AlbumsPage> {
-    const offset = PAGE_SIZE * (pageNumber - 1);
-    const albums = getAlbums();
-    const sortedAlbums = SORT_HASH[sortType](albums);
-    return Promise.resolve({
-      albums: cloneDeep(sortedAlbums.slice(offset, offset + PAGE_SIZE)),
-      totalNumber: albums.length
-    });
+    return this.http.get('https://api.discogs.com/database/search', {
+        headers,
+        params: new HttpParams()
+          .set('type', 'release')
+          .set('per_page', `${PAGE_SIZE}`)
+          .set('page', `${pageNumber}`)
+      })
+      .map((response: any) => {
+        const albums = response.results.map(mapToAlbum);
+        return {
+          albums: SORT_HASH[sortType](albums),
+          totalNumber: response.pagination.items
+        };
+      })
+      .toPromise();
   }
 
   getById(albumId: string):Promise<Album> {
-    const albums = getAlbums();
-    const album = find(albums, (album) => album.id === albumId);
-    if (!album) {
-      return Promise.reject('Album not found');
-    }
-    return Promise.resolve(cloneDeep(album));
+    return this.http.get(`https://api.discogs.com/releases/${albumId}`, {headers})
+      .map((response: any) => {
+        console.log(response);
+        const album = mapToAlbum(response);
+        album.artists = response.artists.map(({id, name}) => ({id, name}));
+        return album;
+      })
+      .toPromise();
   }
 }
