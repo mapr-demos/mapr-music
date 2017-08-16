@@ -44,6 +44,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- OJAI Driver which is used to connect to MapR cluster -->
+        <dependency>
+            <artifactId>mapr-ojai-driver</artifactId>
+            <groupId>com.mapr.ojai</groupId>
+            <version>${mapr.library.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
