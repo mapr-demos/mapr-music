@@ -16,11 +16,14 @@ export class AlbumDetailPage implements OnInit{
   ) {}
 
   album: Album;
+  sourceURL: string;
 
   ngOnInit(): void {
     this.router.paramMap
       .switchMap((params: ParamMap) => {
-        return this.albumService.getById(params.get('albumId'))
+        const albumId = params.get('albumId');
+        this.sourceURL = this.albumService.getAlbumByIdURL(albumId);
+        return this.albumService.getAlbumById(albumId);
       })
       .subscribe((album) => {
         this.album = album;

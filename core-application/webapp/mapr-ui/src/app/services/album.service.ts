@@ -1,15 +1,13 @@
 import { Injectable } from '@angular/core';
-import {AlbumsPage, Album} from '../models/album';
+import {AlbumsPage, Album, Artist} from '../models/album';
 import sortBy from 'lodash/sortBy';
 import reverse from 'lodash/reverse';
 import identity from 'lodash/identity';
-import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/map';
 import {AppConfig} from "../app.config";
-
-const PAGE_SIZE = 12;
 
 const SORT_HASH = {
   'NO_SORTING': identity,
@@ -22,17 +20,22 @@ interface PageRequest {
   sortType: string
 }
 
-function mapToAlbum({id, title, thumb, country}): Album {
+function mapToArtist({artist_id, artist_name}): Artist {
   return {
-    id,
-    title,
-    coverImageURL: thumb,
-    country,
-    artists: []
-  };
+    id: artist_id,
+    name: artist_name
+  }
 }
 
-const headers = new HttpHeaders().set('Authorization', 'Discogs token=uwBGTHIwIUVQftGUciVuEFVFHoyINAYqHjWEHGta');
+function mapToAlbum({_id, name, cover_image_url, country, artist_list}): Album {
+  return {
+    id: _id,
+    title: name,
+    coverImageURL: cover_image_url,
+    country,
+    artists: artist_list.map(mapToArtist)
+  };
+}
 
 @Injectable()
 export class AlbumService {
@@ -43,30 +46,43 @@ export class AlbumService {
   ) {
   }
 
-  getPage({pageNumber, sortType}: PageRequest): Promise<AlbumsPage> {
-    return this.http.get(`${this.config.apiURL}/database/search`, {
-        headers,
-        params: new HttpParams()
-          .set('type', 'release')
-          .set('per_page', `${PAGE_SIZE}`)
-          .set('page', `${pageNumber}`)
-      })
+/**
+ * @desc returns URL for albums page request
+ * */
+  getAlbumsPageURL({pageNumber, sortType}: PageRequest): string {
+    return `${this.config.apiURL}/mapr-music/api/1.0/albums?page=${pageNumber}`;
+  }
+
+/**
+ * @desc get albums page from server side
+ * */
+  getAlbumsPage(request: PageRequest): Promise<AlbumsPage> {
+    debugger;
+    return this.http.get(this.getAlbumsPageURL(request))
       .map((response: any) => {
         const albums = response.results.map(mapToAlbum);
         return {
-          albums: SORT_HASH[sortType](albums),
+          albums: SORT_HASH[request.sortType](albums),
           totalNumber: response.pagination.items
         };
       })
       .toPromise();
   }
 
-  getById(albumId: string):Promise<Album> {
-    return this.http.get(`${this.config.apiURL}/releases/${albumId}`, {headers})
+/**
+ * @desc get album by id URL
+ * */
+  getAlbumByIdURL(albumId: string): string {
+    return `${this.config.apiURL}/mapr-music/api/1.0/albums/${albumId}`;
+  }
+
+/**
+ * @desc get album by id from server side
+ * */
+  getAlbumById(albumId: string):Promise<Album> {
+    return this.http.get(this.getAlbumByIdURL(albumId))
       .map((response: any) => {
-        const album = mapToAlbum(response);
-        album.artists = response.artists.map(({id, name}) => ({id, name}));
-        return album;
+        return mapToAlbum(response);
       })
       .toPromise();
   }

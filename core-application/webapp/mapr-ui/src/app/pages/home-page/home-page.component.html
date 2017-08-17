@@ -30,29 +30,41 @@
       </div>
     </div>
   </div>
-  <div class="container albums-container">
-    <div class="row">
-      <div *ngFor="let album of albums" class="col-md-3">
-        <div class="album-container">
-          <div style="text-align: center">
-            <a routerLink="/album/{{album.id}}">
-              <img src={{album.coverImageURL}} width="150" height="150" onerror="this.src='https://s.discogs.com/images/default-release.png'">
-            </a>
-          </div>
-          <div class="album-title">
-            Title: <a routerLink="/album/{{album.id}}">{{album.title}}</a>
-          </div>
-          <div class="album-title">
-            Artist{{album.artists > 1 ? 's' : ''}}:
-            <a
-              *ngFor="let artist of album.artists"
-              routerLink="/artist/{{artist.id}}"
-            >
-              {{artist.name}}
-            </a>
+  <div style="display: flex">
+    <div class="container albums-container">
+      <div class="row">
+        <div *ngFor="let album of albums" class="col-md-3">
+          <div class="album-container">
+            <div style="text-align: center">
+              <a routerLink="/album/{{album.id}}">
+                <img src={{album.coverImageURL}} width="150" height="150" onerror="this.src='https://s.discogs.com/images/default-release.png'">
+              </a>
+            </div>
+            <div class="album-title">
+              Title: <a routerLink="/album/{{album.id}}">{{album.title}}</a>
+            </div>
+            <div class="album-title">
+              Artist{{album.artists > 1 ? 's' : ''}}:
+              <a
+                *ngFor="let artist of album.artists"
+                routerLink="/artist/{{artist.id}}"
+              >
+                {{artist.name}}
+              </a>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+    <div
+      *ngIf="sourceURL"
+      style="padding: 10px"
+    >
+      <a
+        href="{{sourceURL}}"
+      >
+        View source
+      </a>
     </div>
   </div>
 </div>

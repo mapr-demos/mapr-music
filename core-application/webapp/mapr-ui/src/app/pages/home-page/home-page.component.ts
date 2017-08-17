@@ -22,6 +22,7 @@ export class HomePage implements OnInit{
   albums: Array<Album> = [];
   totalAlbums: number;
   pageNumber: number;
+  sourceURL: string;
   sortOptions: Array<SelectOption> = [
     {
       label:'Title A-z',
@@ -39,7 +40,9 @@ export class HomePage implements OnInit{
       .switchMap(({page = 1, sort = 'NO_SORTING'}: {page:number, sort: string}) => {
         this.sortType = sort;
         this.albums = [];
-        return this.albumService.getPage({pageNumber: page, sortType: this.sortType})
+        const request = {pageNumber: page, sortType: this.sortType};
+        this.sourceURL = this.albumService.getAlbumsPageURL(request);
+        return this.albumService.getAlbumsPage(request)
           .then((albumsPage: AlbumsPage) => ({albumsPage, page}));
       })
       .subscribe(({albumsPage, page}) => {

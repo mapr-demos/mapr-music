@@ -1,3 +1,3 @@
 export class AppConfig {
-  apiURL: string = 'https://api.discogs.com'
+  apiURL: string = 'http://10.2.13.178:8080'
 }
