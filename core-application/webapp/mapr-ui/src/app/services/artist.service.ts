@@ -35,7 +35,7 @@ export class ArtistService {
         return mapToArtist(response);
       })
       .mergeMap((artist: Artist) => {
-        return this.http.get(`${this.config.apiURL}/artists/${artist.id}/releases`)
+        return this.http.get(`${this.config.apiURL}/artists/${artist.id}/releases`, {headers})
           .map((response: any) => {
             console.log(response.releases);
             artist.albums = response.releases.map(({id, thumb, title}) => ({

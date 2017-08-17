@@ -36,7 +36,7 @@
         <div class="album-container">
           <div style="text-align: center">
             <a routerLink="/album/{{album.id}}">
-              <img src={{album.coverImageURL}} width="150" height="150">
+              <img src={{album.coverImageURL}} width="150" height="150" onerror="this.src='https://s.discogs.com/images/default-release.png'">
             </a>
           </div>
           <div class="album-title">
