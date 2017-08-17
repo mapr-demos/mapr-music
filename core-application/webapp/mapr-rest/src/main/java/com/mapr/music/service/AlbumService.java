@@ -1,8 +1,7 @@
 package com.mapr.music.service;
 
+import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
-
-import java.util.List;
 
 /**
  * Album service interface which is defines methods that should implement actual business logic.
@@ -10,11 +9,21 @@ import java.util.List;
 public interface AlbumService {
 
     /**
-     * Returns list of all albums.
+     * Returns list of albums which is represented by page with default number of albums. Default number of albums
+     * depends on implementation class.
      *
-     * @return list of all albums.
+     * @return albums page resource.
      */
-    List<Album> getAlbumsList();
+    ResourceDto<Album> getAlbumsPage();
+
+    /**
+     * Returns list of albums which is represented by page with default number of albums. Default number of albums
+     * depends on implementation class.
+     *
+     * @param page specifies number of page, which will be returned.
+     * @return albums page resource.
+     */
+    ResourceDto<Album> getAlbumsPage(long page);
 
     /**
      * Returns single album according to it's identifier.
