@@ -5,10 +5,7 @@ import com.mapr.music.annotation.MaprDbTable;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.ojai.Document;
 import org.ojai.DocumentStream;
-import org.ojai.store.Connection;
-import org.ojai.store.DocumentStore;
-import org.ojai.store.DriverManager;
-import org.ojai.store.Query;
+import org.ojai.store.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +48,20 @@ public class MaprDbDaoImpl<T> implements MaprDbDao<T> {
      */
     @Override
     public List<T> getList(long offset, long limit) {
-        return getList(offset, limit, new String[]{});
+        return getList(offset, limit, null, new String[]{});
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param offset      offset value.
+     * @param limit       limit value.
+     * @param sortOptions define the order of documents.
+     * @return list of document.
+     */
+    @Override
+    public List<T> getList(long offset, long limit, SortOption... sortOptions) {
+        return getList(offset, limit, sortOptions, new String[]{});
     }
 
     /**
@@ -64,9 +74,23 @@ public class MaprDbDaoImpl<T> implements MaprDbDao<T> {
      */
     @Override
     public List<T> getList(long offset, long limit, String... fields) {
+        return getList(offset, limit, null, fields);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param offset      offset value.
+     * @param limit       limit value.
+     * @param sortOptions define the order of documents.
+     * @param fields      list of fields that will present in document.
+     * @return list of document.
+     */
+    @Override
+    public List<T> getList(long offset, long limit, SortOption[] sortOptions, String... fields) {
         return processStore((connection, store) -> {
 
-            Query query = buildQuery(connection, offset, limit, fields);
+            Query query = buildQuery(connection, offset, limit, fields, sortOptions);
 
             // Fetch all OJAI Documents from this store according to the built query
             DocumentStream documentStream = store.findQuery(query);
@@ -199,13 +223,24 @@ public class MaprDbDaoImpl<T> implements MaprDbDao<T> {
      * @param fields     fields what will present in returned document. Used for projection.
      * @return OJAI query, which is built according to the specified parameters.
      */
-    private Query buildQuery(Connection connection, long offset, long limit, String... fields) {
+    private Query buildQuery(Connection connection, long offset, long limit, String[] fields, SortOption[] options) {
 
         Query query = connection.newQuery();
         if (fields == null || fields.length == 0) {
             query.select("*");
         } else {
             query.select(fields);
+        }
+
+        if (options == null || options.length == 0) {
+            return query.offset(offset).limit(limit).build();
+        }
+
+        for (SortOption sortOption : options) {
+            SortOrder ojaiSortOrder = (SortOption.Order.DESC == sortOption.getOrder()) ? SortOrder.DESC : SortOrder.ASC;
+            for (String field : sortOption.getFields()) {
+                query = query.orderBy(field, ojaiSortOrder);
+            }
         }
 
         return query.offset(offset).limit(limit).build();

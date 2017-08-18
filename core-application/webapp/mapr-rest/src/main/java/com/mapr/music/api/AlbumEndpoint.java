@@ -8,6 +8,7 @@ import com.mapr.music.service.impl.AlbumServiceImpl;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 /**
  * Endpoint for accessing 'Album' resources.
@@ -28,8 +29,11 @@ public class AlbumEndpoint {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public ResourceDto<Album> getAllAlbums(@QueryParam("page") Long page) {
+    public ResourceDto<Album> getAllAlbums(@QueryParam("page") Long page, @QueryParam("sort_order") String order,
+                                           @QueryParam("sort_fields") List<String> orderFields) {
 
-        return (page != null) ? albumService.getAlbumsPage(page) : albumService.getAlbumsPage();
+        return (page != null)
+                ? albumService.getAlbumsPage(page, order, orderFields)
+                : albumService.getAlbumsPage(order, orderFields);
     }
 }

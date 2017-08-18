@@ -22,6 +22,17 @@ public interface MaprDbDao<T> {
 
     /**
      * Returns list of document according to specified <code>offset</code> and <code>limit</code> values using
+     * projection. Documents will be ordered according to the specified {@link SortOption} options.
+     *
+     * @param offset      offset value.
+     * @param limit       limit value.
+     * @param sortOptions define the order of documents.
+     * @return list of document.
+     */
+    List<T> getList(long offset, long limit, SortOption... sortOptions);
+
+    /**
+     * Returns list of document according to specified <code>offset</code> and <code>limit</code> values using
      * projection.
      *
      * @param offset offset value.
@@ -30,6 +41,18 @@ public interface MaprDbDao<T> {
      * @return list of document.
      */
     List<T> getList(long offset, long limit, String... fields);
+
+    /**
+     * Returns list of document according to specified <code>offset</code> and <code>limit</code> values using
+     * projection. Documents will be ordered according to the specified {@link SortOption} options.
+     *
+     * @param offset      offset value.
+     * @param limit       limit value.
+     * @param sortOptions define the order of documents.
+     * @param fields      list of fields that will present in document.
+     * @return list of document.
+     */
+    List<T> getList(long offset, long limit, SortOption[] sortOptions, String... fields);
 
     /**
      * Returns single document by it's identifier.

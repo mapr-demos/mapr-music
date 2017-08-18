@@ -3,6 +3,8 @@ package com.mapr.music.service;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
 
+import java.util.List;
+
 /**
  * Album service interface which is defines methods that should implement actual business logic.
  */
@@ -24,6 +26,27 @@ public interface AlbumService {
      * @return albums page resource.
      */
     ResourceDto<Album> getAlbumsPage(long page);
+
+    /**
+     * Returns list of albums which is represented by page with default number of albums. Default number of albums
+     * depends on implementation class. Albums will be ordered according to the specified order and fields.
+     *
+     * @param order       string representation of the order. Valid values are: "asc", "ASC", "desc", "DESC".
+     * @param orderFields fields by which ordering will be performed.
+     * @return albums page resource.
+     */
+    ResourceDto<Album> getAlbumsPage(String order, List<String> orderFields);
+
+    /**
+     * Returns list of albums which is represented by page with default number of albums. Default number of albums
+     * depends on implementation class. Albums will be ordered according to the specified order and fields.
+     *
+     * @param page        specifies number of page, which will be returned.
+     * @param order       string representation of the order. Valid values are: "asc", "ASC", "desc", "DESC".
+     * @param orderFields fields by which ordering will be performed.
+     * @return albums page resource.
+     */
+    ResourceDto<Album> getAlbumsPage(long page, String order, List<String> orderFields);
 
     /**
      * Returns single album according to it's identifier.

@@ -2,6 +2,7 @@ package com.mapr.music.service.impl;
 
 import com.mapr.music.dao.MaprDbDao;
 import com.mapr.music.dao.MaprDbDaoImpl;
+import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
 import com.mapr.music.service.AlbumService;
@@ -54,22 +55,52 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     /**
      * {@inheritDoc}
      *
+     * @param order       string representation of the order. Valid values are: "asc", "ASC", "desc", "DESC".
+     * @param orderFields fields by which ordering will be performed.
+     * @return albums page resource.
+     */
+    @Override
+    public ResourceDto<Album> getAlbumsPage(String order, List<String> orderFields) {
+        return getAlbumsPage(1, order, orderFields);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * @param page specifies number of page, which will be returned.
      * @return albums page resource.
      */
     @Override
     public ResourceDto<Album> getAlbumsPage(long page) {
+        return getAlbumsPage(page, null, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param page        specifies number of page, which will be returned.
+     * @param order       string representation of the order. Valid values are: "asc", "ASC", "desc", "DESC".
+     * @param orderFields fields by which ordering will be performed.
+     * @return albums page resource.
+     */
+    @Override
+    public ResourceDto<Album> getAlbumsPage(long page, String order, List<String> orderFields) {
 
         if (page <= 0) {
             throw new IllegalArgumentException("Page must be greater than zero");
         }
 
         ResourceDto<Album> albumsPage = new ResourceDto<>();
-
         albumsPage.setPagination(getPaginationInfo(page, ALBUMS_PER_PAGE_DEFAULT));
-
         long offset = (page - 1) * ALBUMS_PER_PAGE_DEFAULT;
-        List<Album> albums = albumDao.getList(offset, ALBUMS_PER_PAGE_DEFAULT, ALBUM_SHORT_INFO_FIELDS);
+
+        SortOption[] sortOptions = null;
+        if (order != null && orderFields != null && orderFields.size() > 0) {
+            SortOption.Order sortOrder = SortOption.Order.valueOf(order.toUpperCase());
+            sortOptions = new SortOption[]{new SortOption(sortOrder, orderFields)};
+        }
+
+        List<Album> albums = albumDao.getList(offset, ALBUMS_PER_PAGE_DEFAULT, sortOptions, ALBUM_SHORT_INFO_FIELDS);
         albumsPage.setResults(albums);
 
         return albumsPage;
