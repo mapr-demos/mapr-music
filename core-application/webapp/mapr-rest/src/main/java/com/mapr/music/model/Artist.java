@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mapr.music.annotation.MaprDbTable;
 
+import java.util.List;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@MaprDbTable("/apps/artist")
+@MaprDbTable("/apps/artists")
 public class Artist {
 
     @JsonProperty("_id")
@@ -28,8 +30,8 @@ public class Artist {
     @JsonProperty("disambiguation_comment")
     private String disambiguationComment;
 
-    @JsonProperty("release_ids")
-    private String[] releaseIds;
+    @JsonProperty("albums")
+    private List albums; // TODO change it to use actual class
 
     @JsonProperty("profile_image_url")
     private String profileImageUrl;
@@ -115,12 +117,12 @@ public class Artist {
         return this;
     }
 
-    public String[] getReleaseIds() {
-        return releaseIds;
+    public List getAlbums() {
+        return albums;
     }
 
-    public Artist setReleaseIds(String[] releaseIds) {
-        this.releaseIds = releaseIds;
+    public Artist setAlbums(List albums) {
+        this.albums = albums;
         return this;
     }
 

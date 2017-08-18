@@ -11,6 +11,7 @@ import com.mapr.music.service.PaginatedService;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ArtistServiceImpl implements ArtistService, PaginatedService {
 
@@ -25,7 +26,7 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
             "ISNI",
             "MBID",
             "disambiguation_comment",
-            "release_ids",
+            "albums",
             "profile_image_url",
             "images_urls",
             "begin_date",
@@ -73,6 +74,15 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
         }
 
         List<Artist> artists = artistDao.getList(offset, ARTISTS_PER_PAGE_DEFAULT, sortOptions, ARTIST_SHORT_INFO_FIELDS);
+
+        // FIXME change data model, get albums by list of ids.
+        artists.stream().forEach(artist -> {
+            List albumsShortInfo = (List) artist.getAlbums().stream()
+                    .map(albumId -> albumDao.getById((String) albumId, "_id", "name", "cover_image_url", "released_date"))
+                    .collect(Collectors.toList());
+            artist.setAlbums(albumsShortInfo);
+        });
+
         artistsPage.setResults(artists);
 
         return artistsPage;
