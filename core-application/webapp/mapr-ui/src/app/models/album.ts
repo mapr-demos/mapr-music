@@ -3,10 +3,19 @@ export interface Artist {
   name: string
 }
 
+export interface Track {
+  name: string,
+  duration: string
+}
+
 export interface Album {
   id: string,
   title: string,
   coverImageURL: string,
+  format: string,
+  style: string,
+  genre: string,
+  trackList: Array<Track>,
   country: string,
   artists: Array<Artist>
 }

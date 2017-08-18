@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {AlbumsPage, Album, Artist} from '../models/album';
+import {AlbumsPage, Album, Artist, Track} from '../models/album';
 import sortBy from 'lodash/sortBy';
 import reverse from 'lodash/reverse';
 import identity from 'lodash/identity';
@@ -27,12 +27,34 @@ function mapToArtist({artist_id, artist_name}): Artist {
   }
 }
 
-function mapToAlbum({_id, name, cover_image_url, country, artist_list}): Album {
+function mapToTrack({name, duration}): Track {
+  return {
+    //convert to miliseconds
+    duration: `${duration}` + '000',
+    name
+  };
+}
+
+function mapToAlbum({
+  _id,
+  name,
+  cover_image_url,
+  country,
+  artist_list,
+  style,
+  format,
+  genre,
+  track_list
+}): Album {
   return {
     id: _id,
     title: name,
     coverImageURL: cover_image_url,
     country,
+    style,
+    format,
+    genre,
+    trackList: track_list ? track_list.map(mapToTrack): [],
     artists: artist_list.map(mapToArtist)
   };
 }
@@ -82,6 +104,7 @@ export class AlbumService {
   getAlbumById(albumId: string):Promise<Album> {
     return this.http.get(this.getAlbumByIdURL(albumId))
       .map((response: any) => {
+        console.log(response);
         return mapToAlbum(response);
       })
       .toPromise();
