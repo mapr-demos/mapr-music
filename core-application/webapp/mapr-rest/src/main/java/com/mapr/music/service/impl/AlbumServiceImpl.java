@@ -1,7 +1,7 @@
 package com.mapr.music.service.impl;
 
 import com.mapr.music.dao.MaprDbDao;
-import com.mapr.music.dto.Pagination;
+import com.mapr.music.dao.MaprDbDaoImpl;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
 import com.mapr.music.service.AlbumService;
@@ -34,8 +34,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     };
 
     // FIXME use DI
-    private MaprDbDao<Album> albumDao = new MaprDbDao<>(Album.class);
-
+    private MaprDbDao<Album> albumDao = new MaprDbDaoImpl<>(Album.class);
 
     @Override
     public long getTotalNum() {

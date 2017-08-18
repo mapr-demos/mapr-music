@@ -1,8 +1,7 @@
 package com.mapr.music.service.impl;
 
-import com.mapr.music.dao.ArtistDao;
-import com.mapr.music.dao.impl.ArtistDaoImpl;
-import com.mapr.music.dto.Pagination;
+import com.mapr.music.dao.MaprDbDao;
+import com.mapr.music.dao.MaprDbDaoImpl;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Artist;
 import com.mapr.music.service.ArtistService;
@@ -11,7 +10,7 @@ import com.mapr.music.service.PaginatedService;
 import java.util.Collection;
 import java.util.List;
 
-public class ArtistServiceImpl implements ArtistService, PaginatedService{
+public class ArtistServiceImpl implements ArtistService, PaginatedService {
 
     private static final long ARTISTS_PER_PAGE_DEFAULT = 50;
 
@@ -20,9 +19,9 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService{
             "name",
             "gender",
             "area",
-            "ipi",
-            "isni",
-            "mbid",
+            "IPI",
+            "ISNI",
+            "MBID",
             "disambiguation_comment",
             "release_ids",
             "profile_image_url",
@@ -31,7 +30,7 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService{
             "end_date"
     };
 
-    private ArtistDao artistDao = new ArtistDaoImpl();
+    private MaprDbDao<Artist> artistDao = new MaprDbDaoImpl<>(Artist.class);
 
     @Override
     public long getTotalNum() {
@@ -55,8 +54,7 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService{
         artistsPage.setPagination(getPaginationInfo(page, ARTISTS_PER_PAGE_DEFAULT));
 
         long offset = (page - 1) * ARTISTS_PER_PAGE_DEFAULT;
-        // TODO CHECKING FOR TOTAL NUM
-        List<Artist> artists = artistDao.getAll(offset, ARTISTS_PER_PAGE_DEFAULT, ARTIST_SHORT_INFO_FIELDS);
+        List<Artist> artists = artistDao.getList(offset, ARTISTS_PER_PAGE_DEFAULT, ARTIST_SHORT_INFO_FIELDS);
         artistsPage.setResults(artists);
 
         return artistsPage;

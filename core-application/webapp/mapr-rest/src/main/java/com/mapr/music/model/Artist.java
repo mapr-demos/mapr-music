@@ -15,8 +15,14 @@ public class Artist {
     private String name;
     private String gender;
     private String area;
+
+    @JsonProperty("IPI")
     private String ipi;
+
+    @JsonProperty("ISNI")
     private String isni;
+
+    @JsonProperty("MBID")
     private String mbid;
 
     @JsonProperty("disambiguation_comment")

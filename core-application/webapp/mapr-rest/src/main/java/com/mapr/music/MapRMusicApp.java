@@ -1,6 +1,7 @@
 package com.mapr.music;
 
 import com.mapr.music.api.AlbumEndpoint;
+import com.mapr.music.api.ArtistEndpoint;
 import com.mapr.music.util.CORSFilter;
 
 import javax.ws.rs.ApplicationPath;
@@ -17,6 +18,7 @@ public class MapRMusicApp extends Application {
     // FIXME use DI
     public MapRMusicApp() {
         singletons.add(new AlbumEndpoint());
+        singletons.add(new ArtistEndpoint());
         singletons.add(new CORSFilter());
     }
 
