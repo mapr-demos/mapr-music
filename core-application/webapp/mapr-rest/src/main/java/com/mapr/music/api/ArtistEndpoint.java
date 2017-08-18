@@ -22,7 +22,6 @@ public class ArtistEndpoint {
         return (fieldList.size() == 0) ? artistService.getById(id) : artistService.getById(id, fieldList);
     }
 
-
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)

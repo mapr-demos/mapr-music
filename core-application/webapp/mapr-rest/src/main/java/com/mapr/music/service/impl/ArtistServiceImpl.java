@@ -6,11 +6,12 @@ import com.mapr.music.dto.Pagination;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Artist;
 import com.mapr.music.service.ArtistService;
+import com.mapr.music.service.PaginatedService;
 
 import java.util.Collection;
 import java.util.List;
 
-public class ArtistServiceImpl implements ArtistService {
+public class ArtistServiceImpl implements ArtistService, PaginatedService{
 
     private static final long ARTISTS_PER_PAGE_DEFAULT = 50;
 
@@ -33,6 +34,11 @@ public class ArtistServiceImpl implements ArtistService {
     private ArtistDao artistDao = new ArtistDaoImpl();
 
     @Override
+    public long getTotalNum() {
+        return artistDao.getTotalNum();
+    }
+
+    @Override
     public ResourceDto<Artist> getAll() {
         return getAll(1);
     }
@@ -46,11 +52,7 @@ public class ArtistServiceImpl implements ArtistService {
 
         ResourceDto<Artist> artistsPage = new ResourceDto<>();
 
-        // TODO MOVE IT TO UTILITY METHOD
-        long totalNum = artistDao.getTotalNum();
-        long remainder = totalNum % ARTISTS_PER_PAGE_DEFAULT;
-        long pages = (remainder == 0) ? totalNum / ARTISTS_PER_PAGE_DEFAULT : totalNum / ARTISTS_PER_PAGE_DEFAULT + 1;
-        artistsPage.setPagination(new Pagination(ARTISTS_PER_PAGE_DEFAULT, totalNum, page, pages));
+        artistsPage.setPagination(getPaginationInfo(page, ARTISTS_PER_PAGE_DEFAULT));
 
         long offset = (page - 1) * ARTISTS_PER_PAGE_DEFAULT;
         // TODO CHECKING FOR TOTAL NUM

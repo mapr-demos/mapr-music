@@ -1,18 +1,18 @@
 package com.mapr.music.service.impl;
 
-import com.mapr.music.dao.AlbumDao;
-import com.mapr.music.dao.impl.AlbumDaoImpl;
+import com.mapr.music.dao.MaprDbDao;
 import com.mapr.music.dto.Pagination;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
 import com.mapr.music.service.AlbumService;
+import com.mapr.music.service.PaginatedService;
 
 import java.util.List;
 
 /**
  * Actual implementation of {@link AlbumService} which is responsible of performing all business logic.
  */
-public class AlbumServiceImpl implements AlbumService {
+public class AlbumServiceImpl implements AlbumService, PaginatedService {
 
     private static final long ALBUMS_PER_PAGE_DEFAULT = 50;
 
@@ -34,7 +34,13 @@ public class AlbumServiceImpl implements AlbumService {
     };
 
     // FIXME use DI
-    private AlbumDao albumDao = new AlbumDaoImpl();
+    private MaprDbDao<Album> albumDao = new MaprDbDao<>(Album.class);
+
+
+    @Override
+    public long getTotalNum() {
+        return albumDao.getTotalNum();
+    }
 
     /**
      * {@inheritDoc}
@@ -61,13 +67,10 @@ public class AlbumServiceImpl implements AlbumService {
 
         ResourceDto<Album> albumsPage = new ResourceDto<>();
 
-        long totalNum = albumDao.getTotalNum();
-        long remainder = totalNum % ALBUMS_PER_PAGE_DEFAULT;
-        long pages = (remainder == 0) ? totalNum / ALBUMS_PER_PAGE_DEFAULT : totalNum / ALBUMS_PER_PAGE_DEFAULT + 1;
-        albumsPage.setPagination(new Pagination(ALBUMS_PER_PAGE_DEFAULT, totalNum, page, pages));
+        albumsPage.setPagination(getPaginationInfo(page, ALBUMS_PER_PAGE_DEFAULT));
 
         long offset = (page - 1) * ALBUMS_PER_PAGE_DEFAULT;
-        List<Album> albums = albumDao.getAlbumList(offset, ALBUMS_PER_PAGE_DEFAULT, ALBUM_SHORT_INFO_FIELDS);
+        List<Album> albums = albumDao.getList(offset, ALBUMS_PER_PAGE_DEFAULT, ALBUM_SHORT_INFO_FIELDS);
         albumsPage.setResults(albums);
 
         return albumsPage;
