@@ -2,7 +2,9 @@ package com.mapr.music.service.impl;
 
 import com.mapr.music.dao.MaprDbDao;
 import com.mapr.music.dao.MaprDbDaoImpl;
+import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.ResourceDto;
+import com.mapr.music.model.Album;
 import com.mapr.music.model.Artist;
 import com.mapr.music.service.ArtistService;
 import com.mapr.music.service.PaginatedService;
@@ -31,6 +33,7 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
     };
 
     private MaprDbDao<Artist> artistDao = new MaprDbDaoImpl<>(Artist.class);
+    private MaprDbDao<Album> albumDao = new MaprDbDaoImpl<>(Album.class);
 
     @Override
     public long getTotalNum() {
@@ -38,23 +41,38 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
     }
 
     @Override
-    public ResourceDto<Artist> getAll() {
-        return getAll(1);
+    public ResourceDto<Artist> getArtistsPage() {
+        return getArtistsPage(1);
     }
 
     @Override
-    public ResourceDto<Artist> getAll(long page) {
+    public ResourceDto<Artist> getArtistsPage(long page) {
+        return getArtistsPage(page, null, null);
+    }
+
+    @Override
+    public ResourceDto<Artist> getArtistsPage(String order, List<String> orderFields) {
+        return getArtistsPage(1, order, orderFields);
+    }
+
+    @Override
+    public ResourceDto<Artist> getArtistsPage(long page, String order, List<String> orderFields) {
 
         if (page <= 0) {
             throw new IllegalArgumentException("Page must be greater than zero");
         }
 
         ResourceDto<Artist> artistsPage = new ResourceDto<>();
-
         artistsPage.setPagination(getPaginationInfo(page, ARTISTS_PER_PAGE_DEFAULT));
-
         long offset = (page - 1) * ARTISTS_PER_PAGE_DEFAULT;
-        List<Artist> artists = artistDao.getList(offset, ARTISTS_PER_PAGE_DEFAULT, ARTIST_SHORT_INFO_FIELDS);
+
+        SortOption[] sortOptions = null;
+        if (order != null && orderFields != null && orderFields.size() > 0) {
+            SortOption.Order sortOrder = SortOption.Order.valueOf(order.toUpperCase());
+            sortOptions = new SortOption[]{new SortOption(sortOrder, orderFields)};
+        }
+
+        List<Artist> artists = artistDao.getList(offset, ARTISTS_PER_PAGE_DEFAULT, sortOptions, ARTIST_SHORT_INFO_FIELDS);
         artistsPage.setResults(artists);
 
         return artistsPage;

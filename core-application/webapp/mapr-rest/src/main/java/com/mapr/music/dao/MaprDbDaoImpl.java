@@ -239,6 +239,7 @@ public class MaprDbDaoImpl<T> implements MaprDbDao<T> {
         for (SortOption sortOption : options) {
             SortOrder ojaiSortOrder = (SortOption.Order.DESC == sortOption.getOrder()) ? SortOrder.DESC : SortOrder.ASC;
             for (String field : sortOption.getFields()) {
+                log.info("QUERY CHANGING. FIELD: {}, ORDER: {}", field, ojaiSortOrder);
                 query = query.orderBy(field, ojaiSortOrder);
             }
         }

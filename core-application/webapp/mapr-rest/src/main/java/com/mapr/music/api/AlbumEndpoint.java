@@ -5,6 +5,8 @@ import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
 import com.mapr.music.service.AlbumService;
 import com.mapr.music.service.impl.AlbumServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -15,6 +17,8 @@ import java.util.List;
  */
 @Path("/albums")
 public class AlbumEndpoint {
+
+    Logger log = LoggerFactory.getLogger(AlbumEndpoint.class);
 
     // FIXME use DI
     private AlbumService albumService = new AlbumServiceImpl();
