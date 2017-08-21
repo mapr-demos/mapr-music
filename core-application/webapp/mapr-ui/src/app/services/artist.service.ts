@@ -1,22 +1,29 @@
 import { Injectable } from '@angular/core';
 import {HttpHeaders, HttpClient} from "@angular/common/http";
-import {Artist} from "../models/artist";
+import {Artist, Album} from "../models/artist";
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/mergeMap';
 import {AppConfig} from "../app.config";
+import {AlbumService} from "./album.service";
 
-const headers = new HttpHeaders().set('Authorization', 'Discogs token=uwBGTHIwIUVQftGUciVuEFVFHoyINAYqHjWEHGta');
-
-function mapToArtist({id, name, images}):Artist {
+function mapToArtist({_id, name, profile_image_url, gender}):Artist {
   return {
-    id,
+    id: _id,
     name,
-    gender: 'Male',
-    avatarURL: images[0].uri,
+    gender,
+    avatarURL: profile_image_url,
     albums: []
   }
+}
+
+function mapToAlbum({_id, name, cover_image_url}): Album {
+  return {
+    id: _id,
+    title: name,
+    coverImageURL: cover_image_url
+  };
 }
 
 @Injectable()
@@ -24,25 +31,28 @@ export class ArtistService {
 
   constructor(
     private http: HttpClient,
-    private config: AppConfig
+    private config: AppConfig,
+    private albumService: AlbumService
   ) {
   }
 
-  getById(artistId: string) {
-    return this.http.get(`${this.config.apiURL}/artists/${artistId}`, {headers})
-      .map((response: any) => {
+  getArtistByIdURL(artistId: string): string {
+    return `${this.config.apiURL}/mapr-music/api/1.0/artists/${artistId}`;
+  }
+
+  getArtistById(artistId: string): Promise<Artist> {
+    return this.http.get(this.getArtistByIdURL(artistId))
+      .mergeMap((response: any) => {
+        const artist = mapToArtist(response);
         console.log(response);
-        return mapToArtist(response);
-      })
-      .mergeMap((artist: Artist) => {
-        return this.http.get(`${this.config.apiURL}/artists/${artist.id}/releases`, {headers})
-          .map((response: any) => {
-            console.log(response.releases);
-            artist.albums = response.releases.map(({id, thumb, title}) => ({
-              id,
-              coverImageURL: thumb,
-              title
-            }));
+        return Promise
+          .all(response.release_ids
+            .map((releaseID) => this.http.get(this.albumService.getAlbumByIdURL(releaseID))
+              .toPromise())
+          )
+          .then((releases) => {
+            console.log(releases);
+            artist.albums = releases.map(mapToAlbum);
             return artist;
           });
       })

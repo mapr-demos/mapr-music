@@ -17,11 +17,14 @@ export class ArtistPage implements OnInit {
   ) {}
 
   artist: Artist;
+  sourceURL: string;
 
   ngOnInit(): void {
     this.router.paramMap
       .switchMap((params: ParamMap) => {
-        return this.artistService.getById(params.get('artistId'));
+        const artistId = params.get('artistId');
+        this.sourceURL = this.artistService.getArtistByIdURL(artistId);
+        return this.artistService.getArtistById(artistId);
       })
       .subscribe((artist) => {
         this.artist = artist;
