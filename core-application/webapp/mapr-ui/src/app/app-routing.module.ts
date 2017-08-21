@@ -7,6 +7,7 @@ import { HomePage } from './pages/home-page/home-page.component';
 import { AlbumDetailPage } from './pages/album-detail-page/album-detail-page.component';
 import { ArtistPage } from './pages/artist-page/artist-page.component';
 import { NotFoundPage } from './pages/not-found-page/not-found-page.component';
+import {ReportingPage} from "./pages/reporting-page/reporting-page.component";
 
 
 const appRoutes: Routes = [
@@ -17,6 +18,10 @@ const appRoutes: Routes = [
   {
     path: 'album/:albumId',
     component: AlbumDetailPage
+  },
+  {
+    path: 'reporting',
+    component: ReportingPage
   },
   {
     path: 'artist/:artistId',
@@ -32,6 +37,7 @@ const appRoutes: Routes = [
   declarations: [
     HomePage,
     NotFoundPage,
+    ReportingPage,
     AlbumDetailPage,
     ArtistPage
   ],
