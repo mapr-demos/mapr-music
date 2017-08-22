@@ -20,10 +20,11 @@ public interface ArtistService {
      * Returns list of artists which is represented by page with default number of artists. Default number of artists
      * depends on implementation class.
      *
-     * @param page specifies number of page, which will be returned.
+     * @param page specifies number of page, which will be returned. In case when page value is <code>null</code> the
+     *             first page will be returned.
      * @return artists page resource.
      */
-    ResourceDto<Artist> getArtistsPage(long page);
+    ResourceDto<Artist> getArtistsPage(Long page);
 
     /**
      * Returns list of artists which is represented by page with default number of artists. Default number of artists
@@ -39,12 +40,15 @@ public interface ArtistService {
      * Returns list of artists which is represented by page with default number of artists. Default number of artists
      * depends on implementation class. artists will be ordered according to the specified order and fields.
      *
-     * @param page        specifies number of page, which will be returned.
+     * @param perPage     specifies number of artists per page. In case when value is <code>null</code> the
+     *                    default value will be used. Default value depends on implementation class.
+     * @param page        specifies number of page, which will be returned. In case when page value is <code>null</code> the
+     *                    first page will be returned.
      * @param order       string representation of the order. Valid values are: "asc", "ASC", "desc", "DESC".
      * @param orderFields fields by which ordering will be performed.
      * @return artists page resource.
      */
-    ResourceDto<Artist> getArtistsPage(long page, String order, List<String> orderFields);
+    ResourceDto<Artist> getArtistsPage(Long perPage, Long page, String order, List<String> orderFields);
 
     /**
      * @param id

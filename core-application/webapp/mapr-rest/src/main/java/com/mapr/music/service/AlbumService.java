@@ -14,7 +14,7 @@ public interface AlbumService {
      * Returns list of albums which is represented by page with default number of albums. Default number of albums
      * depends on implementation class.
      *
-     * @return albums page resource.
+     * @return first albums page resource.
      */
     ResourceDto<Album> getAlbumsPage();
 
@@ -22,10 +22,11 @@ public interface AlbumService {
      * Returns list of albums which is represented by page with default number of albums. Default number of albums
      * depends on implementation class.
      *
-     * @param page specifies number of page, which will be returned.
+     * @param page specifies number of page, which will be returned. In case when page value is <code>null</code> the
+     *             first page will be returned.
      * @return albums page resource.
      */
-    ResourceDto<Album> getAlbumsPage(long page);
+    ResourceDto<Album> getAlbumsPage(Long page);
 
     /**
      * Returns list of albums which is represented by page with default number of albums. Default number of albums
@@ -41,12 +42,15 @@ public interface AlbumService {
      * Returns list of albums which is represented by page with default number of albums. Default number of albums
      * depends on implementation class. Albums will be ordered according to the specified order and fields.
      *
-     * @param page        specifies number of page, which will be returned.
+     * @param perPage     specifies number of albums per page. In case when value is <code>null</code> the
+     *                    default value will be used. Default value depends on implementation class.
+     * @param page        specifies number of page, which will be returned. In case when page value is <code>null</code> the
+     *                    first page will be returned.
      * @param order       string representation of the order. Valid values are: "asc", "ASC", "desc", "DESC".
      * @param orderFields fields by which ordering will be performed.
      * @return albums page resource.
      */
-    ResourceDto<Album> getAlbumsPage(long page, String order, List<String> orderFields);
+    ResourceDto<Album> getAlbumsPage(Long perPage, Long page, String order, List<String> orderFields);
 
     /**
      * Returns single album according to it's identifier.

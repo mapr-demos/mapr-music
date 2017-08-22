@@ -5,8 +5,6 @@ import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
 import com.mapr.music.service.AlbumService;
 import com.mapr.music.service.impl.AlbumServiceImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -17,8 +15,6 @@ import java.util.List;
  */
 @Path("/albums")
 public class AlbumEndpoint {
-
-    Logger log = LoggerFactory.getLogger(AlbumEndpoint.class);
 
     // FIXME use DI
     private AlbumService albumService = new AlbumServiceImpl();
@@ -33,11 +29,11 @@ public class AlbumEndpoint {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public ResourceDto<Album> getAllAlbums(@QueryParam("page") Long page, @QueryParam("sort_order") String order,
+    public ResourceDto<Album> getAllAlbums(@QueryParam("per_page") Long perPage,
+                                           @QueryParam("page") Long page,
+                                           @QueryParam("sort_type") String order,
                                            @QueryParam("sort_fields") List<String> orderFields) {
 
-        return (page != null)
-                ? albumService.getAlbumsPage(page, order, orderFields)
-                : albumService.getAlbumsPage(order, orderFields);
+        return albumService.getAlbumsPage(perPage, page, order, orderFields);
     }
 }

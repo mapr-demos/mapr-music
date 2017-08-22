@@ -16,6 +16,7 @@ import java.util.List;
 public class AlbumServiceImpl implements AlbumService, PaginatedService {
 
     private static final long ALBUMS_PER_PAGE_DEFAULT = 50;
+    private static final long FIRST_PAGE_NUM = 1;
 
     /**
      * Array of album's fields that will be used for projection.
@@ -45,11 +46,11 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     /**
      * {@inheritDoc}
      *
-     * @return albums page resource.
+     * @return first albums page resource.
      */
     @Override
     public ResourceDto<Album> getAlbumsPage() {
-        return getAlbumsPage(1);
+        return getAlbumsPage(FIRST_PAGE_NUM);
     }
 
     /**
@@ -61,38 +62,54 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      */
     @Override
     public ResourceDto<Album> getAlbumsPage(String order, List<String> orderFields) {
-        return getAlbumsPage(1, order, orderFields);
+        return getAlbumsPage(ALBUMS_PER_PAGE_DEFAULT, FIRST_PAGE_NUM, order, orderFields);
     }
 
     /**
      * {@inheritDoc}
      *
-     * @param page specifies number of page, which will be returned.
+     * @param page specifies number of page, which will be returned. In case when page value is <code>null</code> the
+     *             first page will be returned.
      * @return albums page resource.
      */
     @Override
-    public ResourceDto<Album> getAlbumsPage(long page) {
-        return getAlbumsPage(page, null, null);
+    public ResourceDto<Album> getAlbumsPage(Long page) {
+        return getAlbumsPage(ALBUMS_PER_PAGE_DEFAULT, page, null, null);
     }
 
     /**
      * {@inheritDoc}
      *
-     * @param page        specifies number of page, which will be returned.
+     * @param perPage     specifies number of albums per page. In case when value is <code>null</code> the
+     *                    default value {@link AlbumServiceImpl#ALBUMS_PER_PAGE_DEFAULT} will be used.
+     * @param page        specifies number of page, which will be returned. In case when page value is <code>null</code> the
+     *                    first page will be returned.
      * @param order       string representation of the order. Valid values are: "asc", "ASC", "desc", "DESC".
      * @param orderFields fields by which ordering will be performed.
      * @return albums page resource.
      */
     @Override
-    public ResourceDto<Album> getAlbumsPage(long page, String order, List<String> orderFields) {
+    public ResourceDto<Album> getAlbumsPage(Long perPage, Long page, String order, List<String> orderFields) {
+
+        if (page == null) {
+            page = FIRST_PAGE_NUM;
+        }
 
         if (page <= 0) {
             throw new IllegalArgumentException("Page must be greater than zero");
         }
 
+        if (perPage == null) {
+            perPage = ALBUMS_PER_PAGE_DEFAULT;
+        }
+
+        if (perPage <= 0) {
+            throw new IllegalArgumentException("Per page value must be greater than zero");
+        }
+
         ResourceDto<Album> albumsPage = new ResourceDto<>();
-        albumsPage.setPagination(getPaginationInfo(page, ALBUMS_PER_PAGE_DEFAULT));
-        long offset = (page - 1) * ALBUMS_PER_PAGE_DEFAULT;
+        albumsPage.setPagination(getPaginationInfo(page, perPage));
+        long offset = (page - 1) * perPage;
 
         SortOption[] sortOptions = null;
         if (order != null && orderFields != null && orderFields.size() > 0) {
@@ -100,7 +117,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             sortOptions = new SortOption[]{new SortOption(sortOrder, orderFields)};
         }
 
-        List<Album> albums = albumDao.getList(offset, ALBUMS_PER_PAGE_DEFAULT, sortOptions, ALBUM_SHORT_INFO_FIELDS);
+        List<Album> albums = albumDao.getList(offset, perPage, sortOptions, ALBUM_SHORT_INFO_FIELDS);
         albumsPage.setResults(albums);
 
         return albumsPage;

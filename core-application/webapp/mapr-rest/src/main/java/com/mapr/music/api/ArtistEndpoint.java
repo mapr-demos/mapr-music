@@ -25,11 +25,11 @@ public class ArtistEndpoint {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public ResourceDto<Artist> getAllAlbums(@QueryParam("page") Long page, @QueryParam("sort_order") String order,
+    public ResourceDto<Artist> getAllAlbums(@QueryParam("per_page") Long perPage,
+                                            @QueryParam("page") Long page,
+                                            @QueryParam("sort_type") String order,
                                             @QueryParam("sort_fields") List<String> orderFields) {
 
-        return (page != null)
-                ? artistService.getArtistsPage(page, order, orderFields)
-                : artistService.getArtistsPage(order, orderFields);
+        return artistService.getArtistsPage(perPage, page, order, orderFields);
     }
 }
