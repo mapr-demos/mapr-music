@@ -4,8 +4,10 @@ package com.mapr.music.api;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
 import com.mapr.music.service.AlbumService;
-import com.mapr.music.service.impl.AlbumServiceImpl;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
@@ -13,22 +15,26 @@ import java.util.List;
 /**
  * Endpoint for accessing 'Album' resources.
  */
-@Path("/albums")
+@Api(value = AlbumEndpoint.ENDPOINT_PATH, description = "Albums endpoint, which allows to manage 'Album' documents")
+@Path(AlbumEndpoint.ENDPOINT_PATH)
+@Produces(MediaType.APPLICATION_JSON)
 public class AlbumEndpoint {
 
-    // FIXME use DI
-    private AlbumService albumService = new AlbumServiceImpl();
+    public static final String ENDPOINT_PATH = "/albums";
+
+    @Inject
+    private AlbumService albumService;
 
     @GET
     @Path("{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Get single album by it's identifier")
     public Album getAlbum(@PathParam("id") String id) {
         return albumService.getById(id);
     }
 
     @GET
     @Path("/")
-    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Get list of albums, which is represented by page")
     public ResourceDto<Album> getAllAlbums(@QueryParam("per_page") Long perPage,
                                            @QueryParam("page") Long page,
                                            @QueryParam("sort_type") String order,

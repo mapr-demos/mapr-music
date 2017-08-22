@@ -8,11 +8,13 @@ import com.mapr.music.model.Album;
 import com.mapr.music.service.AlbumService;
 import com.mapr.music.service.PaginatedService;
 
+import javax.inject.Named;
 import java.util.List;
 
 /**
  * Actual implementation of {@link AlbumService} which is responsible of performing all business logic.
  */
+@Named
 public class AlbumServiceImpl implements AlbumService, PaginatedService {
 
     private static final long ALBUMS_PER_PAGE_DEFAULT = 50;
@@ -35,8 +37,12 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             "artist_list"
     };
 
+    private final MaprDbDao<Album> albumDao;
+
     // FIXME use DI
-    private MaprDbDao<Album> albumDao = new MaprDbDaoImpl<>(Album.class);
+    public AlbumServiceImpl() {
+        this.albumDao = new MaprDbDaoImpl<>(Album.class);
+    }
 
     @Override
     public long getTotalNum() {

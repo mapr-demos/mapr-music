@@ -9,10 +9,12 @@ import com.mapr.music.model.Artist;
 import com.mapr.music.service.ArtistService;
 import com.mapr.music.service.PaginatedService;
 
+import javax.inject.Named;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Named
 public class ArtistServiceImpl implements ArtistService, PaginatedService {
 
     private static final long ARTISTS_PER_PAGE_DEFAULT = 50;
@@ -34,8 +36,15 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
             "end_date"
     };
 
-    private MaprDbDao<Artist> artistDao = new MaprDbDaoImpl<>(Artist.class);
-    private MaprDbDao<Album> albumDao = new MaprDbDaoImpl<>(Album.class);
+
+    private final MaprDbDao<Artist> artistDao;
+    private final MaprDbDao<Album> albumDao;
+
+    // FIXME use DI
+    public ArtistServiceImpl() {
+        this.artistDao = new MaprDbDaoImpl<>(Artist.class);
+        this.albumDao = new MaprDbDaoImpl<>(Album.class);
+    }
 
     @Override
     public long getTotalNum() {

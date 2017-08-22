@@ -15,6 +15,7 @@
         <cdi.api.version>1.2</cdi.api.version>
         <jboss.jaxrs.api.version>1.0.0.Final</jboss.jaxrs.api.version>
         <jboss.logging.version>3.3.0.Final</jboss.logging.version>
+        <swagger.version>1.5.16</swagger.version>
         <war.plugin.version>3.1.0</war.plugin.version>
     </properties>
 
@@ -34,6 +35,13 @@
             <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
             <version>${jboss.jaxrs.api.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- Swagger -->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-jaxrs</artifactId>
+            <version>${swagger.version}</version>
         </dependency>
 
         <!-- OJAI Driver which is used to connect to MapR cluster -->
