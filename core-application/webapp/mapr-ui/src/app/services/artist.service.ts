@@ -1,12 +1,10 @@
-import { Injectable } from '@angular/core';
-import {HttpHeaders, HttpClient} from "@angular/common/http";
+import {Injectable} from "@angular/core";
+import {HttpClient} from "@angular/common/http";
 import {Artist, Album} from "../models/artist";
-
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/toPromise';
-import 'rxjs/add/operator/mergeMap';
+import "rxjs/add/operator/map";
+import "rxjs/add/operator/toPromise";
+import "rxjs/add/operator/mergeMap";
 import {AppConfig} from "../app.config";
-import {AlbumService} from "./album.service";
 
 function mapToArtist({_id, name, profile_image_url, gender}):Artist {
   return {
@@ -31,8 +29,7 @@ export class ArtistService {
 
   constructor(
     private http: HttpClient,
-    private config: AppConfig,
-    private albumService: AlbumService
+    private config: AppConfig
   ) {
   }
 
@@ -42,19 +39,11 @@ export class ArtistService {
 
   getArtistById(artistId: string): Promise<Artist> {
     return this.http.get(this.getArtistByIdURL(artistId))
-      .mergeMap((response: any) => {
-        const artist = mapToArtist(response);
+      .map((response: any) => {
         console.log(response);
-        return Promise
-          .all(response.release_ids
-            .map((releaseID) => this.http.get(this.albumService.getAlbumByIdURL(releaseID))
-              .toPromise())
-          )
-          .then((releases) => {
-            console.log(releases);
-            artist.albums = releases.map(mapToAlbum);
-            return artist;
-          });
+        const artist = mapToArtist(response);
+        artist.albums = response.albums.map(mapToAlbum);
+        return artist;
       })
       .toPromise();
   }
