@@ -1,8 +1,8 @@
 package com.mapr.music.service.impl;
 
 import com.mapr.music.dao.MaprDbDao;
-import com.mapr.music.dao.MaprDbDaoImpl;
 import com.mapr.music.dao.SortOption;
+import com.mapr.music.dao.impl.AlbumDao;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
 import com.mapr.music.service.AlbumService;
@@ -10,6 +10,7 @@ import com.mapr.music.service.PaginatedService;
 
 import javax.inject.Named;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Actual implementation of {@link AlbumService} which is responsible of performing all business logic.
@@ -19,6 +20,9 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
 
     private static final long ALBUMS_PER_PAGE_DEFAULT = 50;
     private static final long FIRST_PAGE_NUM = 1;
+
+    // FIXME '_id' hardcode
+    private static final String JSON_STRING_ID_TEMPLATE = "{\"_id\": \"%s\", ";
 
     /**
      * Array of album's fields that will be used for projection.
@@ -41,7 +45,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
 
     // FIXME use DI
     public AlbumServiceImpl() {
-        this.albumDao = new MaprDbDaoImpl<>(Album.class);
+        this.albumDao = new AlbumDao();
     }
 
     @Override
@@ -136,7 +140,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      * @return album with the specified identifier.
      */
     @Override
-    public Album getById(String id) {
+    public Album getAlbumById(String id) {
 
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Album's identifier can not be empty");
@@ -144,4 +148,101 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
 
         return albumDao.getById(id);
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param id identifier of album which will be deleted.
+     */
+    @Override
+    public void deleteAlbumById(String id) {
+
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("Album's identifier can not be empty");
+        }
+
+        albumDao.deleteById(id);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param album contains album info.
+     * @return created album.
+     */
+    @Override
+    public Album createAlbum(Album album) {
+
+        if (album == null) {
+            throw new IllegalArgumentException("Album can not be null");
+        }
+
+        String id = UUID.randomUUID().toString();
+        album.setId(id);
+
+        return albumDao.create(album);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param jsonString contains album info.
+     * @return created album.
+     */
+    @Override
+    public Album createAlbum(String jsonString) {
+
+        if (jsonString == null || jsonString.isEmpty()) {
+            throw new IllegalArgumentException("Album JSON string can not be empty");
+        }
+
+        return albumDao.create(appendId(jsonString));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param album album which will be updated. Note, that album's id must be set, otherwise
+     *              {@link IllegalArgumentException} will be thrown.
+     * @return updated album.
+     */
+    @Override
+    public Album updateAlbum(Album album) {
+
+        if (album == null || album.getId() == null || album.getId().isEmpty()) {
+            throw new IllegalArgumentException("Album's identifier can not be empty");
+        }
+
+        return albumDao.update(album.getId(), album);
+    }
+
+    @Override
+    public Album updateAlbum(String id, Album album) {
+
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("Album's identifier can not be empty");
+        }
+
+        if (album == null) {
+            throw new IllegalArgumentException("Album can not be null");
+        }
+
+        return albumDao.update(id, album);
+    }
+
+    // FIXME hardcode, duplication
+    private static String appendId(String jsonString) {
+
+        String id = UUID.randomUUID().toString();
+        int indexOfIdKey = jsonString.indexOf("\"_id\"");
+        if (indexOfIdKey < 0) {
+
+            String idFormatted = String.format(JSON_STRING_ID_TEMPLATE, id);
+            return jsonString.replaceFirst("\\{", idFormatted);
+        }
+
+        String replacement = String.format("$1 \"%s\"$3", id);
+        return jsonString.replaceAll("(\"_id\":)(.*?)(,)", replacement);
+    }
+
 }

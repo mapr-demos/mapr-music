@@ -29,7 +29,7 @@ public class AlbumEndpoint {
     @Path("{id}")
     @ApiOperation(value = "Get single album by it's identifier")
     public Album getAlbum(@PathParam("id") String id) {
-        return albumService.getById(id);
+        return albumService.getAlbumById(id);
     }
 
     @GET
@@ -41,5 +41,35 @@ public class AlbumEndpoint {
                                            @QueryParam("sort_fields") List<String> orderFields) {
 
         return albumService.getAlbumsPage(perPage, page, order, orderFields);
+    }
+
+    @DELETE
+    @Path("{id}")
+    @ApiOperation(value = "Delete single album by it's identifier")
+    public void deleteAlbum(@PathParam("id") String id) {
+        albumService.deleteAlbumById(id);
+    }
+
+    @PUT
+    @Path("{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Update single album")
+    public Album updateAlbum(@PathParam("id") String id, Album album) {
+        return albumService.updateAlbum(id, album);
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Create album")
+    public Album createAlbum(Album album) {
+        return albumService.createAlbum(album);
+    }
+
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @ApiOperation(value = "Create album according to the specified JSON string. Note that although string in JSON " +
+            "format, request's content-type must be set to text/plain.")
+    public Album createAlbum(String albumJsonString) {
+        return albumService.createAlbum(albumJsonString);
     }
 }

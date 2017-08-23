@@ -58,7 +58,48 @@ public interface AlbumService {
      * @param id album's identifier.
      * @return album with the specified identifier.
      */
-    Album getById(String id);
+    Album getAlbumById(String id);
 
-    // TODO sort options
+    /**
+     * Deletes single album by it's identifier.
+     *
+     * @param id identifier of album which will be deleted.
+     */
+    void deleteAlbumById(String id);
+
+    /**
+     * Creates album according to the specified instance of {@link Album} class.
+     *
+     * @param album contains album info.
+     * @return created album.
+     */
+    Album createAlbum(Album album);
+
+    /**
+     * Creates album according to the specified JSON string.
+     *
+     * @param jsonString contains album info.
+     * @return created album.
+     */
+    Album createAlbum(String jsonString);
+
+    /**
+     * Updates single album according to the specified instance of {@link Album} class.
+     *
+     * @param album album which will be updated. Note, that album's id must be set, otherwise
+     *              {@link IllegalArgumentException} will be thrown.
+     * @return updated album.
+     * @throws IllegalArgumentException in case when specified album is <code>null</code> or it does not contain id.
+     */
+    Album updateAlbum(Album album);
+
+    /**
+     * Updates single album according to the specified instance of {@link Album} class.
+     *
+     * @param id    identifier of album which will be updated.
+     * @param album album which will be updated.
+     * @return updated album.
+     */
+    Album updateAlbum(String id, Album album);
+
 }

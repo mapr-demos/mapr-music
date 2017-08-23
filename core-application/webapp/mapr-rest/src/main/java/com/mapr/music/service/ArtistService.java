@@ -3,7 +3,6 @@ package com.mapr.music.service;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Artist;
 
-import java.util.Collection;
 import java.util.List;
 
 public interface ArtistService {
@@ -51,19 +50,52 @@ public interface ArtistService {
     ResourceDto<Artist> getArtistsPage(Long perPage, Long page, String order, List<String> orderFields);
 
     /**
-     * @param id
-     * @return
+     * Returns single artist according to it's identifier.
+     *
+     * @param id artist's identifier.
+     * @return artist with the specified identifier.
      */
     Artist getById(String id);
 
     /**
-     * @param id
-     * @param fields
-     * @return
+     * Deletes single artist by it's identifier.
+     *
+     * @param id identifier of artist which will be deleted.
      */
-    Artist getById(String id, String... fields);
+    void deleteArtistById(String id);
 
-    Artist getById(String id, Collection<String> fields);
+    /**
+     * Creates artist according to the specified instance of {@link Artist} class.
+     *
+     * @param artist contains artist info.
+     * @return created artist.
+     */
+    Artist createArtist(Artist artist);
 
-    // TODO sort options
+    /**
+     * Creates artist according to the specified JSON string.
+     *
+     * @param jsonString contains album info.
+     * @return created artist.
+     */
+    Artist createArtist(String jsonString);
+
+    /**
+     * Updates single artist according to the specified instance of {@link Artist} class.
+     *
+     * @param artist artist which will be updated. Note, that artist's id must be set, otherwise
+     *               {@link IllegalArgumentException} will be thrown.
+     * @return updated artist.
+     * @throws IllegalArgumentException in case when specified artist is <code>null</code> or it does not contain id.
+     */
+    Artist updateArtist(Artist artist);
+
+    /**
+     * Updates single artist according to the specified instance of {@link Artist} class.
+     *
+     * @param id     identifier of artist which will be updated.
+     * @param artist artist which will be updated.
+     * @return updated artist.
+     */
+    Artist updateArtist(String id, Artist artist);
 }

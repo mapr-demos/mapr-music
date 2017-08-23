@@ -1,7 +1,9 @@
-package com.mapr.music.dao;
+package com.mapr.music.dao.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mapr.music.annotation.MaprDbTable;
+import com.mapr.music.dao.MaprDbDao;
+import com.mapr.music.dao.SortOption;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.ojai.Document;
 import org.ojai.DocumentStream;
@@ -13,8 +15,9 @@ import javax.ws.rs.NotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-public class MaprDbDaoImpl<T> implements MaprDbDao<T> {
+public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
 
     // TODO
     protected static final String TEST_USER_NAME = "mapr";
@@ -163,7 +166,7 @@ public class MaprDbDaoImpl<T> implements MaprDbDao<T> {
      *
      * @param storeAction specifies action which will be performed on store.
      * @param <R>         type of {@link OjaiStoreAction} return value.
-     * @return
+     * @return process result.
      */
     @Override
     public <R> R processStore(OjaiStoreAction<R> storeAction) {
@@ -189,6 +192,86 @@ public class MaprDbDaoImpl<T> implements MaprDbDao<T> {
 
         return processingResult;
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param storeVoidAction specifies action which will be performed on store.
+     */
+    @Override
+    public void processStore(OjaiStoreVoidAction storeVoidAction) {
+
+        OjaiStoreAction<Optional> storeAction = (connection, store) -> {
+            storeVoidAction.process(connection, store);
+            return Optional.empty();
+        };
+
+        processStore(storeAction);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param id identifier of document which will be deleted.
+     */
+    @Override
+    public void deleteById(String id) {
+        processStore((connection, store) -> {
+            store.delete(id);
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param entity contains info for document, which will be created.
+     * @return created document.
+     */
+    @Override
+    public T create(T entity) {
+        return processStore((connection, store) -> {
+
+            // Create an OJAI Document form the Java bean (there are other ways too)
+            final Document createdOjaiDoc = connection.newDocument(entity);
+
+            // Insert the document into the OJAI store
+            store.insertOrReplace(createdOjaiDoc);
+
+            // Map Ojai document to the actual instance of model class
+            return mapOjaiDocument(createdOjaiDoc);
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param jsonString document representation.
+     * @return created document.
+     */
+    @Override
+    public T create(String jsonString) {
+        return processStore((connection, store) -> {
+
+            // Create an OJAI Document form the JSON string (there are other ways too)
+            final Document createdOjaiDoc = connection.newDocument(jsonString);
+
+            // Insert the document into the OJAI store
+            store.insertOrReplace(createdOjaiDoc);
+
+            // Map Ojai document to the actual instance of model class
+            return mapOjaiDocument(createdOjaiDoc);
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param id     identifier of document, which will be updated.
+     * @param entity contains info for document, which will be updated.
+     * @return updated document.
+     */
+    @Override
+    public abstract T update(String id, T entity);
 
     /**
      * Converts OJAI document to the instance of model class.

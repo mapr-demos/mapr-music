@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Endpoint for accessing 'Artist' resources.
  */
-@Api(value = AlbumEndpoint.ENDPOINT_PATH, description = "Artists endpoint, which allows to manage 'Artist' documents")
+@Api(value = ArtistEndpoint.ENDPOINT_PATH, description = "Artists endpoint, which allows to manage 'Artist' documents")
 @Path(ArtistEndpoint.ENDPOINT_PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public class ArtistEndpoint {
@@ -27,8 +27,8 @@ public class ArtistEndpoint {
     @GET
     @Path("{id}")
     @ApiOperation(value = "Get single artist by it's identifier")
-    public Artist getArtist(@PathParam("id") String id, @QueryParam("field") final List<String> fieldList) {
-        return (fieldList.size() == 0) ? artistService.getById(id) : artistService.getById(id, fieldList);
+    public Artist getArtist(@PathParam("id") String id) {
+        return artistService.getById(id);
     }
 
     @GET
@@ -40,5 +40,35 @@ public class ArtistEndpoint {
                                              @QueryParam("sort_fields") List<String> orderFields) {
 
         return artistService.getArtistsPage(perPage, page, order, orderFields);
+    }
+
+    @DELETE
+    @Path("{id}")
+    @ApiOperation(value = "Delete single artist by it's identifier")
+    public void deleteArtist(@PathParam("id") String id) {
+        artistService.deleteArtistById(id);
+    }
+
+    @PUT
+    @Path("{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Update single artist")
+    public Artist updateArtist(@PathParam("id") String id, Artist artist) {
+        return artistService.updateArtist(id, artist);
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Create artist")
+    public Artist createArtist(Artist artist) {
+        return artistService.createArtist(artist);
+    }
+
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @ApiOperation(value = "Create artist according to the specified JSON string. Note that although string in JSON " +
+            "format, request's content-type must be set to text/plain.")
+    public Artist createArtist(String artistJsonString) {
+        return artistService.createArtist(artistJsonString);
     }
 }
