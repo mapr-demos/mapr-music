@@ -1,0 +1,78 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.mapr.music</groupId>
+  <artifactId>mapr-music-ui</artifactId>
+  <packaging>war</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>mapr-music-ui</name>
+  <url>https://github.com/mapr-demos/mapr-music</url>
+
+  <properties>
+    <war.plugin.version>3.1.0</war.plugin.version>
+  </properties>
+
+  <build>
+    <finalName>mapr-music-ui</finalName>
+    <plugins>
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <!-- Use the latest released version:
+        https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
+        <version>1.5</version>
+        <configuration>
+          <installDirectory>target</installDirectory>
+          <nodeVersion>v8.1.0</nodeVersion>
+        </configuration>
+        <executions>
+          <execution>
+            <id>install node and npm</id>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>npm install</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>install</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>npm build</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run build</arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.1.0</version>
+        <configuration>
+          <!-- Java EE 7 doesn't require web.xml, Maven needs to
+              catch up! -->
+          <webXml>WEB-INF/web.xml</webXml>
+          <webResources>
+            <resource>
+              <!-- this is relative to the pom.xml directory -->
+              <directory>target/dist</directory>
+            </resource>
+          </webResources>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.wildfly.plugins</groupId>
+        <artifactId>wildfly-maven-plugin</artifactId>
+        <version>1.2.0.Beta1</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>
