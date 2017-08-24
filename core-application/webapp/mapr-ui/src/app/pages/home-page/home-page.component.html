@@ -14,12 +14,6 @@
       <div>
         <select class="form-control" id="sort" (change)="onSortChange($event.target.value)">
           <option
-            value="NO_SORTING"
-            [attr.selected]="sortType === '-1' ? '': null"
-          >
-            No sorting
-          </option>
-          <option
             *ngFor="let option of sortOptions"
             value="{{option.value}}"
             [attr.selected]="option.value === sortType ? '': null"

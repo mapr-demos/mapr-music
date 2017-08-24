@@ -25,12 +25,24 @@ export class HomePage implements OnInit{
   sourceURL: string;
   sortOptions: Array<SelectOption> = [
     {
+      label:'No sorting',
+      value: 'NO_SORTING'
+    },
+    {
       label:'Title A-z',
       value: 'TITLE_ASC'
     },
     {
       label:'Title z-A',
       value: 'TITLE_DESC'
+    },
+    {
+      label: 'Newest first',
+      value: 'RELEASE_DESC'
+    },
+    {
+      label: 'Oldest first',
+      value: 'RELEASE_ASC'
     }
   ];
   sortType: string;
