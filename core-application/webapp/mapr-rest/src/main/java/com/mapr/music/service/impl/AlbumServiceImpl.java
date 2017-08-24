@@ -52,6 +52,11 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         this.artistDao = new ArtistsDao();
     }
 
+    public AlbumServiceImpl(MaprDbDao<Album> albumDao, MaprDbDao<Artist> artistDao) {
+        this.albumDao = albumDao;
+        this.artistDao = artistDao;
+    }
+
     @Override
     public long getTotalNum() {
         return albumDao.getTotalNum();
