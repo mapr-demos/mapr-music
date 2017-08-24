@@ -1,15 +1,31 @@
 package com.mapr.music.dao.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mapr.music.model.Artist;
 import org.ojai.Document;
 import org.ojai.store.DocumentMutation;
 
+import java.util.Map;
+
+/**
+ * Actual implementation of {@link com.mapr.music.dao.MaprDbDao} to manage {@link Artist} model.
+ */
 public class ArtistsDao extends MaprDbDaoImpl<Artist> {
+
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public ArtistsDao() {
         super(Artist.class);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param id     identifier of document, which will be updated.
+     * @param artist contains artist info that will be updated.
+     * @return updated artist.
+     */
     @Override
     public Artist update(String id, Artist artist) {
         return processStore((connection, store) -> {
@@ -17,7 +33,7 @@ public class ArtistsDao extends MaprDbDaoImpl<Artist> {
             // Create a DocumentMutation to update the zipCode field
             DocumentMutation mutation = connection.newMutation();
 
-            // FIXME get rid of hardcode
+            // Update only basic fields
             if (artist.getName() != null) {
                 mutation.set("name", artist.getName());
             }
@@ -35,6 +51,41 @@ public class ArtistsDao extends MaprDbDaoImpl<Artist> {
 
             // Map Ojai document to the actual instance of model class
             return mapOjaiDocument(updatedOjaiDoc);
+        });
+    }
+
+
+    /**
+     * Creates single artist document. For the sake of example OJAI Document is created form the JSON string. In this
+     * case {@link org.ojai.store.Connection#newDocument(String)} method is used.
+     * <p>
+     * There are also ways to create OJAI documents from the Java beans
+     * ({@link org.ojai.store.Connection#newDocument(Object)}) and
+     * Maps({@link org.ojai.store.Connection#newDocument(Map)}).
+     *
+     * @param artist contains artist's info.
+     * @return created artist.
+     */
+    @Override
+    public Artist create(Artist artist) {
+        return processStore((connection, store) -> {
+
+            // Convert artist instance to JSON string
+            String artistJsonString;
+            try {
+                artistJsonString = mapper.writeValueAsString(artist);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Can not convert artist instance to JSON string", e);
+            }
+
+            // Create an OJAI Document form the JSON string (there are other ways too)
+            final Document createdOjaiDoc = connection.newDocument(artistJsonString);
+
+            // Insert the document into the OJAI store
+            store.insertOrReplace(createdOjaiDoc);
+
+            // Map Ojai document to the actual instance of model class
+            return mapOjaiDocument(createdOjaiDoc);
         });
     }
 }

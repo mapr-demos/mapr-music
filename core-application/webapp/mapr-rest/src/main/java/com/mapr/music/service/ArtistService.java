@@ -1,5 +1,6 @@
 package com.mapr.music.service;
 
+import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Artist;
 
@@ -13,7 +14,7 @@ public interface ArtistService {
      *
      * @return artists page resource.
      */
-    ResourceDto<Artist> getArtistsPage();
+    ResourceDto<ArtistDto> getArtistsPage();
 
     /**
      * Returns list of artists which is represented by page with default number of artists. Default number of artists
@@ -23,7 +24,7 @@ public interface ArtistService {
      *             first page will be returned.
      * @return artists page resource.
      */
-    ResourceDto<Artist> getArtistsPage(Long page);
+    ResourceDto<ArtistDto> getArtistsPage(Long page);
 
     /**
      * Returns list of artists which is represented by page with default number of artists. Default number of artists
@@ -33,7 +34,7 @@ public interface ArtistService {
      * @param orderFields fields by which ordering will be performed.
      * @return artists page resource.
      */
-    ResourceDto<Artist> getArtistsPage(String order, List<String> orderFields);
+    ResourceDto<ArtistDto> getArtistsPage(String order, List<String> orderFields);
 
     /**
      * Returns list of artists which is represented by page with default number of artists. Default number of artists
@@ -41,13 +42,13 @@ public interface ArtistService {
      *
      * @param perPage     specifies number of artists per page. In case when value is <code>null</code> the
      *                    default value will be used. Default value depends on implementation class.
-     * @param page        specifies number of page, which will be returned. In case when page value is <code>null</code> the
-     *                    first page will be returned.
+     * @param page        specifies number of page, which will be returned. In case when page value is <code>null</code>
+     *                    the first page will be returned.
      * @param order       string representation of the order. Valid values are: "asc", "ASC", "desc", "DESC".
      * @param orderFields fields by which ordering will be performed.
      * @return artists page resource.
      */
-    ResourceDto<Artist> getArtistsPage(Long perPage, Long page, String order, List<String> orderFields);
+    ResourceDto<ArtistDto> getArtistsPage(Long perPage, Long page, String order, List<String> orderFields);
 
     /**
      * Returns single artist according to it's identifier.
@@ -55,7 +56,7 @@ public interface ArtistService {
      * @param id artist's identifier.
      * @return artist with the specified identifier.
      */
-    Artist getById(String id);
+    ArtistDto getById(String id);
 
     /**
      * Deletes single artist by it's identifier.
@@ -70,15 +71,7 @@ public interface ArtistService {
      * @param artist contains artist info.
      * @return created artist.
      */
-    Artist createArtist(Artist artist);
-
-    /**
-     * Creates artist according to the specified JSON string.
-     *
-     * @param jsonString contains album info.
-     * @return created artist.
-     */
-    Artist createArtist(String jsonString);
+    ArtistDto createArtist(Artist artist);
 
     /**
      * Updates single artist according to the specified instance of {@link Artist} class.
@@ -88,7 +81,7 @@ public interface ArtistService {
      * @return updated artist.
      * @throws IllegalArgumentException in case when specified artist is <code>null</code> or it does not contain id.
      */
-    Artist updateArtist(Artist artist);
+    ArtistDto updateArtist(Artist artist);
 
     /**
      * Updates single artist according to the specified instance of {@link Artist} class.
@@ -97,5 +90,5 @@ public interface ArtistService {
      * @param artist artist which will be updated.
      * @return updated artist.
      */
-    Artist updateArtist(String id, Artist artist);
+    ArtistDto updateArtist(String id, Artist artist);
 }

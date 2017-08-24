@@ -3,6 +3,9 @@ package com.mapr.music.dao;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Represents sort option with list of fields and order.
+ */
 public class SortOption {
 
     private List<String> fields;

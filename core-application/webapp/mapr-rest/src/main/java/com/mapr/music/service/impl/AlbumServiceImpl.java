@@ -3,14 +3,20 @@ package com.mapr.music.service.impl;
 import com.mapr.music.dao.MaprDbDao;
 import com.mapr.music.dao.SortOption;
 import com.mapr.music.dao.impl.AlbumDao;
+import com.mapr.music.dao.impl.ArtistsDao;
+import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
+import com.mapr.music.model.Artist;
 import com.mapr.music.service.AlbumService;
 import com.mapr.music.service.PaginatedService;
+import org.apache.commons.beanutils.PropertyUtilsBean;
 
 import javax.inject.Named;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Actual implementation of {@link AlbumService} which is responsible of performing all business logic.
@@ -20,9 +26,6 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
 
     private static final long ALBUMS_PER_PAGE_DEFAULT = 50;
     private static final long FIRST_PAGE_NUM = 1;
-
-    // FIXME '_id' hardcode
-    private static final String JSON_STRING_ID_TEMPLATE = "{\"_id\": \"%s\", ";
 
     /**
      * Array of album's fields that will be used for projection.
@@ -42,10 +45,11 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     };
 
     private final MaprDbDao<Album> albumDao;
+    private final MaprDbDao<Artist> artistDao;
 
-    // FIXME use DI
     public AlbumServiceImpl() {
         this.albumDao = new AlbumDao();
+        this.artistDao = new ArtistsDao();
     }
 
     @Override
@@ -59,7 +63,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      * @return first albums page resource.
      */
     @Override
-    public ResourceDto<Album> getAlbumsPage() {
+    public ResourceDto<AlbumDto> getAlbumsPage() {
         return getAlbumsPage(FIRST_PAGE_NUM);
     }
 
@@ -71,7 +75,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      * @return albums page resource.
      */
     @Override
-    public ResourceDto<Album> getAlbumsPage(String order, List<String> orderFields) {
+    public ResourceDto<AlbumDto> getAlbumsPage(String order, List<String> orderFields) {
         return getAlbumsPage(ALBUMS_PER_PAGE_DEFAULT, FIRST_PAGE_NUM, order, orderFields);
     }
 
@@ -83,7 +87,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      * @return albums page resource.
      */
     @Override
-    public ResourceDto<Album> getAlbumsPage(Long page) {
+    public ResourceDto<AlbumDto> getAlbumsPage(Long page) {
         return getAlbumsPage(ALBUMS_PER_PAGE_DEFAULT, page, null, null);
     }
 
@@ -99,7 +103,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      * @return albums page resource.
      */
     @Override
-    public ResourceDto<Album> getAlbumsPage(Long perPage, Long page, String order, List<String> orderFields) {
+    public ResourceDto<AlbumDto> getAlbumsPage(Long perPage, Long page, String order, List<String> orderFields) {
 
         if (page == null) {
             page = FIRST_PAGE_NUM;
@@ -117,7 +121,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             throw new IllegalArgumentException("Per page value must be greater than zero");
         }
 
-        ResourceDto<Album> albumsPage = new ResourceDto<>();
+        ResourceDto<AlbumDto> albumsPage = new ResourceDto<>();
         albumsPage.setPagination(getPaginationInfo(page, perPage));
         long offset = (page - 1) * perPage;
 
@@ -128,7 +132,11 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         }
 
         List<Album> albums = albumDao.getList(offset, perPage, sortOptions, ALBUM_SHORT_INFO_FIELDS);
-        albumsPage.setResults(albums);
+        List<AlbumDto> albumDtoList = albums.stream()
+                .map(this::albumToDto)
+                .collect(Collectors.toList());
+
+        albumsPage.setResults(albumDtoList);
 
         return albumsPage;
     }
@@ -140,13 +148,13 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      * @return album with the specified identifier.
      */
     @Override
-    public Album getAlbumById(String id) {
+    public AlbumDto getAlbumById(String id) {
 
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Album's identifier can not be empty");
         }
 
-        return albumDao.getById(id);
+        return albumToDto(albumDao.getById(id));
     }
 
     /**
@@ -171,7 +179,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      * @return created album.
      */
     @Override
-    public Album createAlbum(Album album) {
+    public AlbumDto createAlbum(Album album) {
 
         if (album == null) {
             throw new IllegalArgumentException("Album can not be null");
@@ -180,23 +188,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         String id = UUID.randomUUID().toString();
         album.setId(id);
 
-        return albumDao.create(album);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param jsonString contains album info.
-     * @return created album.
-     */
-    @Override
-    public Album createAlbum(String jsonString) {
-
-        if (jsonString == null || jsonString.isEmpty()) {
-            throw new IllegalArgumentException("Album JSON string can not be empty");
-        }
-
-        return albumDao.create(appendId(jsonString));
+        return albumToDto(albumDao.create(album));
     }
 
     /**
@@ -207,17 +199,24 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      * @return updated album.
      */
     @Override
-    public Album updateAlbum(Album album) {
+    public AlbumDto updateAlbum(Album album) {
 
         if (album == null || album.getId() == null || album.getId().isEmpty()) {
             throw new IllegalArgumentException("Album's identifier can not be empty");
         }
 
-        return albumDao.update(album.getId(), album);
+        return albumToDto(albumDao.update(album.getId(), album));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param id    identifier of album which will be updated.
+     * @param album album which will be updated.
+     * @return updated album.
+     */
     @Override
-    public Album updateAlbum(String id, Album album) {
+    public AlbumDto updateAlbum(String id, Album album) {
 
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Album's identifier can not be empty");
@@ -227,22 +226,19 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             throw new IllegalArgumentException("Album can not be null");
         }
 
-        return albumDao.update(id, album);
+        return albumToDto(albumDao.update(id, album));
     }
 
-    // FIXME hardcode, duplication
-    private static String appendId(String jsonString) {
-
-        String id = UUID.randomUUID().toString();
-        int indexOfIdKey = jsonString.indexOf("\"_id\"");
-        if (indexOfIdKey < 0) {
-
-            String idFormatted = String.format(JSON_STRING_ID_TEMPLATE, id);
-            return jsonString.replaceFirst("\\{", idFormatted);
+    private AlbumDto albumToDto(Album album) {
+        AlbumDto albumDto = new AlbumDto();
+        PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
+        try {
+            propertyUtilsBean.copyProperties(albumDto, album);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException("Can not create album Data Transfer Object", e);
         }
 
-        String replacement = String.format("$1 \"%s\"$3", id);
-        return jsonString.replaceAll("(\"_id\":)(.*?)(,)", replacement);
+        return albumDto;
     }
 
 }

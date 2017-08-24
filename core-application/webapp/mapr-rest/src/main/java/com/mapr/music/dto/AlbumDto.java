@@ -1,19 +1,17 @@
-package com.mapr.music.model;
+package com.mapr.music.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.mapr.music.annotation.MaprDbTable;
 
 import java.util.List;
 
 /**
- * Model class, which represents 'Album' document stored in MapR DB.
+ * Data Transfer Object for {@link com.mapr.music.model.Album} model class.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@MaprDbTable("/apps/albums")
-public class Album {
+public class AlbumDto {
 
     @JsonProperty("_id")
     private String id;

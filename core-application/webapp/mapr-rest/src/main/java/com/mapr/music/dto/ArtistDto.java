@@ -1,19 +1,17 @@
-package com.mapr.music.model;
+package com.mapr.music.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.mapr.music.annotation.MaprDbTable;
 
 import java.util.List;
 
 /**
- * Model class, which represents 'Album' document stored in MapR DB.
+ * Data Transfer Object for {@link com.mapr.music.model.Artist} model class.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@MaprDbTable("/apps/artists")
-public class Artist {
+public class ArtistDto {
 
     @JsonProperty("_id")
     private String id;
@@ -34,7 +32,7 @@ public class Artist {
     private String disambiguationComment;
 
     @JsonProperty("albums")
-    private List<String> albumsIds;
+    private List<AlbumDto> albums;
 
     @JsonProperty("profile_image_url")
     private String profileImageUrl;
@@ -52,116 +50,103 @@ public class Artist {
         return id;
     }
 
-    public Artist setId(String id) {
+    public void setId(String id) {
         this.id = id;
-        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public Artist setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     public String getGender() {
         return gender;
     }
 
-    public Artist setGender(String gender) {
+    public void setGender(String gender) {
         this.gender = gender;
-        return this;
     }
 
     public String getArea() {
         return area;
     }
 
-    public Artist setArea(String area) {
+    public void setArea(String area) {
         this.area = area;
-        return this;
     }
 
     public String getIpi() {
         return ipi;
     }
 
-    public Artist setIpi(String ipi) {
+    public void setIpi(String ipi) {
         this.ipi = ipi;
-        return this;
     }
 
     public String getIsni() {
         return isni;
     }
 
-    public Artist setIsni(String isni) {
+    public void setIsni(String isni) {
         this.isni = isni;
-        return this;
     }
 
     public String getMbid() {
         return mbid;
     }
 
-    public Artist setMbid(String mbid) {
+    public void setMbid(String mbid) {
         this.mbid = mbid;
-        return this;
     }
 
     public String getDisambiguationComment() {
         return disambiguationComment;
     }
 
-    public Artist setDisambiguationComment(String disambiguationComment) {
+    public void setDisambiguationComment(String disambiguationComment) {
         this.disambiguationComment = disambiguationComment;
-        return this;
     }
 
-    public List<String> getAlbumsIds() {
-        return albumsIds;
+    public List<AlbumDto> getAlbums() {
+        return albums;
     }
 
-    public Artist setAlbumsIds(List<String> albumsIds) {
-        this.albumsIds = albumsIds;
-        return this;
+    public void setAlbums(List<AlbumDto> albums) {
+        this.albums = albums;
     }
 
     public String getProfileImageUrl() {
         return profileImageUrl;
     }
 
-    public Artist setProfileImageUrl(String profileImageUrl) {
+    public void setProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
-        return this;
     }
 
     public String[] getImagesUrls() {
         return imagesUrls;
     }
 
-    public Artist setImagesUrls(String[] imagesUrls) {
+    public void setImagesUrls(String[] imagesUrls) {
         this.imagesUrls = imagesUrls;
-        return this;
     }
 
     public Long getBeginDate() {
         return beginDate;
     }
 
-    public Artist setBeginDate(Long beginDate) {
+    public void setBeginDate(Long beginDate) {
         this.beginDate = beginDate;
-        return this;
     }
 
     public Long getEndDate() {
         return endDate;
     }
 
-    public Artist setEndDate(Long endDate) {
+    public void setEndDate(Long endDate) {
         this.endDate = endDate;
-        return this;
     }
 }

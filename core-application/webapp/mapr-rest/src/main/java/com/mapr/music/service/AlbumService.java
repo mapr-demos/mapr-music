@@ -1,5 +1,6 @@
 package com.mapr.music.service;
 
+import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
 
@@ -16,7 +17,7 @@ public interface AlbumService {
      *
      * @return first albums page resource.
      */
-    ResourceDto<Album> getAlbumsPage();
+    ResourceDto<AlbumDto> getAlbumsPage();
 
     /**
      * Returns list of albums which is represented by page with default number of albums. Default number of albums
@@ -26,7 +27,7 @@ public interface AlbumService {
      *             first page will be returned.
      * @return albums page resource.
      */
-    ResourceDto<Album> getAlbumsPage(Long page);
+    ResourceDto<AlbumDto> getAlbumsPage(Long page);
 
     /**
      * Returns list of albums which is represented by page with default number of albums. Default number of albums
@@ -36,7 +37,7 @@ public interface AlbumService {
      * @param orderFields fields by which ordering will be performed.
      * @return albums page resource.
      */
-    ResourceDto<Album> getAlbumsPage(String order, List<String> orderFields);
+    ResourceDto<AlbumDto> getAlbumsPage(String order, List<String> orderFields);
 
     /**
      * Returns list of albums which is represented by page with default number of albums. Default number of albums
@@ -50,7 +51,7 @@ public interface AlbumService {
      * @param orderFields fields by which ordering will be performed.
      * @return albums page resource.
      */
-    ResourceDto<Album> getAlbumsPage(Long perPage, Long page, String order, List<String> orderFields);
+    ResourceDto<AlbumDto> getAlbumsPage(Long perPage, Long page, String order, List<String> orderFields);
 
     /**
      * Returns single album according to it's identifier.
@@ -58,7 +59,7 @@ public interface AlbumService {
      * @param id album's identifier.
      * @return album with the specified identifier.
      */
-    Album getAlbumById(String id);
+    AlbumDto getAlbumById(String id);
 
     /**
      * Deletes single album by it's identifier.
@@ -73,15 +74,7 @@ public interface AlbumService {
      * @param album contains album info.
      * @return created album.
      */
-    Album createAlbum(Album album);
-
-    /**
-     * Creates album according to the specified JSON string.
-     *
-     * @param jsonString contains album info.
-     * @return created album.
-     */
-    Album createAlbum(String jsonString);
+    AlbumDto createAlbum(Album album);
 
     /**
      * Updates single album according to the specified instance of {@link Album} class.
@@ -91,7 +84,7 @@ public interface AlbumService {
      * @return updated album.
      * @throws IllegalArgumentException in case when specified album is <code>null</code> or it does not contain id.
      */
-    Album updateAlbum(Album album);
+    AlbumDto updateAlbum(Album album);
 
     /**
      * Updates single album according to the specified instance of {@link Album} class.
@@ -100,6 +93,6 @@ public interface AlbumService {
      * @param album album which will be updated.
      * @return updated album.
      */
-    Album updateAlbum(String id, Album album);
+    AlbumDto updateAlbum(String id, Album album);
 
 }

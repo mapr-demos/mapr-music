@@ -17,9 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implements common methods to access MapR-DB using OJAI driver.
+ *
+ * @param <T> model type.
+ */
 public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
 
-    // TODO
     protected static final String TEST_USER_NAME = "mapr";
     protected static final String TEST_USER_GROUP = "mapr";
     protected static final String CONNECTION_URL = "ojai:mapr:";
@@ -245,27 +249,6 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
     /**
      * {@inheritDoc}
      *
-     * @param jsonString document representation.
-     * @return created document.
-     */
-    @Override
-    public T create(String jsonString) {
-        return processStore((connection, store) -> {
-
-            // Create an OJAI Document form the JSON string (there are other ways too)
-            final Document createdOjaiDoc = connection.newDocument(jsonString);
-
-            // Insert the document into the OJAI store
-            store.insertOrReplace(createdOjaiDoc);
-
-            // Map Ojai document to the actual instance of model class
-            return mapOjaiDocument(createdOjaiDoc);
-        });
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @param id     identifier of document, which will be updated.
      * @param entity contains info for document, which will be updated.
      * @return updated document.
@@ -322,7 +305,6 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
         for (SortOption sortOption : options) {
             SortOrder ojaiSortOrder = (SortOption.Order.DESC == sortOption.getOrder()) ? SortOrder.DESC : SortOrder.ASC;
             for (String field : sortOption.getFields()) {
-                log.info("QUERY CHANGING. FIELD: {}, ORDER: {}", field, ojaiSortOrder);
                 query = query.orderBy(field, ojaiSortOrder);
             }
         }
@@ -330,7 +312,6 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
         return query.offset(offset).limit(limit).build();
     }
 
-    // TODO
     private static void loginTestUser(String username, String group) {
         UserGroupInformation currentUgi = UserGroupInformation.createUserForTesting(username, new String[]{group});
         UserGroupInformation.setLoginUser(currentUgi);

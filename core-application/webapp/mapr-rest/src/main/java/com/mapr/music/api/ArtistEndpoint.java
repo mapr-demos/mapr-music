@@ -1,5 +1,6 @@
 package com.mapr.music.api;
 
+import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Artist;
 import com.mapr.music.service.ArtistService;
@@ -27,17 +28,17 @@ public class ArtistEndpoint {
     @GET
     @Path("{id}")
     @ApiOperation(value = "Get single artist by it's identifier")
-    public Artist getArtist(@PathParam("id") String id) {
+    public ArtistDto getArtist(@PathParam("id") String id) {
         return artistService.getById(id);
     }
 
     @GET
     @Path("/")
     @ApiOperation(value = "Get list of artists, which is represented by page")
-    public ResourceDto<Artist> getAllArtists(@QueryParam("per_page") Long perPage,
-                                             @QueryParam("page") Long page,
-                                             @QueryParam("sort_type") String order,
-                                             @QueryParam("sort_fields") List<String> orderFields) {
+    public ResourceDto<ArtistDto> getAllArtists(@QueryParam("per_page") Long perPage,
+                                                @QueryParam("page") Long page,
+                                                @QueryParam("sort_type") String order,
+                                                @QueryParam("sort_fields") List<String> orderFields) {
 
         return artistService.getArtistsPage(perPage, page, order, orderFields);
     }
@@ -53,22 +54,15 @@ public class ArtistEndpoint {
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update single artist")
-    public Artist updateArtist(@PathParam("id") String id, Artist artist) {
+    public ArtistDto updateArtist(@PathParam("id") String id, Artist artist) {
         return artistService.updateArtist(id, artist);
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create artist")
-    public Artist createArtist(Artist artist) {
+    public ArtistDto createArtist(Artist artist) {
         return artistService.createArtist(artist);
     }
 
-    @POST
-    @Consumes(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Create artist according to the specified JSON string. Note that although string in JSON " +
-            "format, request's content-type must be set to text/plain.")
-    public Artist createArtist(String artistJsonString) {
-        return artistService.createArtist(artistJsonString);
-    }
 }

@@ -7,8 +7,8 @@ import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 
 /**
- * TODO change it.
- * Filter which adds CORS headers to each response. Allows all origins. Added for testing.
+ * Filter which adds CORS headers to each response. Allows all origins. Added for testing. Please, keep in mind that such
+ * configuration is only suitable for testing and should be changed for the real-world applications.
  */
 @Provider
 public class CORSFilter implements ContainerResponseFilter {

@@ -5,6 +5,11 @@ import org.ojai.store.DocumentStore;
 
 import java.util.List;
 
+/**
+ * Defines common methods to access MapR-DB.
+ *
+ * @param <T> model type.
+ */
 public interface MaprDbDao<T> {
 
     interface OjaiStoreAction<R> {
@@ -114,14 +119,6 @@ public interface MaprDbDao<T> {
      * @return created document.
      */
     T create(T entity);
-
-    /**
-     * Creates single document according to the specified JSON string.
-     *
-     * @param jsonString document representation.
-     * @return created document.
-     */
-    T create(String jsonString);
 
     /**
      * Updates single document.

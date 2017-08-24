@@ -4,12 +4,22 @@ import com.mapr.music.model.Album;
 import org.ojai.Document;
 import org.ojai.store.DocumentMutation;
 
+/**
+ * Actual implementation of {@link com.mapr.music.dao.MaprDbDao} to manage {@link Album} model.
+ */
 public class AlbumDao extends MaprDbDaoImpl<Album> {
 
     public AlbumDao() {
         super(Album.class);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param id    identifier of album, which will be updated.
+     * @param album contains album info that will be updated.
+     * @return updated album.
+     */
     @Override
     public Album update(String id, Album album) {
         return processStore((connection, store) -> {
@@ -17,7 +27,7 @@ public class AlbumDao extends MaprDbDaoImpl<Album> {
             // Create a DocumentMutation to update the zipCode field
             DocumentMutation mutation = connection.newMutation();
 
-            // FIXME get rid of hardcode
+            // Update only basic fields
             if (album.getName() != null) {
                 mutation.set("name", album.getName());
             }
