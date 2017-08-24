@@ -110,7 +110,7 @@ export class AlbumService {
   getAlbumById(albumId: string):Promise<Album> {
     return this.http.get(this.getAlbumByIdURL(albumId))
       .map((response: any) => {
-        console.log(response);
+        console.log('Album: ', response);
         return mapToAlbum(response);
       })
       .toPromise();

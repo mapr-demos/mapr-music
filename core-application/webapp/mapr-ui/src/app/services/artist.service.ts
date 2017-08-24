@@ -40,9 +40,11 @@ export class ArtistService {
   getArtistById(artistId: string): Promise<Artist> {
     return this.http.get(this.getArtistByIdURL(artistId))
       .map((response: any) => {
-        console.log(response);
+        console.log('Artist: ', response);
         const artist = mapToArtist(response);
-        artist.albums = response.albums.map(mapToAlbum);
+        artist.albums = response.albums
+          ? response.albums.map(mapToAlbum)
+          : [];
         return artist;
       })
       .toPromise();
