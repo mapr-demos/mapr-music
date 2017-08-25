@@ -10,7 +10,8 @@ import io.swagger.annotations.ApiOperation;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.*;
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -62,7 +63,13 @@ public class AlbumEndpoint {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create album")
-    public AlbumDto createAlbum(Album album) {
-        return albumService.createAlbum(album);
+    public Response createAlbum(Album album, @Context UriInfo uriInfo) {
+
+        AlbumDto createdAlbum = albumService.createAlbum(album);
+        UriBuilder builder = uriInfo.getAbsolutePathBuilder();
+        builder.path(createdAlbum.getId());
+        URI location = builder.build();
+
+        return Response.status(Response.Status.CREATED).entity(createdAlbum).location(location).build();
     }
 }

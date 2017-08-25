@@ -52,152 +52,171 @@ public class Album {
         return id;
     }
 
-    public void setId(String id) {
+    public Album setId(String id) {
         this.id = id;
+        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public Album setName(String name) {
         this.name = name;
+        return this;
     }
 
     public List getArtistList() {
         return artistList;
     }
 
-    public void setArtistList(List artistList) {
+    public Album setArtistList(List artistList) {
         this.artistList = artistList;
+        return this;
     }
 
     public List getCatalogNumbers() {
         return catalogNumbers;
     }
 
-    public void setCatalogNumbers(List catalogNumbers) {
+    public Album setCatalogNumbers(List catalogNumbers) {
         this.catalogNumbers = catalogNumbers;
+        return this;
     }
 
     public List getTrackList() {
         return trackList;
     }
 
-    public void setTrackList(List trackList) {
+    public Album setTrackList(List trackList) {
         this.trackList = trackList;
+        return this;
     }
 
     public List getReviews() {
         return reviews;
     }
 
-    public void setReviews(List reviews) {
+    public Album setReviews(List reviews) {
         this.reviews = reviews;
+        return this;
     }
 
     public String getCoverImageUrl() {
         return coverImageUrl;
     }
 
-    public void setCoverImageUrl(String coverImageUrl) {
+    public Album setCoverImageUrl(String coverImageUrl) {
         this.coverImageUrl = coverImageUrl;
+        return this;
     }
 
     public List<String> getImagesUrls() {
         return imagesUrls;
     }
 
-    public void setImagesUrls(List<String> imagesUrls) {
+    public Album setImagesUrls(List<String> imagesUrls) {
         this.imagesUrls = imagesUrls;
+        return this;
     }
 
     public String getFormat() {
         return format;
     }
 
-    public void setFormat(String format) {
+    public Album setFormat(String format) {
         this.format = format;
+        return this;
     }
 
     public String getCountry() {
         return country;
     }
 
-    public void setCountry(String country) {
+    public Album setCountry(String country) {
         this.country = country;
+        return this;
     }
 
     public Long getReleasedDate() {
         return releasedDate;
     }
 
-    public void setReleasedDate(Long releasedDate) {
+    public Album setReleasedDate(Long releasedDate) {
         this.releasedDate = releasedDate;
+        return this;
     }
 
     public String getGenre() {
         return genre;
     }
 
-    public void setGenre(String genre) {
+    public Album setGenre(String genre) {
         this.genre = genre;
+        return this;
     }
 
     public String getStyle() {
         return style;
     }
 
-    public void setStyle(String style) {
+    public Album setStyle(String style) {
         this.style = style;
+        return this;
     }
 
     public String getBarcode() {
         return barcode;
     }
 
-    public void setBarcode(String barcode) {
+    public Album setBarcode(String barcode) {
         this.barcode = barcode;
+        return this;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public Album setStatus(String status) {
         this.status = status;
+        return this;
     }
 
     public String getPackaging() {
         return packaging;
     }
 
-    public void setPackaging(String packaging) {
+    public Album setPackaging(String packaging) {
         this.packaging = packaging;
+        return this;
     }
 
     public String getLanguage() {
         return language;
     }
 
-    public void setLanguage(String language) {
+    public Album setLanguage(String language) {
         this.language = language;
+        return this;
     }
 
     public String getScript() {
         return script;
     }
 
-    public void setScript(String script) {
+    public Album setScript(String script) {
         this.script = script;
+        return this;
     }
 
     public String getMBID() {
         return MBID;
     }
 
-    public void setMBID(String MBID) {
+    public Album setMBID(String MBID) {
         this.MBID = MBID;
+        return this;
     }
 
 }
