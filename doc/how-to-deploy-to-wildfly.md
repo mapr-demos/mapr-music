@@ -135,7 +135,7 @@ https://docstage.mapr.com/public/beta/60/DevelopmentGuide/c-loading-mapr-native-
  
 Start application server in standalone mode:
 ```
-/wildfly-10.1.0.Final/bin$ export JAVA_OPTS='-Dmapr.library.flatclas'
+/wildfly-10.1.0.Final/bin$ export JAVA_OPTS='-Dmapr.library.flatclass'
 
 /wildfly-10.1.0.Final/bin$ ./standalone.sh
 ```
