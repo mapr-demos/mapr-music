@@ -334,7 +334,7 @@ Use Wildfly Command Line Interface (CLI) management tool to deploy the app:
 ```
 /wildfly-10.1.0.Final/bin$ ./jboss-cli.sh --connect
 
-[standalone@localhost:9990 /] deploy ~/mapr-music/core-application/webapp/mapr-rest/mapr-music.war
+[standalone@localhost:9990 /] deploy ~/mapr-music/core-application/webapp/mapr-rest/target/mapr-music.war
 ```
 
 Ensure that application is running by executing the following command:
