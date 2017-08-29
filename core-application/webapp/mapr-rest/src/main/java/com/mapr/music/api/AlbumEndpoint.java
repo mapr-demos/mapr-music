@@ -1,6 +1,7 @@
 package com.mapr.music.api;
 
 
+import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
@@ -35,14 +36,20 @@ public class AlbumEndpoint {
     }
 
     @GET
+    @Path("/slug/{slug}")
+    @ApiOperation(value = "Get single album by it's slug name")
+    public AlbumDto getAlbumBySlugName(@PathParam("slug") String slug) {
+        return albumService.getAlbumBySlugName(slug);
+    }
+
+    @GET
     @Path("/")
     @ApiOperation(value = "Get list of albums, which is represented by page")
-    public ResourceDto<AlbumDto> getAllAlbums(@QueryParam("per_page") Long perPage,
-                                              @QueryParam("page") Long page,
-                                              @QueryParam("sort_type") String order,
-                                              @QueryParam("sort_fields") List<String> orderFields) {
+    public ResourceDto<AlbumDto> getAlbumsList(@QueryParam("per_page") Long perPage,
+                                               @QueryParam("page") Long page,
+                                               @QueryParam("sort") List<SortOption> sortOptions) {
 
-        return albumService.getAlbumsPage(perPage, page, order, orderFields);
+        return albumService.getAlbumsPage(perPage, page, sortOptions);
     }
 
     @DELETE

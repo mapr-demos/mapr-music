@@ -1,5 +1,6 @@
 package com.mapr.music.dao;
 
+import org.ojai.Document;
 import org.ojai.store.Connection;
 import org.ojai.store.DocumentStore;
 
@@ -61,10 +62,10 @@ public interface MaprDbDao<T> {
      * @param fields      list of fields that will present in document.
      * @return list of documents.
      */
-    List<T> getList(long offset, long limit, SortOption[] sortOptions, String... fields);
+    List<T> getList(long offset, long limit, List<SortOption> sortOptions, String... fields);
 
     /**
-     * Returns single document by it's identifier.
+     * Returns single document by it's identifier. If there is no such document <code>null</code> will be returned.
      *
      * @param id document's identifier.
      * @return document with the specified identifier.
@@ -73,7 +74,7 @@ public interface MaprDbDao<T> {
 
     /**
      * Returns single document by it's identifier using projection. Note that only specified fields will be filled with
-     * values.
+     * values. If there is no such document <code>null</code> will be returned.
      *
      * @param id     document's identifier.
      * @param fields list of fields that will present in document.
@@ -129,4 +130,19 @@ public interface MaprDbDao<T> {
      */
     T update(String id, T entity);
 
+    /**
+     * Indicates whether document with specified identifier exists.
+     *
+     * @param id document's identifier.
+     * @return <code>true</code> if document with specified identifier exists, <code>false</code> otherwise.
+     */
+    boolean exists(String id);
+
+    /**
+     * Converts OJAI document to the instance of model class.
+     *
+     * @param ojaiDocument OJAI document which will be converted.
+     * @return instance of the model class.
+     */
+    T mapOjaiDocument(Document ojaiDocument);
 }

@@ -4,9 +4,12 @@ import com.mapr.music.model.Album;
 import org.ojai.Document;
 import org.ojai.store.DocumentMutation;
 
+import javax.inject.Named;
+
 /**
  * Actual implementation of {@link com.mapr.music.dao.MaprDbDao} to manage {@link Album} model.
  */
+@Named("albumDao")
 public class AlbumDao extends MaprDbDaoImpl<Album> {
 
     public AlbumDao() {

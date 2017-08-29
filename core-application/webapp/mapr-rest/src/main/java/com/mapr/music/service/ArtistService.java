@@ -1,5 +1,6 @@
 package com.mapr.music.service;
 
+import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Artist;
@@ -51,12 +52,33 @@ public interface ArtistService {
     ResourceDto<ArtistDto> getArtistsPage(Long perPage, Long page, String order, List<String> orderFields);
 
     /**
+     * Returns list of artists which is represented by page with default number of artists. Default number of artists
+     * depends on implementation class. artists will be ordered according to the specified order and fields.
+     *
+     * @param perPage     specifies number of artists per page. In case when value is <code>null</code> the
+     *                    default value will be used. Default value depends on implementation class.
+     * @param page        specifies number of page, which will be returned. In case when page value is <code>null</code>
+     *                    the first page will be returned.
+     * @param sortOptions specifies artists ordering.
+     * @return artists page resource.
+     */
+    ResourceDto<ArtistDto> getArtistsPage(Long perPage, Long page, List<SortOption> sortOptions);
+
+    /**
      * Returns single artist according to it's identifier.
      *
      * @param id artist's identifier.
      * @return artist with the specified identifier.
      */
-    ArtistDto getById(String id);
+    ArtistDto getArtistById(String id);
+
+    /**
+     * Returns single artist by it's slug name.
+     *
+     * @param slugName slug representation of artist's name which is used to generate readable and SEO-friendly URLs.
+     * @return artist with specified slug name.
+     */
+    ArtistDto getArtistBySlugName(String slugName);
 
     /**
      * Deletes single artist by it's identifier.
@@ -91,4 +113,5 @@ public interface ArtistService {
      * @return updated artist.
      */
     ArtistDto updateArtist(String id, Artist artist);
+
 }

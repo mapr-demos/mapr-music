@@ -21,6 +21,12 @@ public class Artist {
     private String gender;
     private String area;
 
+    @JsonProperty("slug_name")
+    private String slugName;
+
+    @JsonProperty("slug_postfix")
+    private Long slugPostfix;
+
     @JsonProperty("IPI")
     private String ipi;
 
@@ -63,6 +69,24 @@ public class Artist {
 
     public Artist setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public String getSlugName() {
+        return slugName;
+    }
+
+    public Artist setSlugName(String slugName) {
+        this.slugName = slugName;
+        return this;
+    }
+
+    public Long getSlugPostfix() {
+        return slugPostfix;
+    }
+
+    public Artist setSlugPostfix(Long slugPostfix) {
+        this.slugPostfix = slugPostfix;
         return this;
     }
 

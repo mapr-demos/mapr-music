@@ -1,21 +1,23 @@
 package com.mapr.music.dao.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mapr.music.model.Artist;
 import org.ojai.Document;
 import org.ojai.store.DocumentMutation;
 
+import javax.inject.Named;
 import java.util.Map;
 
 /**
  * Actual implementation of {@link com.mapr.music.dao.MaprDbDao} to manage {@link Artist} model.
  */
-public class ArtistsDao extends MaprDbDaoImpl<Artist> {
+@Named("artistDao")
+public class ArtistDao extends MaprDbDaoImpl<Artist> {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public ArtistsDao() {
+    public ArtistDao() {
         super(Artist.class);
     }
 
@@ -68,15 +70,21 @@ public class ArtistsDao extends MaprDbDaoImpl<Artist> {
      */
     @Override
     public Artist create(Artist artist) {
+
         return processStore((connection, store) -> {
 
             // Convert artist instance to JSON string
-            String artistJsonString;
-            try {
-                artistJsonString = mapper.writeValueAsString(artist);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("Can not convert artist instance to JSON string", e);
+
+            ObjectNode artistJsonNode = mapper.valueToTree(artist);
+
+            // Since we creating artist from JSON string we have to specify tags explicitly.
+            if (artist.getSlugPostfix() != null) {
+
+                ObjectNode slugPostfix = mapper.createObjectNode();
+                slugPostfix.put("$numberLong", artist.getSlugPostfix());
+                artistJsonNode.set("slug_postfix", slugPostfix);
             }
+            String artistJsonString = artistJsonNode.toString();
 
             // Create an OJAI Document form the JSON string (there are other ways too)
             final Document createdOjaiDoc = connection.newDocument(artistJsonString);

@@ -11,9 +11,9 @@ import org.ojai.store.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.NotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,7 +68,7 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
      */
     @Override
     public List<T> getList(long offset, long limit, SortOption... sortOptions) {
-        return getList(offset, limit, sortOptions, new String[]{});
+        return getList(offset, limit, Arrays.asList(sortOptions));
     }
 
     /**
@@ -94,7 +94,7 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
      * @return list of document.
      */
     @Override
-    public List<T> getList(long offset, long limit, SortOption[] sortOptions, String... fields) {
+    public List<T> getList(long offset, long limit, List<SortOption> sortOptions, String... fields) {
         return processStore((connection, store) -> {
 
             Query query = buildQuery(connection, offset, limit, fields, sortOptions);
@@ -137,11 +137,8 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
 
             // Fetch single OJAI Document from store by it's identifier. Use projection if fields are defined.
             Document ojaiDoc = (fields == null || fields.length == 0) ? store.findById(id) : store.findById(id, fields);
-            if (ojaiDoc == null) {
-                throw new NotFoundException("Document with id '" + id + "' not found");
-            }
 
-            return mapOjaiDocument(ojaiDoc);
+            return (ojaiDoc == null) ? null : mapOjaiDocument(ojaiDoc);
         });
     }
 
@@ -154,7 +151,6 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
     public long getTotalNum() {
         return processStore((connection, store) -> {
 
-            // TODO is there "count" method
             DocumentStream documentStream = store.find();
             long totalNum = 0;
             for (Document ignored : documentStream) {
@@ -257,12 +253,24 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
     public abstract T update(String id, T entity);
 
     /**
-     * Converts OJAI document to the instance of model class.
+     * {@inheritDoc}
+     *
+     * @param id document's identifier.
+     * @return <code>true</code> if document with specified identifier exists, <code>false</code> otherwise.
+     */
+    @Override
+    public boolean exists(String id) {
+        return processStore((connection, store) -> store.findById(id) != null);
+    }
+
+    /**
+     * {@inheritDoc}
      *
      * @param ojaiDocument OJAI document which will be converted.
      * @return instance of the model class.
      */
-    protected T mapOjaiDocument(Document ojaiDocument) {
+    @Override
+    public T mapOjaiDocument(Document ojaiDocument) {
 
         if (ojaiDocument == null) {
             throw new IllegalArgumentException("OJAI document can not be null");
@@ -289,7 +297,7 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
      * @param fields     fields what will present in returned document. Used for projection.
      * @return OJAI query, which is built according to the specified parameters.
      */
-    private Query buildQuery(Connection connection, long offset, long limit, String[] fields, SortOption[] options) {
+    private Query buildQuery(Connection connection, long offset, long limit, String[] fields, List<SortOption> options) {
 
         Query query = connection.newQuery();
         if (fields == null || fields.length == 0) {
@@ -298,7 +306,7 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
             query.select(fields);
         }
 
-        if (options == null || options.length == 0) {
+        if (options == null || options.isEmpty()) {
             return query.offset(offset).limit(limit).build();
         }
 

@@ -19,6 +19,9 @@ public class ArtistDto {
     private String gender;
     private String area;
 
+    @JsonProperty("slug")
+    private String slug;
+
     @JsonProperty("IPI")
     private String ipi;
 
@@ -60,6 +63,14 @@ public class ArtistDto {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
     }
 
     public String getGender() {

@@ -2,8 +2,6 @@ package com.mapr.music.service.impl;
 
 import com.mapr.music.dao.MaprDbDao;
 import com.mapr.music.dao.SortOption;
-import com.mapr.music.dao.impl.AlbumDao;
-import com.mapr.music.dao.impl.ArtistsDao;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.ResourceDto;
@@ -13,8 +11,11 @@ import com.mapr.music.service.ArtistService;
 import com.mapr.music.service.PaginatedService;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.ws.rs.NotFoundException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -22,7 +23,6 @@ import java.util.stream.Collectors;
 /**
  * Actual implementation of {@link ArtistService} which is responsible of performing all business logic.
  */
-@Named
 public class ArtistServiceImpl implements ArtistService, PaginatedService {
 
     private static final long ARTISTS_PER_PAGE_DEFAULT = 50;
@@ -31,6 +31,8 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
     private static final String[] ARTIST_SHORT_INFO_FIELDS = {
             "_id",
             "name",
+            "slug_name",
+            "slug_postfix",
             "gender",
             "area",
             "IPI",
@@ -44,12 +46,18 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
             "end_date"
     };
 
+
     private final MaprDbDao<Artist> artistDao;
     private final MaprDbDao<Album> albumDao;
+    private final SlugService slugService;
 
-    public ArtistServiceImpl() {
-        this.artistDao = new ArtistsDao();
-        this.albumDao = new AlbumDao();
+    @Inject
+    public ArtistServiceImpl(@Named("artistDao") MaprDbDao<Artist> artistDao,
+                             @Named("albumDao") MaprDbDao<Album> albumDao, SlugService slugService) {
+
+        this.artistDao = artistDao;
+        this.albumDao = albumDao;
+        this.slugService = slugService;
     }
 
     /**
@@ -109,6 +117,21 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
      */
     @Override
     public ResourceDto<ArtistDto> getArtistsPage(Long perPage, Long page, String order, List<String> orderFields) {
+        return getArtistsPage(perPage, page, Collections.singletonList(new SortOption(order, orderFields)));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param perPage     specifies number of artists per page. In case when value is <code>null</code> the
+     *                    default value will be used. Default value depends on implementation class.
+     * @param page        specifies number of page, which will be returned. In case when page value is <code>null</code>
+     *                    the first page will be returned.
+     * @param sortOptions specifies artists ordering.
+     * @return artists page resource.
+     */
+    @Override
+    public ResourceDto<ArtistDto> getArtistsPage(Long perPage, Long page, List<SortOption> sortOptions) {
 
         if (page == null) {
             page = FIRST_PAGE_NUM;
@@ -130,12 +153,6 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
         artistsPage.setPagination(getPaginationInfo(page, perPage));
         long offset = (page - 1) * perPage;
 
-        SortOption[] sortOptions = null;
-        if (order != null && orderFields != null && orderFields.size() > 0) {
-            SortOption.Order sortOrder = SortOption.Order.valueOf(order.toUpperCase());
-            sortOptions = new SortOption[]{new SortOption(sortOrder, orderFields)};
-        }
-
         List<Artist> artists = artistDao.getList(offset, perPage, sortOptions, ARTIST_SHORT_INFO_FIELDS);
         List<ArtistDto> artistDtoList = artists.stream()
                 .map(this::artistToDto)
@@ -151,20 +168,45 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
      * @param id artist's identifier.
      * @return artist with the specified identifier.
      */
-    public ArtistDto getById(String id) {
+    @Override
+    public ArtistDto getArtistById(String id) {
 
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Artist's identifier can not be empty");
         }
 
         Artist artist = artistDao.getById(id);
+        if (artist == null) {
+            throw new NotFoundException("Artist with id '" + id + "' not found");
+        }
+
         ArtistDto artistDto = artistToDto(artist);
+        List<AlbumDto> albumsDtoList = albumsIdsToDtoList(artist.getAlbumsIds());
+        artistDto.setAlbums(albumsDtoList);
 
-        List<AlbumDto> albumsDtoList = artist.getAlbumsIds().stream()
-                .map(albumId -> albumDao.getById(albumId, "_id", "name", "cover_image_url", "released_date"))
-                .map(this::albumToDto)
-                .collect(Collectors.toList());
+        return artistDto;
+    }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param slugName slug representation of artist's name which is used to generate readable and SEO-friendly URLs.
+     * @return artist with specified slug name.
+     */
+    @Override
+    public ArtistDto getArtistBySlugName(String slugName) {
+
+        if (slugName == null || slugName.isEmpty()) {
+            throw new IllegalArgumentException("Artist's slug name can not be empty");
+        }
+
+        Artist artist = slugService.getArtistBySlug(slugName);
+        if (artist == null) {
+            throw new NotFoundException("Artist with slug name '" + slugName + "' not found");
+        }
+
+        ArtistDto artistDto = artistToDto(artist);
+        List<AlbumDto> albumsDtoList = albumsIdsToDtoList(artist.getAlbumsIds());
         artistDto.setAlbums(albumsDtoList);
 
         return artistDto;
@@ -180,6 +222,10 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
 
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Artist's identifier can not be empty");
+        }
+
+        if (!artistDao.exists(id)) {
+            throw new NotFoundException("Artist with id '" + id + "' not found");
         }
 
         artistDao.deleteById(id);
@@ -201,6 +247,8 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
         String id = UUID.randomUUID().toString();
         artist.setId(id);
 
+        slugService.setSlugForArtist(artist);
+
         return artistToDto(artistDao.create(artist));
     }
 
@@ -213,12 +261,7 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
      */
     @Override
     public ArtistDto updateArtist(Artist artist) {
-
-        if (artist == null || artist.getId() == null || artist.getId().isEmpty()) {
-            throw new IllegalArgumentException("Artist's identifier can not be empty");
-        }
-
-        return artistToDto(artistDao.update(artist.getId(), artist));
+        return updateArtist(artist.getId(), artist);
     }
 
     /**
@@ -239,6 +282,10 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
             throw new IllegalArgumentException("Artist can not be null");
         }
 
+        if (!artistDao.exists(id)) {
+            throw new NotFoundException("Artist with id '" + id + "' not found");
+        }
+
         return artistToDto(artistDao.update(id, artist));
     }
 
@@ -251,10 +298,14 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
             throw new RuntimeException("Can not create artist Data Transfer Object", e);
         }
 
+        String slug = slugService.getSlugForArtist(artist);
+        artistDto.setSlug(slug);
+
         return artistDto;
     }
 
     private AlbumDto albumToDto(Album album) {
+
         AlbumDto albumDto = new AlbumDto();
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
@@ -263,7 +314,22 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
             throw new RuntimeException("Can not create album Data Transfer Object", e);
         }
 
+        String slug = slugService.getSlugForAlbum(album);
+        albumDto.setSlug(slug);
+
         return albumDto;
+    }
+
+    private List<AlbumDto> albumsIdsToDtoList(List<String> albumsIds) {
+
+        if (albumsIds == null) {
+            return Collections.emptyList();
+        }
+
+        return albumsIds.stream()
+                .map(albumId -> albumDao.getById(albumId, "_id", "name", "slug_name", "slug_postfix", "cover_image_url", "released_date"))
+                .map(this::albumToDto)
+                .collect(Collectors.toList());
     }
 
 }

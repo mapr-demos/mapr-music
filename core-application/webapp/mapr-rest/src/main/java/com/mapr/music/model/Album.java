@@ -30,6 +30,12 @@ public class Album {
     private String country;
     private List reviews;
 
+    @JsonProperty("slug_name")
+    private String slugName;
+
+    @JsonProperty("slug_postfix")
+    private Long slugPostfix;
+
     @JsonProperty("artist_list")
     private List artistList;
 
@@ -63,6 +69,24 @@ public class Album {
 
     public Album setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public String getSlugName() {
+        return slugName;
+    }
+
+    public Album setSlugName(String slugName) {
+        this.slugName = slugName;
+        return this;
+    }
+
+    public Long getSlugPostfix() {
+        return slugPostfix;
+    }
+
+    public Album setSlugPostfix(Long slugPostfix) {
+        this.slugPostfix = slugPostfix;
         return this;
     }
 

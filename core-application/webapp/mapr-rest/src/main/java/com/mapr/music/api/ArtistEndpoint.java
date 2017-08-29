@@ -1,5 +1,6 @@
 package com.mapr.music.api;
 
+import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Artist;
@@ -9,7 +10,8 @@ import io.swagger.annotations.ApiOperation;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.*;
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -29,7 +31,14 @@ public class ArtistEndpoint {
     @Path("{id}")
     @ApiOperation(value = "Get single artist by it's identifier")
     public ArtistDto getArtist(@PathParam("id") String id) {
-        return artistService.getById(id);
+        return artistService.getArtistById(id);
+    }
+
+    @GET
+    @Path("/slug/{slug}")
+    @ApiOperation(value = "Get single artist by it's slug name")
+    public ArtistDto getArtistBySlugName(@PathParam("slug") String slug) {
+        return artistService.getArtistBySlugName(slug);
     }
 
     @GET
@@ -37,10 +46,9 @@ public class ArtistEndpoint {
     @ApiOperation(value = "Get list of artists, which is represented by page")
     public ResourceDto<ArtistDto> getAllArtists(@QueryParam("per_page") Long perPage,
                                                 @QueryParam("page") Long page,
-                                                @QueryParam("sort_type") String order,
-                                                @QueryParam("sort_fields") List<String> orderFields) {
+                                                @QueryParam("sort") List<SortOption> sortOptions) {
 
-        return artistService.getArtistsPage(perPage, page, order, orderFields);
+        return artistService.getArtistsPage(perPage, page, sortOptions);
     }
 
     @DELETE
@@ -61,8 +69,14 @@ public class ArtistEndpoint {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create artist")
-    public ArtistDto createArtist(Artist artist) {
-        return artistService.createArtist(artist);
+    public Response createAlbum(Artist artist, @Context UriInfo uriInfo) {
+
+        ArtistDto createdArtist = artistService.createArtist(artist);
+        UriBuilder builder = uriInfo.getAbsolutePathBuilder();
+        builder.path(createdArtist.getId());
+        URI location = builder.build();
+
+        return Response.status(Response.Status.CREATED).entity(createdArtist).location(location).build();
     }
 
 }

@@ -28,6 +28,9 @@ public class AlbumDto {
     private String country;
     private List reviews;
 
+    @JsonProperty("slug")
+    private String slug;
+
     @JsonProperty("artist_list")
     private List artistList;
 
@@ -60,6 +63,14 @@ public class AlbumDto {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
     }
 
     public List getArtistList() {
