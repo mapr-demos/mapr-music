@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
-import 'rxjs/add/operator/switchMap';
+import {Component, OnInit} from "@angular/core";
+import {ActivatedRoute, ParamMap} from "@angular/router";
+import "rxjs/add/operator/switchMap";
 import {Album} from "../../models/album";
 import {AlbumService} from "../../services/album.service";
 
@@ -21,9 +21,9 @@ export class AlbumDetailPage implements OnInit{
   ngOnInit(): void {
     this.router.paramMap
       .switchMap((params: ParamMap) => {
-        const albumId = params.get('albumId');
-        this.sourceURL = this.albumService.getAlbumByIdURL(albumId);
-        return this.albumService.getAlbumById(albumId);
+        const albumSlug = params.get('albumSlug');
+        this.sourceURL = this.albumService.getAlbumBySlugURL(albumSlug);
+        return this.albumService.getAlbumBySlug(albumSlug);
       })
       .subscribe((album) => {
         this.album = album;

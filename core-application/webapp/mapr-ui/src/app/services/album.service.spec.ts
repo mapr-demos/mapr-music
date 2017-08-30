@@ -1,9 +1,9 @@
 import {AlbumService} from "./album.service";
 import {HttpClient} from "@angular/common/http";
 import {AppConfig} from "../app.config";
-import createSpy = jasmine.createSpy;
 import {Observable} from "rxjs";
 import {AlbumsPage, Album} from "../models/album";
+import createSpy = jasmine.createSpy;
 
 function mockGet(client, response) {
   client.get = createSpy('get').and.returnValue(Observable.of(response));
@@ -57,7 +57,7 @@ describe('Service: Album Service', () => {
         done();
       });
   });
-  it('getAlbumById', (done) => {
+  it('getAlbumBySlug', (done) => {
     const response = {
       _id: 'test_id',
       name: 'Test_Name',
@@ -80,10 +80,10 @@ describe('Service: Album Service', () => {
       ]
     };
     mockGet(client, response);
-    const getAlbumByIdURLSpy = spyOn(service, 'getAlbumByIdURL');
-    service.getAlbumById('')
+    const getAlbumBySlugURLSpy = spyOn(service, 'getAlbumBySlugURL');
+    service.getAlbumBySlug('')
       .then((album: Album) => {
-        expect(getAlbumByIdURLSpy).toHaveBeenCalled();
+        expect(getAlbumBySlugURLSpy).toHaveBeenCalled();
         expect(album.id).toBe('test_id');
         expect(album.artists).toEqual([
           {

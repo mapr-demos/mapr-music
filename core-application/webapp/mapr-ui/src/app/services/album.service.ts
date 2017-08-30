@@ -45,7 +45,8 @@ function mapToAlbum({
   style,
   format,
   genre,
-  track_list
+  track_list,
+  slug
 }): Album {
   return {
     id: _id,
@@ -55,6 +56,7 @@ function mapToAlbum({
     style,
     format,
     genre,
+    slug,
     trackList: track_list
       ? track_list.map(mapToTrack)
       : [],
@@ -98,17 +100,17 @@ export class AlbumService {
   }
 
 /**
- * @desc get album by id URL
+ * @desc get album by slug URL
  * */
-  getAlbumByIdURL(albumId: string): string {
-    return `${this.config.apiURL}/mapr-music/api/1.0/albums/${albumId}`;
+  getAlbumBySlugURL(albumSlug: string): string {
+    return `${this.config.apiURL}/mapr-music/api/1.0/albums/slug/${albumSlug}`;
   }
 
 /**
- * @desc get album by id from server side
+ * @desc get album by slug from server side
  * */
-  getAlbumById(albumId: string):Promise<Album> {
-    return this.http.get(this.getAlbumByIdURL(albumId))
+  getAlbumBySlug(albumSlug: string):Promise<Album> {
+    return this.http.get(this.getAlbumBySlugURL(albumSlug))
       .map((response: any) => {
         console.log('Album: ', response);
         return mapToAlbum(response);

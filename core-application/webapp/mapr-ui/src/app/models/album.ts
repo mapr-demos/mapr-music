@@ -14,6 +14,7 @@ export interface Album {
   coverImageURL: string,
   format: string,
   style: string,
+  slug: string,
   genre: string,
   trackList: Array<Track>,
   country: string,
