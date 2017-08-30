@@ -8,12 +8,55 @@ import {AppConfig} from "../app.config";
 
 const PAGE_SIZE = 12;
 
+export const SORT_OPTIONS = [
+  {
+    label:'No sorting',
+    value: 'NO_SORTING'
+  },
+  {
+    label:'Title A-z',
+    value: 'TITLE_ASC'
+  },
+  {
+    label:'Title z-A',
+    value: 'TITLE_DESC'
+  },
+  {
+    label: 'Newest first',
+    value: 'RELEASE_DESC'
+  },
+  {
+    label: 'Oldest first',
+    value: 'RELEASE_ASC'
+  },
+  {
+    label: 'Newest First, Title A-z',
+    value: 'RELEASE_DESC_TITLE_ASC'
+  },
+  {
+    label: 'Newest First, Title z-A',
+    value: 'RELEASE_DESC_TITLE_DESC'
+  },
+  {
+    label: 'Oldest first, Title A-z',
+    value: 'RELEASE_ASC_TITLE_ASC'
+  },
+  {
+    label: 'Oldest first, Title z-A',
+    value: 'RELEASE_ASC_TITLE_DESC'
+  }
+];
+
 const SORT_HASH = {
   'NO_SORTING': identity,
-  'RELEASE_DESC': (url) => `${url}&sort_type=desc&sort_fields=released_date`,
-  'RELEASE_ASC': (url) => `${url}&sort_type=asc&sort_fields=released_date`,
-  'TITLE_ASC': (url) => `${url}&sort_type=asc&sort_fields=name`,
-  'TITLE_DESC': (url) => `${url}&sort_type=desc&sort_fields=name`
+  'RELEASE_DESC': (url) => `${url}&sort=desc,released_date`,
+  'RELEASE_ASC': (url) => `${url}&sort=asc,released_date`,
+  'TITLE_ASC': (url) => `${url}&sort=asc,name`,
+  'TITLE_DESC': (url) => `${url}&sort=desc,name`,
+  'RELEASE_DESC_TITLE_ASC': (url) => SORT_HASH.TITLE_ASC(SORT_HASH.RELEASE_DESC(url)),
+  'RELEASE_DESC_TITLE_DESC': (url) => SORT_HASH.TITLE_DESC(SORT_HASH.RELEASE_DESC(url)),
+  'RELEASE_ASC_TITLE_ASC': (url) => SORT_HASH.TITLE_ASC(SORT_HASH.RELEASE_ASC(url)),
+  'RELEASE_ASC_TITLE_DESC': (url) => SORT_HASH.TITLE_DESC(SORT_HASH.RELEASE_ASC(url))
 };
 
 interface PageRequest {

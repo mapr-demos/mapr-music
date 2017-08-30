@@ -1,10 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import 'rxjs/add/operator/switchMap';
-
-import {Album, AlbumsPage} from '../../models/album';
-import {AlbumService} from "../../services/album.service";
-import {SelectOption} from '../../models/select-option';
+import {Component, OnInit} from "@angular/core";
+import {ActivatedRoute, Router} from "@angular/router";
+import "rxjs/add/operator/switchMap";
+import {Album, AlbumsPage} from "../../models/album";
+import {AlbumService, SORT_OPTIONS} from "../../services/album.service";
+import {SelectOption} from "../../models/select-option";
 
 @Component({
   selector: 'home-page',
@@ -23,28 +22,7 @@ export class HomePage implements OnInit{
   totalAlbums: number;
   pageNumber: number;
   sourceURL: string;
-  sortOptions: Array<SelectOption> = [
-    {
-      label:'No sorting',
-      value: 'NO_SORTING'
-    },
-    {
-      label:'Title A-z',
-      value: 'TITLE_ASC'
-    },
-    {
-      label:'Title z-A',
-      value: 'TITLE_DESC'
-    },
-    {
-      label: 'Newest first',
-      value: 'RELEASE_DESC'
-    },
-    {
-      label: 'Oldest first',
-      value: 'RELEASE_ASC'
-    }
-  ];
+  sortOptions: Array<SelectOption> = SORT_OPTIONS;
   sortType: string;
 
   ngOnInit(): void {
