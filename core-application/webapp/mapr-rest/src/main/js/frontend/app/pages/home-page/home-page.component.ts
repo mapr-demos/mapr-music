@@ -1,0 +1,89 @@
+import {Component, OnInit} from "@angular/core";
+import {ActivatedRoute, Router} from "@angular/router";
+import "rxjs/add/operator/switchMap";
+import {Album, AlbumsPage} from "../../models/album";
+import {AlbumService} from "../../services/album.service";
+import {SelectOption} from "../../models/select-option";
+
+@Component({
+  selector: 'home-page',
+  templateUrl: './home-page.component.html',
+  styleUrls: ['./home-page.component.css'],
+})
+export class HomePage implements OnInit{
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private albumService: AlbumService
+  ) {
+  }
+
+  albums: Array<Album> = [];
+  totalAlbums: number;
+  pageNumber: number;
+  sourceURL: string;
+  sortOptions: Array<SelectOption> = [
+    {
+      label:'No sorting',
+      value: 'NO_SORTING'
+    },
+    {
+      label:'Title A-z',
+      value: 'TITLE_ASC'
+    },
+    {
+      label:'Title z-A',
+      value: 'TITLE_DESC'
+    },
+    {
+      label: 'Newest first',
+      value: 'RELEASE_DESC'
+    },
+    {
+      label: 'Oldest first',
+      value: 'RELEASE_ASC'
+    }
+  ];
+  sortType: string;
+
+  ngOnInit(): void {
+    this.route.queryParams
+      .switchMap(({page = 1, sort = 'NO_SORTING'}: {page:number, sort: string}) => {
+        this.sortType = sort;
+        this.albums = [];
+        const request = {pageNumber: page, sortType: this.sortType};
+        this.sourceURL = this.albumService.getAlbumsPageURL(request);
+        return this.albumService.getAlbumsPage(request)
+          .then((albumsPage: AlbumsPage) => ({albumsPage, page}));
+      })
+      .subscribe(({albumsPage, page}) => {
+        const {albums, totalNumber} = albumsPage;
+        this.pageNumber = page;
+        this.albums = albums;
+        this.totalAlbums = totalNumber;
+      });
+  }
+
+  changeURL() {
+    const queryParams = {
+      page: this.pageNumber,
+      sort: null
+    };
+    if (this.sortType !== 'NO_SORTING') {
+      queryParams.sort = this.sortType;
+    }
+    this.router.navigate(['/'], {queryParams});
+  }
+
+  onChangePage(newPage: number) {
+    if (!Number.isNaN(newPage)) {
+      this.pageNumber = newPage;
+      this.changeURL();
+    }
+  }
+
+  onSortChange(sortType: string) {
+    this.sortType = sortType;
+    this.changeURL();
+  }
+}

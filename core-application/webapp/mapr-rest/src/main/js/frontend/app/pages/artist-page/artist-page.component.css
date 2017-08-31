@@ -1,0 +1,14 @@
+.artist-page {
+  padding: 20px;
+}
+
+.artist-album-item {
+  display: flex;
+  padding: 5px;
+}
+
+.artist-album-item-title {
+  padding-left: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
