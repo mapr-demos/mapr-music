@@ -20,6 +20,10 @@ import java.util.stream.Stream;
 
 public class AlbumParser {
 
+    private static final String VALUE_NOT_DEFINED_SYMBOL = "\\N";
+    private static final String TAB_SYMBOL = "\t";
+    private static final String EMPTY_STRING = "";
+
     private List<Artist> artists;
     private String albumFilePath;
     private String albumStatusFilePath;
@@ -58,8 +62,8 @@ public class AlbumParser {
         //read file into stream, try-with-resources
         try (Stream<String> stream = Files.lines(Paths.get(albumFilePath))) {
             Stream<String[]> rows = stream.map(strRow ->
-                    Arrays.stream(strRow.split("\t"))
-                            .map(val -> val.equals("\\N") ? "" : val)
+                    Arrays.stream(strRow.split(TAB_SYMBOL))
+                            .map(val -> val.equals(VALUE_NOT_DEFINED_SYMBOL) ? EMPTY_STRING : val)
                             .toArray(String[]::new)
 
             );
@@ -90,7 +94,7 @@ public class AlbumParser {
 
         //read file into stream, try-with-resources
         try (Stream<String> stream = Files.lines(Paths.get(albumStatusFilePath))) {
-            Stream<String[]> rows = stream.map(strRow -> strRow.split("\t"));
+            Stream<String[]> rows = stream.map(strRow -> strRow.split(TAB_SYMBOL));
             rows.forEach(row -> {
                 List<Album> curAlbums = albumMap.get(row[0]);
                 if (curAlbums != null) {
@@ -111,7 +115,7 @@ public class AlbumParser {
 
         //read file into stream, try-with-resources
         try (Stream<String> stream = Files.lines(Paths.get(albumPackagingFilePath))) {
-            Stream<String[]> rows = stream.map(strRow -> strRow.split("\t"));
+            Stream<String[]> rows = stream.map(strRow -> strRow.split(TAB_SYMBOL));
             rows.forEach(row -> {
                 List<Album> curAlbums = albumMap.get(row[0]);
                 if (curAlbums != null) {
@@ -132,7 +136,7 @@ public class AlbumParser {
 
         //read file into stream, try-with-resources
         try (Stream<String> stream = Files.lines(Paths.get(languageFilePath))) {
-            Stream<String[]> rows = stream.map(strRow -> strRow.split("\t"));
+            Stream<String[]> rows = stream.map(strRow -> strRow.split(TAB_SYMBOL));
             rows.forEach(row -> {
                 List<Album> curAlbums = albumMap.get(row[0]);
                 if (curAlbums != null) {
@@ -153,7 +157,7 @@ public class AlbumParser {
 
         //read file into stream, try-with-resources
         try (Stream<String> stream = Files.lines(Paths.get(mediumFilePath))) {
-            Stream<String[]> rows = stream.map(strRow -> strRow.split("\t"));
+            Stream<String[]> rows = stream.map(strRow -> strRow.split(TAB_SYMBOL));
             rows.forEach(row -> {
                 Album album = albumIdAlbumMap.get(row[1]);
                 if (album != null) {
@@ -174,7 +178,7 @@ public class AlbumParser {
 
         //read file into stream, try-with-resources
         try (Stream<String> stream = Files.lines(Paths.get(trackFilePath))) {
-            Stream<String[]> rows = stream.map(strRow -> strRow.split("\t"));
+            Stream<String[]> rows = stream.map(strRow -> strRow.split(TAB_SYMBOL));
             rows.forEach(row -> {
                 Album album = mediumIdAlbumMap.get(row[3]);
                 if (album != null) {
@@ -212,12 +216,14 @@ public class AlbumParser {
 
     public static Album parseTrack(String[] values, Album album) {
         Track track = new Track();
-        track.setLength(Integer.parseInt(values[8]));
+
+        if (!VALUE_NOT_DEFINED_SYMBOL.equals(values[8])) {
+            track.setLength(Integer.parseInt(values[8]));
+        }
         track.setMbid(values[1]);
         track.setName(values[6]);
         track.setPosition(Integer.parseInt(values[4]));
 
-        // TODO ARTIST CREDIT?
         album.addTrack(track);
         return album;
     }
