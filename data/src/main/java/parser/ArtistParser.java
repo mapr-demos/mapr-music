@@ -3,6 +3,7 @@ package parser;
 import model.Artist;
 import model.ArtistUrlLink;
 import org.apache.commons.lang3.StringUtils;
+import util.SlugUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +44,8 @@ public class ArtistParser {
         linkTypePath = dumpPath + File.separator + "link_type";
 
         List<Artist> artists = parseArtistFile(size);
+        generateSlugs(artists);
+
         parseAreaFile(artists);
         parseArtistIsniFile(artists);
         parseArtistIpiFile(artists);
@@ -311,11 +314,29 @@ public class ArtistParser {
         return artists;
     }
 
+    private void generateSlugs(List<Artist> artists) {
+
+        Map<String, List<Artist>> slugNameArtistMap = artists.stream()
+                .filter(artist -> StringUtils.isNotEmpty(artist.getName()))
+                .peek(artist -> artist.setSlugName(SlugUtil.toSlug(artist.getName())))
+                .collect(Collectors.groupingBy(Artist::getSlugName));
+
+        slugNameArtistMap.values().stream()
+                .filter(artistList -> artistList.size() > 1)
+                .forEach(artistList -> {
+                    long slug_postfix = 0;
+                    for(Artist artist : artistList) {
+                        artist.setSlugPostfix(slug_postfix++);
+                    }
+                });
+
+    }
+
     private Artist parseArtistRow(String[] values) {
         Artist artist = new Artist();
         artist.setPk(values[0]);
         artist.setId(values[1]);
-        artist.setMbid(values[1]);
+        artist.setMBID(values[1]);
         artist.setName(values[2]);
         artist.setDisambiguationComment(values[13]);
 

@@ -1,12 +1,19 @@
 package model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Track {
 
     private String name;
     private int length;
-    private String mbid;
+
+    @JsonProperty("MBID")
+    private String MBID;
     private int position;
 
     public String getName() {
@@ -25,12 +32,12 @@ public class Track {
         this.length = length;
     }
 
-    public String getMbid() {
-        return mbid;
+    public String getMBID() {
+        return MBID;
     }
 
-    public void setMbid(String mbid) {
-        this.mbid = mbid;
+    public void setMBID(String MBID) {
+        this.MBID = MBID;
     }
 
     public int getPosition() {
@@ -46,7 +53,7 @@ public class Track {
         return new ToStringBuilder(this)
                 .append("name", name)
                 .append("length", length)
-                .append("mbid", mbid)
+                .append("MBID", MBID)
                 .append("position", position)
                 .build();
     }

@@ -52,7 +52,7 @@ public class Main {
 
 
         try {
-            mapper.writeValue(new File(directoryPath + File.separator + artist.getMbid() + JSON_EXTENSION_NAME), artist);
+            mapper.writeValue(new File(directoryPath + File.separator + artist.getMBID() + JSON_EXTENSION_NAME), artist);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,7 +60,7 @@ public class Main {
 
     private static void writeAlbumJson(Album album, String directoryPath) {
         try {
-            mapper.writeValue(new File(directoryPath + File.separator + album.getMbid() + JSON_EXTENSION_NAME), album);
+            mapper.writeValue(new File(directoryPath + File.separator + album.getMBID() + JSON_EXTENSION_NAME), album);
         } catch (IOException e) {
             e.printStackTrace();
         }

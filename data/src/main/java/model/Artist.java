@@ -1,6 +1,7 @@
 package model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Artist {
 
     @JsonIgnore
@@ -24,6 +26,13 @@ public class Artist {
     @JsonProperty("_id")
     private String id;
     private String name;
+
+    @JsonProperty("slug_name")
+    private String slugName;
+
+    @JsonProperty("slug_postfix")
+    private long slugPostfix;
+
     private String gender;
     private String area;
 
@@ -34,7 +43,7 @@ public class Artist {
     private String isni;
 
     @JsonProperty("MBID")
-    private String mbid;
+    private String MBID;
 
     @JsonProperty("disambiguation_comment")
     private String disambiguationComment;
@@ -76,6 +85,24 @@ public class Artist {
         return this;
     }
 
+    public String getSlugName() {
+        return slugName;
+    }
+
+    public Artist setSlugName(String slugName) {
+        this.slugName = slugName;
+        return this;
+    }
+
+    public long getSlugPostfix() {
+        return slugPostfix;
+    }
+
+    public Artist setSlugPostfix(long slugPostfix) {
+        this.slugPostfix = slugPostfix;
+        return this;
+    }
+
     public String getGender() {
         return gender;
     }
@@ -112,12 +139,12 @@ public class Artist {
         return this;
     }
 
-    public String getMbid() {
-        return mbid;
+    public String getMBID() {
+        return MBID;
     }
 
-    public Artist setMbid(String mbid) {
-        this.mbid = mbid;
+    public Artist setMBID(String MBID) {
+        this.MBID = MBID;
         return this;
     }
 
@@ -210,7 +237,7 @@ public class Artist {
                 .append("area", area)
                 .append("ipi", ipi)
                 .append("isni", isni)
-                .append("mbid", mbid)
+                .append("MBID", MBID)
                 .append("disambiguationComment", disambiguationComment)
                 .append("albumsIds", albumsIds)
                 .append("profileImageUrl", profileImageUrl)

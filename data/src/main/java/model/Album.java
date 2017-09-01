@@ -1,6 +1,7 @@
 package model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Album {
 
     @JsonIgnore
@@ -20,6 +22,13 @@ public class Album {
     @JsonProperty("_id")
     private String id;
     private String name;
+
+    @JsonProperty("slug_name")
+    private String slugName;
+
+    @JsonProperty("slug_postfix")
+    private long slugPostfix;
+
     private String genre;
     private String style;
     private String barcode;
@@ -29,7 +38,8 @@ public class Album {
     private String script;
 
     @JsonProperty("MBID")
-    private String mbid;
+    private String MBID;
+
     private String format;
     private String country;
     private List reviews;
@@ -67,6 +77,24 @@ public class Album {
 
     public Album setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public String getSlugName() {
+        return slugName;
+    }
+
+    public Album setSlugName(String slugName) {
+        this.slugName = slugName;
+        return this;
+    }
+
+    public long getSlugPostfix() {
+        return slugPostfix;
+    }
+
+    public Album setSlugPostfix(long slugPostfix) {
+        this.slugPostfix = slugPostfix;
         return this;
     }
 
@@ -219,12 +247,12 @@ public class Album {
         return this;
     }
 
-    public String getMbid() {
-        return mbid;
+    public String getMBID() {
+        return MBID;
     }
 
-    public Album setMbid(String mbid) {
-        this.mbid = mbid;
+    public Album setMBID(String MBID) {
+        this.MBID = MBID;
         return this;
     }
 
@@ -258,7 +286,7 @@ public class Album {
                 .append("packaging", packaging)
                 .append("language", language)
                 .append("script", script)
-                .append("mbid", mbid)
+                .append("MBID", MBID)
                 .append("format", format)
                 .append("country", country)
                 .append("reviews", reviews)

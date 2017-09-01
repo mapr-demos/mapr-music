@@ -5,6 +5,7 @@ import model.Album;
 import model.Artist;
 import model.Track;
 import org.apache.commons.lang3.StringUtils;
+import util.SlugUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +44,8 @@ public class AlbumParser {
         trackFilePath = dumpPath + File.separator + "track";
 
         List<Album> albums = parseAlbumFile();
+        generateSlugs(albums);
+
         parseReleaseStatusFile(albums);
         parseReleasePackagingFile(albums);
         parseReleaseLanguageFile(albums);
@@ -192,6 +195,22 @@ public class AlbumParser {
         return albums;
     }
 
+    private void generateSlugs(List<Album> albums) {
+        Map<String, List<Album>> slugNameAlbumMap = albums.stream()
+                .filter(album -> StringUtils.isNotEmpty(album.getName()))
+                .peek(album -> album.setSlugName(SlugUtil.toSlug(album.getName())))
+                .collect(Collectors.groupingBy(Album::getSlugName));
+
+        slugNameAlbumMap.values().stream()
+                .filter(albumList -> albumList.size() > 1)
+                .forEach(albumList -> {
+                    long slug_postfix = 0;
+                    for (Album album : albumList) {
+                        album.setSlugPostfix(slug_postfix++);
+                    }
+                });
+    }
+
     private Album parseAlbumRow(String[] values, Artist artist) {
 
         Album album = new Album();
@@ -203,11 +222,11 @@ public class AlbumParser {
         album.setLanguage(values[7]); //Language ID
         album.setScript(values[8]);
         album.setBarcode(values[9]);
-        album.setMbid(values[1]);
+        album.setMBID(values[1]);
 
         artist.getAlbumsIds().add(album.getId());
 
-        CoverArtArchiveClient artArchiveClient = new CoverArtArchiveClient(album.getMbid());
+        CoverArtArchiveClient artArchiveClient = new CoverArtArchiveClient(album.getMBID());
         album.setCoverImageUrl(artArchiveClient.getCoverImage());
         album.setImagesUrls(artArchiveClient.getImages());
 
@@ -220,7 +239,7 @@ public class AlbumParser {
         if (!VALUE_NOT_DEFINED_SYMBOL.equals(values[8])) {
             track.setLength(Integer.parseInt(values[8]));
         }
-        track.setMbid(values[1]);
+        track.setMBID(values[1]);
         track.setName(values[6]);
         track.setPosition(Integer.parseInt(values[4]));
 
