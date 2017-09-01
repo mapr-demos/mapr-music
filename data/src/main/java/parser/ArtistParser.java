@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -132,16 +131,18 @@ public class ArtistParser {
     }
 
     private List<Artist> parseArtistIsniFile(List<Artist> artists) {
-        Map<String, Artist> artistMap = artists.stream()
-                .collect(Collectors.toMap(Artist::getPk, Function.identity()));
+
+        Map<String, List<Artist>> artistMap = artists.stream()
+                .filter(album -> !StringUtils.isEmpty(album.getPk()))
+                .collect(Collectors.groupingBy(Artist::getPk));
 
         //read file into stream, try-with-resources
         try (Stream<String> stream = Files.lines(Paths.get(artistIsniFilePath))) {
             stream.map(strRow -> strRow.split(TAB_SYMBOL))
                     .forEach(row -> {
-                        Artist artist = artistMap.get(row[0]);
-                        if (artist != null) {
-                            artist.setIsni(row[1]);
+                        List<Artist> artistList = artistMap.get(row[0]);
+                        if (artistList != null) {
+                            artistList.forEach(artist -> artist.setIsni(row[1]));
                         }
                     });
         } catch (IOException e) {
@@ -152,16 +153,17 @@ public class ArtistParser {
     }
 
     private List<Artist> parseArtistIpiFile(List<Artist> artists) {
-        Map<String, Artist> artistMap = artists.stream()
-                .collect(Collectors.toMap(Artist::getPk, Function.identity()));
+        Map<String, List<Artist>> artistMap = artists.stream()
+                .filter(album -> !StringUtils.isEmpty(album.getPk()))
+                .collect(Collectors.groupingBy(Artist::getPk));
 
         //read file into stream, try-with-resources
         try (Stream<String> stream = Files.lines(Paths.get(artistIpiPath))) {
             stream.map(strRow -> strRow.split(TAB_SYMBOL))
                     .forEach(row -> {
-                        Artist artist = artistMap.get(row[0]);
-                        if (artist != null) {
-                            artist.setIpi(row[1]);
+                        List<Artist> artistList = artistMap.get(row[0]);
+                        if (artistList != null) {
+                            artistList.forEach(artist -> artist.setIpi(row[1]));
                         }
                     });
         } catch (IOException e) {
@@ -172,16 +174,17 @@ public class ArtistParser {
     }
 
     private List<Artist> parseArtistCreditNameFile(List<Artist> artists) {
-        Map<String, Artist> artistMap = artists.stream()
-                .collect(Collectors.toMap(Artist::getPk, Function.identity()));
+        Map<String, List<Artist>> artistMap = artists.stream()
+                .filter(album -> !StringUtils.isEmpty(album.getPk()))
+                .collect(Collectors.groupingBy(Artist::getPk));
 
         //read file into stream, try-with-resources
         try (Stream<String> stream = Files.lines(Paths.get(artistCreditNameFilePath))) {
             stream.map(strRow -> strRow.split(TAB_SYMBOL))
                     .forEach(row -> {
-                        Artist artist = artistMap.get(row[2]);
-                        if (artist != null) {
-                            artist.setArtistCreditId(row[0]);
+                        List<Artist> artistList = artistMap.get(row[2]);
+                        if (artistList != null) {
+                            artistList.forEach(artist -> artist.setArtistCreditId(row[0]));
                         }
                     });
         } catch (IOException e) {
@@ -192,16 +195,17 @@ public class ArtistParser {
     }
 
     private List<Artist> parseArtistLinks(List<Artist> artists) {
-        Map<String, Artist> artistMap = artists.stream()
-                .collect(Collectors.toMap(Artist::getPk, Function.identity()));
+        Map<String, List<Artist>> artistMap = artists.stream()
+                .filter(album -> !StringUtils.isEmpty(album.getPk()))
+                .collect(Collectors.groupingBy(Artist::getPk));
 
         //read file into stream, try-with-resources
         try (Stream<String> stream = Files.lines(Paths.get(artistUrlsPath))) {
             stream.map(strRow -> strRow.split(TAB_SYMBOL))
                     .forEach(row -> {
-                        Artist artist = artistMap.get(row[2]);
-                        if (artist != null) {
-                            artist.getLinks().add(new ArtistUrlLink(row[1], row[3]));
+                        List<Artist> artistList = artistMap.get(row[2]);
+                        if (artistList != null) {
+                            artistList.forEach(artist -> artist.getLinks().add(new ArtistUrlLink(row[1], row[3])));
                         }
                     });
         } catch (IOException e) {
@@ -324,8 +328,8 @@ public class ArtistParser {
         slugNameArtistMap.values().stream()
                 .filter(artistList -> artistList.size() > 1)
                 .forEach(artistList -> {
-                    long slug_postfix = 0;
-                    for(Artist artist : artistList) {
+                    long slug_postfix = 1;
+                    for (Artist artist : artistList) {
                         artist.setSlugPostfix(slug_postfix++);
                     }
                 });
@@ -339,6 +343,7 @@ public class ArtistParser {
         artist.setMBID(values[1]);
         artist.setName(values[2]);
         artist.setDisambiguationComment(values[13]);
+        artist.setSlugPostfix(0);
 
         artist.setBeginDate(ParserUtils.parseTimeStamp(values[4], values[5], values[6]));
         artist.setEndDate(ParserUtils.parseTimeStamp(values[7], values[8], values[9]));

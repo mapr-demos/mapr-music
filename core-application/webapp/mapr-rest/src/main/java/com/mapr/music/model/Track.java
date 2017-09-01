@@ -1,21 +1,15 @@
-package model;
+package com.mapr.music.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Track {
 
     private String id;
     private String name;
-    private JsonNumberLong length;
-
-    @JsonProperty("MBID")
-    private String MBID;
-    private JsonNumberLong position;
+    private int length;
+    private int position;
 
     public String getId() {
         return id;
@@ -33,28 +27,20 @@ public class Track {
         this.name = name;
     }
 
-    public JsonNumberLong getLength() {
+    public int getLength() {
         return length;
     }
 
     public void setLength(int length) {
-        this.length = new JsonNumberLong(length);
+        this.length = length;
     }
 
-    public String getMBID() {
-        return MBID;
-    }
-
-    public void setMBID(String MBID) {
-        this.MBID = MBID;
-    }
-
-    public JsonNumberLong getPosition() {
+    public int getPosition() {
         return position;
     }
 
     public void setPosition(int position) {
-        this.position = new JsonNumberLong(position);
+        this.position = position;
     }
 
     @Override
@@ -62,7 +48,7 @@ public class Track {
         return new ToStringBuilder(this)
                 .append("name", name)
                 .append("length", length)
-                .append("MBID", MBID)
+                .append("id", id)
                 .append("position", position)
                 .build();
     }

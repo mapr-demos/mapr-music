@@ -27,7 +27,7 @@ public class Album {
     private String slugName;
 
     @JsonProperty("slug_postfix")
-    private long slugPostfix;
+    private JsonNumberLong slugPostfix;
 
     private String genre;
     private String style;
@@ -60,7 +60,7 @@ public class Album {
     private List<String> imagesUrls;
 
     @JsonProperty("released_date")
-    private Long releasedDate;
+    private JsonNumberLong releasedDate;
 
     public String getId() {
         return id;
@@ -89,12 +89,12 @@ public class Album {
         return this;
     }
 
-    public long getSlugPostfix() {
+    public JsonNumberLong getSlugPostfix() {
         return slugPostfix;
     }
 
     public Album setSlugPostfix(long slugPostfix) {
-        this.slugPostfix = slugPostfix;
+        this.slugPostfix = new JsonNumberLong(slugPostfix);
         return this;
     }
 
@@ -175,12 +175,12 @@ public class Album {
         return this;
     }
 
-    public Long getReleasedDate() {
+    public JsonNumberLong getReleasedDate() {
         return releasedDate;
     }
 
     public Album setReleasedDate(Long releasedDate) {
-        this.releasedDate = releasedDate;
+        this.releasedDate = (releasedDate != null) ? new JsonNumberLong(releasedDate) : null;
         return this;
     }
 

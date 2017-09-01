@@ -155,16 +155,17 @@ public class AlbumParser {
 
     private List<Album> parseMediumFile(List<Album> albums) {
 
-        Map<String, Album> albumIdAlbumMap = albums.stream()
-                .collect(Collectors.toMap(Album::getPk, Function.identity()));
+        Map<String, List<Album>> albumIdAlbumMap = albums.stream()
+                .filter(album -> !StringUtils.isEmpty(album.getPk()))
+                .collect(Collectors.groupingBy(Album::getPk));
 
         //read file into stream, try-with-resources
         try (Stream<String> stream = Files.lines(Paths.get(mediumFilePath))) {
             Stream<String[]> rows = stream.map(strRow -> strRow.split(TAB_SYMBOL));
             rows.forEach(row -> {
-                Album album = albumIdAlbumMap.get(row[1]);
-                if (album != null) {
-                    album.setMediumId(row[0]);
+                List<Album> albumList = albumIdAlbumMap.get(row[1]);
+                if (albumList != null) {
+                    albumList.forEach(album -> album.setMediumId(row[0]));
                 }
             });
         } catch (IOException e) {
@@ -204,7 +205,7 @@ public class AlbumParser {
         slugNameAlbumMap.values().stream()
                 .filter(albumList -> albumList.size() > 1)
                 .forEach(albumList -> {
-                    long slug_postfix = 0;
+                    long slug_postfix = 1;
                     for (Album album : albumList) {
                         album.setSlugPostfix(slug_postfix++);
                     }
@@ -223,6 +224,7 @@ public class AlbumParser {
         album.setScript(values[8]);
         album.setBarcode(values[9]);
         album.setMBID(values[1]);
+        album.setSlugPostfix(0);
 
         artist.getAlbumsIds().add(album.getId());
 
@@ -239,6 +241,7 @@ public class AlbumParser {
         if (!VALUE_NOT_DEFINED_SYMBOL.equals(values[8])) {
             track.setLength(Integer.parseInt(values[8]));
         }
+        track.setId(values[1]);
         track.setMBID(values[1]);
         track.setName(values[6]);
         track.setPosition(Integer.parseInt(values[4]));

@@ -31,7 +31,7 @@ public class Artist {
     private String slugName;
 
     @JsonProperty("slug_postfix")
-    private long slugPostfix;
+    private JsonNumberLong slugPostfix;
 
     private String gender;
     private String area;
@@ -58,10 +58,10 @@ public class Artist {
     private Set<String> imagesUrls = new HashSet<>();
 
     @JsonProperty("begin_date")
-    private Long beginDate;
+    private JsonNumberLong beginDate;
 
     @JsonProperty("end_date")
-    private Long endDate;
+    private JsonNumberLong endDate;
 
     public Set<ArtistUrlLink> getLinks() {
         return links;
@@ -94,12 +94,12 @@ public class Artist {
         return this;
     }
 
-    public long getSlugPostfix() {
+    public JsonNumberLong getSlugPostfix() {
         return slugPostfix;
     }
 
     public Artist setSlugPostfix(long slugPostfix) {
-        this.slugPostfix = slugPostfix;
+        this.slugPostfix = new JsonNumberLong(slugPostfix);
         return this;
     }
 
@@ -190,21 +190,21 @@ public class Artist {
         return this;
     }
 
-    public Long getBeginDate() {
+    public JsonNumberLong getBeginDate() {
         return beginDate;
     }
 
     public Artist setBeginDate(Long beginDate) {
-        this.beginDate = beginDate;
+        this.beginDate = (beginDate != null) ? new JsonNumberLong(beginDate) : null;
         return this;
     }
 
-    public Long getEndDate() {
+    public JsonNumberLong getEndDate() {
         return endDate;
     }
 
     public Artist setEndDate(Long endDate) {
-        this.endDate = endDate;
+        this.endDate = (endDate != null) ? new JsonNumberLong(endDate) : null;
         return this;
     }
 
