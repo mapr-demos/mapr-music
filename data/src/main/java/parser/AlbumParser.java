@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -177,16 +176,17 @@ public class AlbumParser {
 
     private List<Album> parseTrackFile(List<Album> albums) {
 
-        Map<String, Album> mediumIdAlbumMap = albums.stream()
-                .collect(Collectors.toMap(Album::getMediumId, Function.identity()));
+        Map<String, List<Album>> mediumIdAlbumMap = albums.stream()
+                .filter(album -> !StringUtils.isEmpty(album.getMediumId()))
+                .collect(Collectors.groupingBy(Album::getMediumId));
 
         //read file into stream, try-with-resources
         try (Stream<String> stream = Files.lines(Paths.get(trackFilePath))) {
             Stream<String[]> rows = stream.map(strRow -> strRow.split(TAB_SYMBOL));
             rows.forEach(row -> {
-                Album album = mediumIdAlbumMap.get(row[3]);
-                if (album != null) {
-                    parseTrack(row, album);
+                List<Album> albumList = mediumIdAlbumMap.get(row[3]);
+                if (albumList != null) {
+                    parseTrack(row, albumList);
                 }
             });
         } catch (IOException e) {
@@ -235,7 +235,7 @@ public class AlbumParser {
         return album;
     }
 
-    public static Album parseTrack(String[] values, Album album) {
+    public static List<Album> parseTrack(String[] values, List<Album> albumList) {
         Track track = new Track();
 
         if (!VALUE_NOT_DEFINED_SYMBOL.equals(values[8])) {
@@ -246,7 +246,7 @@ public class AlbumParser {
         track.setName(values[6]);
         track.setPosition(Integer.parseInt(values[4]));
 
-        album.addTrack(track);
-        return album;
+        albumList.forEach(album -> album.addTrack(track));
+        return albumList;
     }
 }
