@@ -13,11 +13,11 @@ import java.util.Map;
  * Actual implementation of {@link com.mapr.music.dao.MaprDbDao} to manage {@link Artist} model.
  */
 @Named("artistDao")
-public class ArtistDao extends MaprDbDaoImpl<Artist> {
+public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public ArtistDao() {
+    public ArtistDaoImpl() {
         super(Artist.class);
     }
 

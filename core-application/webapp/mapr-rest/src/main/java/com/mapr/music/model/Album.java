@@ -43,7 +43,7 @@ public class Album {
     private List catalogNumbers;
 
     @JsonProperty("track_list")
-    private List trackList;
+    private List<Track> trackList;
 
     @JsonProperty("cover_image_url")
     private String coverImageUrl;
@@ -108,11 +108,11 @@ public class Album {
         return this;
     }
 
-    public List getTrackList() {
+    public List<Track> getTrackList() {
         return trackList;
     }
 
-    public Album setTrackList(List trackList) {
+    public Album setTrackList(List<Track> trackList) {
         this.trackList = trackList;
         return this;
     }

@@ -1,10 +1,11 @@
 package com.mapr.music.service.impl;
 
-import com.mapr.music.dao.MaprDbDao;
+import com.mapr.music.dao.AlbumDao;
 import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
+import com.mapr.music.model.Track;
 import com.mapr.music.service.AlbumService;
 import com.mapr.music.service.PaginatedService;
 import org.apache.commons.beanutils.PropertyUtilsBean;
@@ -15,7 +16,6 @@ import javax.ws.rs.NotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -46,11 +46,11 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     };
 
 
-    private final MaprDbDao<Album> albumDao;
+    private final AlbumDao albumDao;
     private final SlugService slugService;
 
     @Inject
-    public AlbumServiceImpl(@Named("albumDao") MaprDbDao<Album> albumDao, SlugService slugService) {
+    public AlbumServiceImpl(@Named("albumDao") AlbumDao albumDao, SlugService slugService) {
         this.albumDao = albumDao;
         this.slugService = slugService;
     }
@@ -226,9 +226,6 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             throw new IllegalArgumentException("Album can not be null");
         }
 
-        String id = UUID.randomUUID().toString();
-        album.setId(id);
-
         slugService.setSlugForAlbum(album);
 
         return albumToDto(albumDao.create(album));
@@ -270,6 +267,106 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         }
 
         return albumToDto(albumDao.update(id, album));
+    }
+
+    @Override
+    public Track getTrackById(String id, String trackId) {
+
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("Album's identifier can not be empty");
+        }
+
+        if (trackId == null || trackId.isEmpty()) {
+            throw new IllegalArgumentException("Track's identifier can not be empty");
+        }
+
+        return albumDao.getTrackById(id, trackId);
+    }
+
+    @Override
+    public List<Track> getAlbumTracksList(String id) {
+
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("Album's identifier can not be empty");
+        }
+
+        return albumDao.getTracksList(id);
+    }
+
+    @Override
+    public Track addTrackToAlbumTrackList(String id, Track track) {
+
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("Album's identifier can not be empty");
+        }
+
+        if (track == null) {
+            throw new IllegalArgumentException("Track can not be null");
+        }
+
+        return albumDao.addTrack(id, track);
+    }
+
+    @Override
+    public List<Track> addTracksToAlbumTrackList(String id, List<Track> tracks) {
+
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("Album's identifier can not be empty");
+        }
+
+        if (tracks == null) {
+            throw new IllegalArgumentException("Track list can not be null");
+        }
+
+        return albumDao.addTracks(id, tracks);
+    }
+
+    @Override
+    public Track updateAlbumTrack(String id, String trackId, Track track) {
+
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("Album's identifier can not be empty");
+        }
+
+        if (trackId == null || trackId.isEmpty()) {
+            throw new IllegalArgumentException("Track's identifier can not be empty");
+        }
+
+        if (track == null) {
+            throw new IllegalArgumentException("Track can not be null");
+        }
+
+        return albumDao.updateTrack(id, trackId, track);
+    }
+
+    @Override
+    public List<Track> setAlbumTrackList(String id, List<Track> trackList) {
+
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("Album's identifier can not be empty");
+        }
+
+        if (trackList == null) {
+            throw new IllegalArgumentException("Track list can not be null");
+        }
+
+        return albumDao.setTrackList(id, trackList);
+    }
+
+    @Override
+    public void deleteAlbumTrack(String id, String trackId) {
+
+        if (id == null || id.isEmpty()) {
+            throw new IllegalArgumentException("Album's identifier can not be empty");
+        }
+
+        if (trackId == null || trackId.isEmpty()) {
+            throw new IllegalArgumentException("Track's identifier can not be empty");
+        }
+
+        if (!albumDao.deleteTrack(id, trackId)) {
+            throw new NotFoundException("Can not find track with id = " + trackId + "' for album with id = " + id);
+        }
     }
 
     private AlbumDto albumToDto(Album album) {

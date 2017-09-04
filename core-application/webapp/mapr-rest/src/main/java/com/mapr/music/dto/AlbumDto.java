@@ -3,6 +3,7 @@ package com.mapr.music.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.mapr.music.model.Track;
 
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class AlbumDto {
     private List catalogNumbers;
 
     @JsonProperty("track_list")
-    private List trackList;
+    private List<Track> trackList;
 
     @JsonProperty("cover_image_url")
     private String coverImageUrl;
@@ -89,11 +90,11 @@ public class AlbumDto {
         this.catalogNumbers = catalogNumbers;
     }
 
-    public List getTrackList() {
+    public List<Track> getTrackList() {
         return trackList;
     }
 
-    public void setTrackList(List trackList) {
+    public void setTrackList(List<Track> trackList) {
         this.trackList = trackList;
     }
 

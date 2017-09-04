@@ -5,6 +5,7 @@ import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
+import com.mapr.music.model.Track;
 import com.mapr.music.service.AlbumService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -78,5 +79,51 @@ public class AlbumEndpoint {
         URI location = builder.build();
 
         return Response.status(Response.Status.CREATED).entity(createdAlbum).location(location).build();
+    }
+
+    @GET
+    @Path("{id}/tracks")
+    @ApiOperation(value = "Get list of album's tracks")
+    public List<Track> getAlbumTracks(@PathParam("id") String id) {
+        return albumService.getAlbumTracksList(id);
+    }
+
+    @GET
+    @Path("{album-id}/tracks/{track-id}")
+    @ApiOperation(value = "Get single album's track")
+    public Track getAlbumsSingleTrack(@PathParam("album-id") String albumId,
+                                      @PathParam("track-id") String trackId) {
+
+        return albumService.getTrackById(albumId, trackId);
+    }
+
+    @PUT
+    @Path("{id}/tracks")
+    @ApiOperation(value = "Updates the whole list of album's tracks")
+    public List<Track> setAlbumTracks(@PathParam("id") String id, List<Track> trackList) {
+        return albumService.setAlbumTrackList(id, trackList);
+    }
+
+    @PUT
+    @Path("{album-id}/tracks/{track-id}")
+    @ApiOperation(value = "Update single album's track")
+    public Track updateAlbumsSingleTrack(@PathParam("album-id") String albumId,
+                                         @PathParam("track-id") String trackId, Track track) {
+
+        return albumService.updateAlbumTrack(albumId, trackId, track);
+    }
+
+    @DELETE
+    @Path("{album-id}/tracks/{track-id}")
+    @ApiOperation(value = "Delete single album's track")
+    public void updateAlbumsSingleTrack(@PathParam("album-id") String albumId, @PathParam("track-id") String trackId) {
+        albumService.deleteAlbumTrack(albumId, trackId);
+    }
+
+    @POST
+    @Path("{id}/tracks/")
+    @ApiOperation(value = "Create single album's track")
+    public Track createAlbumsSingleTrack(@PathParam("id") String id, Track track) {
+        return albumService.addTrackToAlbumTrackList(id, track);
     }
 }

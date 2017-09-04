@@ -8,8 +8,8 @@ public class Track {
 
     private String id;
     private String name;
-    private int length;
-    private int position;
+    private Long length;
+    private Long position;
 
     public String getId() {
         return id;
@@ -27,19 +27,19 @@ public class Track {
         this.name = name;
     }
 
-    public int getLength() {
+    public Long getLength() {
         return length;
     }
 
-    public void setLength(int length) {
+    public void setLength(Long length) {
         this.length = length;
     }
 
-    public int getPosition() {
+    public Long getPosition() {
         return position;
     }
 
-    public void setPosition(int position) {
+    public void setPosition(Long position) {
         this.position = position;
     }
 

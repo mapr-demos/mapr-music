@@ -4,6 +4,7 @@ import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
+import com.mapr.music.model.Track;
 
 import java.util.List;
 
@@ -116,5 +117,19 @@ public interface AlbumService {
      * @return updated album.
      */
     AlbumDto updateAlbum(String id, Album album);
+
+    Track getTrackById(String id, String trackId);
+
+    List<Track> getAlbumTracksList(String id);
+
+    Track addTrackToAlbumTrackList(String id, Track track);
+
+    List<Track> addTracksToAlbumTrackList(String id, List<Track> tracks);
+
+    Track updateAlbumTrack(String id, String trackId, Track track);
+
+    List<Track> setAlbumTrackList(String id, List<Track> trackList);
+
+    void deleteAlbumTrack(String id, String trackId);
 
 }
