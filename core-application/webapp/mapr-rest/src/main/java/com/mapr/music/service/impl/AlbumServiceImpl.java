@@ -14,7 +14,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.NotFoundException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -107,7 +107,12 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      */
     @Override
     public ResourceDto<AlbumDto> getAlbumsPage(Long perPage, Long page, String order, List<String> orderFields) {
-        return getAlbumsPage(perPage, page, Arrays.asList(new SortOption(order, orderFields)));
+
+        List<SortOption> sortOptions = (order != null && orderFields != null)
+                ? Collections.singletonList(new SortOption(order, orderFields))
+                : Collections.emptyList();
+        
+        return getAlbumsPage(perPage, page, sortOptions);
     }
 
     /**

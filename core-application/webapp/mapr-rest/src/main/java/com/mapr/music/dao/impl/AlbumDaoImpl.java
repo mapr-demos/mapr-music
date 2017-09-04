@@ -55,7 +55,6 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
                     .setName(album.getName())
                     .setBarcode(album.getBarcode())
                     .setCountry(album.getCountry())
-                    .setFormat(album.getFormat())
                     .setLanguage(album.getLanguage())
                     .setPackaging(album.getPackaging())
                     .setFormat(album.getFormat());

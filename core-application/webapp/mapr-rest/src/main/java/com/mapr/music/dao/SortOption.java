@@ -40,6 +40,7 @@ public class SortOption {
                     Order.DESC + "'");
         }
 
+        this.order = Order.valueOf(orderNameUppercase);
         this.fields = fields;
     }
 
