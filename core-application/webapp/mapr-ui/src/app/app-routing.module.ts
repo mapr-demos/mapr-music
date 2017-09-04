@@ -7,6 +7,7 @@ import {AlbumDetailPage} from "./pages/album-detail-page/album-detail-page.compo
 import {ArtistPage} from "./pages/artist-page/artist-page.component";
 import {NotFoundPage} from "./pages/not-found-page/not-found-page.component";
 import {ReportingPage} from "./pages/reporting-page/reporting-page.component";
+import { FormsModule }   from '@angular/forms';
 
 
 const appRoutes: Routes = [
@@ -41,6 +42,7 @@ const appRoutes: Routes = [
     ArtistPage
   ],
   imports: [
+    FormsModule,
     NgbModule,
     CommonModule,
     RouterModule.forRoot(appRoutes)

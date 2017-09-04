@@ -64,17 +64,18 @@ interface PageRequest {
   sortType: string
 }
 
-function mapToArtist({artist_id, artist_name}): Artist {
+function mapToArtist({artist_id, name}): Artist {
   return {
     id: artist_id,
-    name: artist_name
+    name
   }
 }
 
-function mapToTrack({name, duration}): Track {
+function mapToTrack({id, name, length}): Track {
   return {
+    id,
     //convert to miliseconds
-    duration: `${duration}` + '000',
+    duration: `${length}` + '',
     name
   };
 }

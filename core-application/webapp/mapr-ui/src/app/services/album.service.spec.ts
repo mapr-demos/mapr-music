@@ -68,8 +68,9 @@ describe('Service: Album Service', () => {
       genre: 'test_genre',
       track_list: [
         {
+          id: '',
           name: 'Test_Track_name',
-          duration: '10'
+          length: '10000'
         }
       ],
       artist_list: [
@@ -92,6 +93,7 @@ describe('Service: Album Service', () => {
           }
         ]);
         expect(album.trackList).toEqual([{
+          id: '',
           name: 'Test_Track_name',
           duration: '10000'
         }]);
