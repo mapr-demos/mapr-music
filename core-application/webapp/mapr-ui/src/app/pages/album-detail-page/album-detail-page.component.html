@@ -2,7 +2,7 @@
   <div class="container">
     <div *ngIf="album" class="album-container">
       <div>
-        <img src="{{album.coverImageURL}}" width="150" height="150">
+        <img src="{{album.coverImageURL}}" width="150" height="150" onerror="this.src='https://s.discogs.com/images/default-release.png'">
       </div>
       <div style="padding: 5px">
         <div>{{album.title}}</div>
