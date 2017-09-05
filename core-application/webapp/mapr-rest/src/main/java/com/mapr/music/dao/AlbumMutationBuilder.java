@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Builder which helps to update Album documents.
+ */
 public class AlbumMutationBuilder {
 
     public static final boolean SET_NULL_VALUE_DEFAULT = false;
