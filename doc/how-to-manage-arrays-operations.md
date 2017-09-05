@@ -18,8 +18,9 @@ Note: Each of the examples depends on modified document as result of executing t
 to try the examples it is recommended to follow them step by step.
 
 You can use the following command to insert such document usin MapR-DB shell:
-`insert /table_name --value '{ "_id": "id1", "nested_doc_field": { "array_field_a": [{"boolean":false}, {"decimal": 123.456}] }, "array_field_b": ["MapR wins"] }'`
-
+```
+insert /table_name --value '{ "_id": "id1", "nested_doc_field": { "array_field_a": [{"boolean":false}, {"decimal": 123.456}] }, "array_field_b": ["MapR wins"] }'
+```
 
 ## Arrays operations examples
 
