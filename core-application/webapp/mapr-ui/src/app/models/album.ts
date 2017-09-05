@@ -6,7 +6,8 @@ export interface Artist {
 export interface Track {
   id: string,
   name: string,
-  duration: string
+  duration: string,
+  position: string
 }
 
 export interface Album {

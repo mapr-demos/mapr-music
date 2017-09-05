@@ -29,7 +29,9 @@ export class AlbumDetailPage implements OnInit{
   sourceURL: string;
 
   editedTrackId = null;
+  nameEditedTrack = '';
   reorderedTracks:Array<Track> = null;
+  newTrack = null;
 
   isFirstTrack(ind: number):boolean {
     return ind === 0;
@@ -56,19 +58,50 @@ export class AlbumDetailPage implements OnInit{
   }
 
   setEditTrackId(id: string) {
+    const editedTrack = this.album.trackList.filter((track) => track.id === id)[0];
     if (this.editedTrackId === id) {
-      this.editedTrackId = null;
+      editedTrack.name = this.nameEditedTrack;
+      this.albumService.updateAlbumTrack(this.album.id, editedTrack).then(() => {
+        this.editedTrackId = null;
+        this.nameEditedTrack = '';
+      });
       return;
     }
     this.editedTrackId = id;
+    this.nameEditedTrack = editedTrack.name;
   }
 
-  removeTrackAtIndex(ind: number) {
-    if (this.reorderedTracks) {
-      this.reorderedTracks = removeAtInd(this.reorderedTracks, ind);
+  removeTrack(trackId: string) {
+    this.albumService.deleteTrackInAlbum(this.album.id, trackId).then(() => {
+      if (this.reorderedTracks) {
+        this.reorderedTracks = this.reorderedTracks.filter((album) => album.id !== trackId);
+      }
+      this.album.trackList = this.album.trackList.filter((album) => album.id !== trackId);
+    });
+  }
+
+  saveTracks() {
+    this.albumService.saveAlbumTracks(this.album.id, this.reorderedTracks).then(() => {
+      this.album.trackList = this.reorderedTracks;
+      this.reorderedTracks = null;
+    });
+  }
+
+  onAddNewTrackClick() {
+    if (this.newTrack) {
+      this.albumService.addTrackToAlbum(this.album.id, this.newTrack).then((track) => {
+        if (this.reorderedTracks) {
+          this.reorderedTracks.push(track);
+        }
+        this.album.trackList.push(track);
+        this.newTrack = null;
+      });
+      return;
     }
-    const {trackList} = this.album;
-    this.album.trackList = removeAtInd(trackList, ind);
+    this.newTrack = {name: '', duration: '', position: 0};
+  }
+  onCancelAddClick() {
+    this.newTrack = null;
   }
 
   ngOnInit(): void {

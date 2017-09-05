@@ -71,12 +71,13 @@ function mapToArtist({artist_id, name}): Artist {
   }
 }
 
-function mapToTrack({id, name, length}): Track {
+function mapToTrack({id, name, length, position}): Track {
   return {
     id,
     //convert to miliseconds
-    duration: `${length}` + '',
-    name
+    duration: length ? `${length}` + '' : '0',
+    name,
+    position
   };
 }
 
@@ -158,6 +159,32 @@ export class AlbumService {
       .map((response: any) => {
         console.log('Album: ', response);
         return mapToAlbum(response);
+      })
+      .toPromise();
+  }
+
+  deleteTrackInAlbum(albumId: string, trackId: string): Promise<Object> {
+    return this.http.delete(`${this.config.apiURL}/mapr-music/api/1.0/albums/${albumId}/tracks/${trackId}`)
+      .toPromise()
+  }
+
+  saveAlbumTracks(albumId: string, tracks: Array<Track>): Promise<Object> {
+    return this.http.put(`${this.config.apiURL}/mapr-music/api/1.0/albums/${albumId}/tracks`, tracks)
+      .toPromise()
+  }
+
+  updateAlbumTrack(albumId: string, track: Track): Promise<Object> {
+    return this.http.put(`${this.config.apiURL}/mapr-music/api/1.0/albums/${albumId}/tracks/${track.id}`, track)
+      .toPromise();
+  }
+
+  addTrackToAlbum(albumId: string, track: Track): Promise<Track> {
+    const request = track as any;
+    request.length = track.duration;
+    return this.http.post(`${this.config.apiURL}/mapr-music/api/1.0/albums/${albumId}/tracks/`, request)
+      .map((response) => {
+        console.log(response);
+        return mapToTrack(response as any);
       })
       .toPromise();
   }

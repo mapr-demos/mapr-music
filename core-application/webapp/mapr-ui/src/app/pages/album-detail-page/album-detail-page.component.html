@@ -47,6 +47,7 @@
           *ngIf="reorderedTracks"
           class="btn btn-primary"
           style="margin: 0 5px"
+          (click)="saveTracks()"
         >
           Save
         </div>
@@ -84,7 +85,7 @@
                 {{track.name}}
               </ng-template>
               <ng-template #editedTrackName>
-                <input [(ngModel)] = "track.name">
+                <input [(ngModel)] = "nameEditedTrack">
               </ng-template>
               <div>Duration: {{track.duration | date:'mm:ss' }}</div>
             </div>
@@ -109,13 +110,58 @@
             style="padding: 0 5px"
           >
             <div
-              (click)="removeTrackAtIndex(i)"
+              (click)="removeTrack(track.id)"
             >
               <i class="fa fa-trash" aria-hidden="true"></i>
             </div>
           </td>
         </tr>
       </table>
+    </div>
+    <div
+      *ngIf = "newTrack"
+      style="padding: 5px;"
+    >
+      <div
+        style="padding: 5px 0;"
+      >
+        <input
+          [(ngModel)] = "newTrack.name"
+          placeholder="New Track Name"
+        >
+      </div>
+      <div
+        style="padding: 5px 0;"
+      >
+        <input
+          [(ngModel)] = "newTrack.duration"
+          placeholder="New Track Duration(ms)"
+        >
+      </div>
+    </div>
+    <div
+      class="btn btn-primary"
+      style="margin: 0 5px"
+      (click)="onAddNewTrackClick()"
+    >
+      <span
+        *ngIf="!newTrack"
+      >
+        Add new Track
+      </span>
+      <span
+        *ngIf="newTrack"
+      >
+        Save
+      </span>
+    </div>
+    <div
+      class="btn btn-primary"
+      style="margin: 0 5px"
+      *ngIf="newTrack"
+      (click)="onCancelAddClick()"
+    >
+      Cancel
     </div>
   </div>
   <div
