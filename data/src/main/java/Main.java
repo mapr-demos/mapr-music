@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-// TODO type tags
 public class Main {
 
     private static final String JSON_EXTENSION_NAME = ".json";
