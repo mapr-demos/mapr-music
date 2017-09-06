@@ -75,6 +75,15 @@ maprcli cluster queryservice setconfig
               -znode < Root Zookeeper node used by MapR Drill cluster >
 ```
 
+Example:
+```
+maprcli cluster queryservice setconfig \
+   -enabled true \
+   -clusterid my.cluster.id \
+   -storageplugin dfs \
+   -znode drill
+```
+
 Note, that in above command parameter `-clusterid`  refer to the value of the cluster-id parameter in the 
 `drill-override.conf` file. Below you can see the minimal Drill configuration, which can be found at 
 `/opt/mapr/drill/drill-<drill-version>/conf/drill-override.conf`:
@@ -104,12 +113,18 @@ location.
    * On Red Hat /Centos: `yum install mapr-client`
    * On Ubuntu: `apt-get install mapr-client`
    * On SUSE: `zypper install mapr-client`
+   
+3. Configure MapR Client by executing the following command:
+ 
+ ```
+ sudo /opt/mapr/server/configure.sh -N my.cluster.com -c -C cldbhost:7222 -Z zkhost:5181
+ ```
     
 Client applications connect to a cluster via CLDB nodes, which are listed in the connection request or in the 
 `mapr-clusters.conf` file on the machine that submits the connection request. 
-So, create or modify `/opt/mapr/conf/mapr-clusters.conf` and add the following configuration:
+So ensure that your `/opt/mapr/conf/mapr-clusters.conf` contains following configuration:
 
-`my.cluster.com secure=false mapr60:7222`
+`my.cluster.com secure=false cldbhost:7222`
 Where:
 
 * `my.cluster.id` is the name of your cluster
