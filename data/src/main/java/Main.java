@@ -1,6 +1,7 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
 import model.Album;
 import model.Artist;
+import model.Language;
 import org.apache.commons.lang3.StringUtils;
 import parser.AlbumParser;
 import parser.ArtistParser;
@@ -8,6 +9,7 @@ import parser.ArtistParser;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 public class Main {
 
@@ -25,6 +27,7 @@ public class Main {
         String dumpPath = args[0];
         String artistDirectoryPath = args[1] + File.separator + "artists";
         String albumDirectoryPath = args[1] + File.separator + "albums";
+        String languagesDirectoryPath = args[1] + File.separator + "languages";
 
         int documentsNumber = DEFAULT_NUMBER_OF_DOCS;
         if (args.length >= 3 && StringUtils.isNumeric(args[2])) {
@@ -41,25 +44,19 @@ public class Main {
         List<Album> albums = albumParser.parsAlbums(dumpPath, artists);
 
         createDirectoryIfNotExists(artistDirectoryPath);
-        artists.forEach(artist -> writeArtistJson(artist, artistDirectoryPath));
+        artists.forEach(artist -> writeJson(artist, artistDirectoryPath, artist.getMBID()));
 
         createDirectoryIfNotExists(albumDirectoryPath);
-        albums.forEach(album -> writeAlbumJson(album, albumDirectoryPath));
+        albums.forEach(album -> writeJson(album, albumDirectoryPath, album.getMBID()));
+
+        createDirectoryIfNotExists(languagesDirectoryPath);
+        Set<Language> existingLanguages = albumParser.getExistingLanguages();
+        existingLanguages.forEach(language -> writeJson(language, languagesDirectoryPath, language.getId()));
     }
 
-    private static void writeArtistJson(Artist artist, String directoryPath) {
-
-
+    private static void writeJson(Object value, String directoryPath, String id) {
         try {
-            mapper.writeValue(new File(directoryPath + File.separator + artist.getMBID() + JSON_EXTENSION_NAME), artist);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void writeAlbumJson(Album album, String directoryPath) {
-        try {
-            mapper.writeValue(new File(directoryPath + File.separator + album.getMBID() + JSON_EXTENSION_NAME), album);
+            mapper.writeValue(new File(directoryPath + File.separator + id + JSON_EXTENSION_NAME), value);
         } catch (IOException e) {
             e.printStackTrace();
         }

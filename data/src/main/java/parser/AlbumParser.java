@@ -3,6 +3,7 @@ package parser;
 import client.CoverArtArchiveClient;
 import model.Album;
 import model.Artist;
+import model.Language;
 import model.Track;
 import org.apache.commons.lang3.StringUtils;
 import util.SlugUtil;
@@ -11,10 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,6 +29,8 @@ public class AlbumParser {
     private String languageFilePath;
     private String mediumFilePath;
     private String trackFilePath;
+
+    private Set<Language> existingLanguages = new HashSet<>();
 
     public List<Album> parsAlbums(String dumpPath, List<Artist> artists) {
         this.artists = artists;
@@ -98,9 +98,9 @@ public class AlbumParser {
         try (Stream<String> stream = Files.lines(Paths.get(albumStatusFilePath))) {
             Stream<String[]> rows = stream.map(strRow -> strRow.split(TAB_SYMBOL));
             rows.forEach(row -> {
-                List<Album> curAlbums = albumMap.get(row[0]);
-                if (curAlbums != null) {
-                    curAlbums.forEach(album -> album.setStatus(row[1]));
+                List<Album> albumList = albumMap.get(row[0]);
+                if (albumList != null) {
+                    albumList.forEach(album -> album.setStatus(row[1]));
                 }
             });
         } catch (IOException e) {
@@ -119,9 +119,9 @@ public class AlbumParser {
         try (Stream<String> stream = Files.lines(Paths.get(albumPackagingFilePath))) {
             Stream<String[]> rows = stream.map(strRow -> strRow.split(TAB_SYMBOL));
             rows.forEach(row -> {
-                List<Album> curAlbums = albumMap.get(row[0]);
-                if (curAlbums != null) {
-                    albums.forEach(album -> album.setPackaging(row[1]));
+                List<Album> albumList = albumMap.get(row[0]);
+                if (albumList != null) {
+                    albumList.forEach(album -> album.setPackaging(row[1]));
                 }
             });
         } catch (IOException e) {
@@ -132,17 +132,31 @@ public class AlbumParser {
     }
 
     private List<Album> parseReleaseLanguageFile(List<Album> albums) {
+
         Map<String, List<Album>> albumMap = albums.stream()
-                .filter(album -> !StringUtils.isEmpty(album.getLanguage()))
+                .filter(album -> StringUtils.isNotEmpty(album.getLanguage()))
                 .collect(Collectors.groupingBy(Album::getLanguage));
 
         //read file into stream, try-with-resources
         try (Stream<String> stream = Files.lines(Paths.get(languageFilePath))) {
             Stream<String[]> rows = stream.map(strRow -> strRow.split(TAB_SYMBOL));
             rows.forEach(row -> {
-                List<Album> curAlbums = albumMap.get(row[0]);
-                if (curAlbums != null) {
-                    albums.forEach(album -> album.setLanguage(row[1]));
+                List<Album> albumList = albumMap.get(row[0]);
+                if (albumList != null) {
+
+                    String iso639Third = row[6]; // ISO 639-3
+                    String iso639SecondT = row[1]; // ISO 639-2 (T)
+                    String iso639SecondB = row[2]; // ISO 639-2 (B)
+                    String iso639First = row[3]; // ISO 639
+
+                    final String code = (!VALUE_NOT_DEFINED_SYMBOL.equals(iso639Third)) ? iso639Third
+                            : (!VALUE_NOT_DEFINED_SYMBOL.equals(iso639SecondT)) ? iso639SecondT
+                            : (!VALUE_NOT_DEFINED_SYMBOL.equals(iso639SecondB)) ? iso639SecondB
+                            : (!VALUE_NOT_DEFINED_SYMBOL.equals(iso639First)) ? iso639First
+                            : null;
+
+                    existingLanguages.add(new Language(code, row[4]));
+                    albumList.forEach(album -> album.setLanguage(code));
                 }
             });
         } catch (IOException e) {
@@ -218,9 +232,18 @@ public class AlbumParser {
         album.setId(values[1]);
         album.setPk(values[0]);
         album.setName(values[2]);
-        album.setStatus(values[5]); //Status ID
-        album.setPackaging(values[6]); //Packaging ID
-        album.setLanguage(values[7]); //Language ID
+
+        if (!VALUE_NOT_DEFINED_SYMBOL.equals(values[5])) {
+            album.setStatus(values[5]); //Status ID
+        }
+
+        if (!VALUE_NOT_DEFINED_SYMBOL.equals(values[6])) {
+            album.setPackaging(values[6]); //Packaging ID
+        }
+
+        if (!VALUE_NOT_DEFINED_SYMBOL.equals(values[7])) {
+            album.setLanguage(values[7]); //Language ID
+        }
         album.setScript(values[8]);
         album.setBarcode(values[9]);
         album.setMBID(values[1]);
@@ -248,5 +271,9 @@ public class AlbumParser {
 
         albumList.forEach(album -> album.addTrack(track));
         return albumList;
+    }
+
+    public Set<Language> getExistingLanguages() {
+        return existingLanguages;
     }
 }
