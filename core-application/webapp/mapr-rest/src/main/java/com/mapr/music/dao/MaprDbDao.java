@@ -22,6 +22,13 @@ public interface MaprDbDao<T> {
     }
 
     /**
+     * Returns list of all documents.
+     *
+     * @return list of documents.
+     */
+    List<T> getList();
+
+    /**
      * Returns list of documents according to specified <code>offset</code> and <code>limit</code> values.
      *
      * @param offset offset value.

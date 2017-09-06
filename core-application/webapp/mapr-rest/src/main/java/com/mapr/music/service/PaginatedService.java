@@ -22,10 +22,23 @@ public interface PaginatedService {
      * @return pagination info.
      */
     default Pagination getPaginationInfo(long page, long perPage) {
-        long totalNum = getTotalNum();
+        return getPaginationInfo(page, perPage, getTotalNum());
+    }
+
+    /**
+     * Computes pagination info according to the specified page number, number of documents per page and total number of
+     * documents.
+     *
+     * @param page     page number.
+     * @param perPage  number of documents per page.
+     * @param totalNum total number of documents.
+     * @return pagination info.
+     */
+    default Pagination getPaginationInfo(long page, long perPage, long totalNum) {
         long remainder = totalNum % perPage;
         long pages = (remainder == 0) ? totalNum / perPage : totalNum / perPage + 1;
 
         return new Pagination(perPage, totalNum, page, pages);
     }
+
 }

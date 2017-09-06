@@ -8,6 +8,26 @@ import java.util.List;
 public interface AlbumDao extends MaprDbDao<Album> {
 
     /**
+     * Returns list of albums by language code.
+     *
+     * @param offset      offset value.
+     * @param limit       limit value.
+     * @param sortOptions define the order of documents.
+     * @param lang        language code.
+     * @param fields      list of fields that will present in document.
+     * @return list of albums with specified language code.
+     */
+    List<Album> getByLanguage(long offset, long limit, List<SortOption> sortOptions, String lang, String... fields);
+
+    /**
+     * Returns number of albums according to the specified language.
+     *
+     * @param language language code.
+     * @return number of albums with specified language code.
+     */
+    long getTotalNumByLanguage(String language);
+
+    /**
      * Returns single track according to the specified track identifier and album identifier.
      *
      * @param albumId identifier of album, which is associated with track.

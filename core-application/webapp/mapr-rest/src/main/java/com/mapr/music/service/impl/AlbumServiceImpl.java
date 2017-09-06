@@ -1,10 +1,12 @@
 package com.mapr.music.service.impl;
 
 import com.mapr.music.dao.AlbumDao;
+import com.mapr.music.dao.LanguageDao;
 import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
+import com.mapr.music.model.Language;
 import com.mapr.music.model.Track;
 import com.mapr.music.service.AlbumService;
 import com.mapr.music.service.PaginatedService;
@@ -47,11 +49,13 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
 
 
     private final AlbumDao albumDao;
+    private final LanguageDao languageDao;
     private final SlugService slugService;
 
     @Inject
-    public AlbumServiceImpl(@Named("albumDao") AlbumDao albumDao, SlugService slugService) {
+    public AlbumServiceImpl(@Named("albumDao") AlbumDao albumDao, LanguageDao languageDao, SlugService slugService) {
         this.albumDao = albumDao;
+        this.languageDao = languageDao;
         this.slugService = slugService;
     }
 
@@ -111,7 +115,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         List<SortOption> sortOptions = (order != null && orderFields != null)
                 ? Collections.singletonList(new SortOption(order, orderFields))
                 : Collections.emptyList();
-        
+
         return getAlbumsPage(perPage, page, sortOptions);
     }
 
@@ -125,6 +129,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      * @param sortOptions sortOptions specifies albums ordering.
      * @return albums page resource.
      */
+    @Override
     public ResourceDto<AlbumDto> getAlbumsPage(Long perPage, Long page, List<SortOption> sortOptions) {
 
         if (page == null) {
@@ -148,6 +153,50 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         long offset = (page - 1) * perPage;
 
         List<Album> albums = albumDao.getList(offset, perPage, sortOptions, ALBUM_SHORT_INFO_FIELDS);
+        List<AlbumDto> albumDtoList = albums.stream()
+                .map(this::albumToDto)
+                .collect(Collectors.toList());
+
+        albumsPage.setResults(albumDtoList);
+
+        return albumsPage;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param perPage     specifies number of albums per page. In case when value is <code>null</code> the
+     *                    default value will be used. Default value depends on implementation class.
+     * @param page        specifies number of page, which will be returned. In case when page value is <code>null</code>
+     *                    the first page will be returned.
+     * @param sortOptions specifies albums ordering.
+     * @param lang        language code.
+     * @return albums page resource.
+     */
+    @Override
+    public ResourceDto<AlbumDto> getAlbumsPageByLanguage(Long perPage, Long page, List<SortOption> sortOptions, String lang) {
+
+        if (page == null) {
+            page = FIRST_PAGE_NUM;
+        }
+
+        if (page <= 0) {
+            throw new IllegalArgumentException("Page must be greater than zero");
+        }
+
+        if (perPage == null) {
+            perPage = ALBUMS_PER_PAGE_DEFAULT;
+        }
+
+        if (perPage <= 0) {
+            throw new IllegalArgumentException("Per page value must be greater than zero");
+        }
+
+        ResourceDto<AlbumDto> albumsPage = new ResourceDto<>();
+        albumsPage.setPagination(getPaginationInfo(page, perPage, albumDao.getTotalNumByLanguage(lang)));
+        long offset = (page - 1) * perPage;
+
+        List<Album> albums = albumDao.getByLanguage(offset, perPage, sortOptions, lang, ALBUM_SHORT_INFO_FIELDS);
         List<AlbumDto> albumDtoList = albums.stream()
                 .map(this::albumToDto)
                 .collect(Collectors.toList());
@@ -274,6 +323,13 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         return albumToDto(albumDao.update(id, album));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param id      identifier of album, which is associated with track.
+     * @param trackId track identifier.
+     * @return single track according to the specified track identifier and album identifier.
+     */
     @Override
     public Track getTrackById(String id, String trackId) {
 
@@ -288,6 +344,12 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         return albumDao.getTrackById(id, trackId);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param id identifier of album, whose track list will be returned.
+     * @return list of tracks for the album with specified identifier.
+     */
     @Override
     public List<Track> getAlbumTracksList(String id) {
 
@@ -298,6 +360,13 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         return albumDao.getTracksList(id);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param id    identifier of album, for which track will be added.
+     * @param track track, which will be added to the album's track list.
+     * @return newly created track with id field set.
+     */
     @Override
     public Track addTrackToAlbumTrackList(String id, Track track) {
 
@@ -312,6 +381,13 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         return albumDao.addTrack(id, track);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param id     identifier of album, for which tracks will be added.
+     * @param tracks list of tracks, which will be added to the album's track list.
+     * @return list of newly created tracks, each of tracks has id field set.
+     */
     @Override
     public List<Track> addTracksToAlbumTrackList(String id, List<Track> tracks) {
 
@@ -326,6 +402,14 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         return albumDao.addTracks(id, tracks);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param id      identifier of album, for which track will be updated.
+     * @param trackId identifier of track, which will be updated.
+     * @param track   contains update information.
+     * @return updated track.
+     */
     @Override
     public Track updateAlbumTrack(String id, String trackId, Track track) {
 
@@ -344,6 +428,13 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         return albumDao.updateTrack(id, trackId, track);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param id        identifier of album, for which track list will be set.
+     * @param trackList list of tracks. Some of them may correspond to existing tracks, that will be updated.
+     * @return album's track list.
+     */
     @Override
     public List<Track> setAlbumTrackList(String id, List<Track> trackList) {
 
@@ -358,6 +449,12 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         return albumDao.setTrackList(id, trackList);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param id      identifier of album, for which track will be deleted.
+     * @param trackId identifier of track, which will be deleted.
+     */
     @Override
     public void deleteAlbumTrack(String id, String trackId) {
 
@@ -372,6 +469,16 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         if (!albumDao.deleteTrack(id, trackId)) {
             throw new NotFoundException("Can not find track with id = " + trackId + "' for album with id = " + id);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return list of supported albums languages.
+     */
+    @Override
+    public List<Language> getSupportedAlbumsLanguages() {
+        return languageDao.getList();
     }
 
     private AlbumDto albumToDto(Album album) {
