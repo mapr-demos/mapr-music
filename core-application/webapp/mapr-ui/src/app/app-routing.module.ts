@@ -7,6 +7,7 @@ import {AlbumDetailPage} from "./pages/album-detail-page/album-detail-page.compo
 import {ArtistPage} from "./pages/artist-page/artist-page.component";
 import {NotFoundPage} from "./pages/not-found-page/not-found-page.component";
 import {ReportingPage} from "./pages/reporting-page/reporting-page.component";
+import {AppBar} from './components/app-bar-component/app-bar.component';
 import { FormsModule }   from '@angular/forms';
 
 
@@ -39,7 +40,8 @@ const appRoutes: Routes = [
     NotFoundPage,
     ReportingPage,
     AlbumDetailPage,
-    ArtistPage
+    ArtistPage,
+    AppBar
   ],
   imports: [
     FormsModule,
