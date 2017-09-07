@@ -34,7 +34,7 @@ export class ArtistService {
   }
 
   getArtistByIdURL(artistId: string): string {
-    return `${this.config.apiURL}/mapr-music/api/1.0/artists/${artistId}`;
+    return `${this.config.apiURL}/api/1.0/artists/${artistId}`;
   }
 
   getArtistById(artistId: string): Promise<Artist> {

@@ -1,4 +1,6 @@
-<app-bar></app-bar>
+<app-bar
+  [sourceURL]="sourceURL"
+></app-bar>
 <div class="container artist-page">
   <div
     *ngIf="artist !== undefined"
@@ -23,14 +25,5 @@
         </div>
       </div>
     </div>
-  </div>
-  <div
-    *ngIf = "sourceURL"
-  >
-    <a
-      href="{{sourceURL}}"
-    >
-      View Source
-    </a>
   </div>
 </div>
