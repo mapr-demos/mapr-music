@@ -1,9 +1,11 @@
 package com.mapr.music.service;
 
 import com.mapr.music.dao.AlbumDao;
+import com.mapr.music.dao.LanguageDao;
 import com.mapr.music.dao.MaprDbDao;
 import com.mapr.music.dao.impl.AlbumDaoImpl;
 import com.mapr.music.dao.impl.ArtistDaoImpl;
+import com.mapr.music.dao.impl.LanguageDaoImpl;
 import com.mapr.music.dao.impl.MaprDbDaoImpl;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
@@ -33,7 +35,9 @@ public class AlbumServiceIntegrationTest {
     public static WebArchive createDeployment() {
         return ShrinkWrap.create(WebArchive.class)
                 .addClasses(
-                        AlbumService.class, AlbumServiceImpl.class, AlbumDao.class, ArtistDaoImpl.class, AlbumDaoImpl.class, MaprDbDao.class, MaprDbDaoImpl.class, SlugService.class)
+                        AlbumService.class, AlbumServiceImpl.class, AlbumDao.class, ArtistDaoImpl.class,
+                        LanguageDao.class, LanguageDaoImpl.class, AlbumDaoImpl.class, MaprDbDao.class,
+                        MaprDbDaoImpl.class, SlugService.class)
                 .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 

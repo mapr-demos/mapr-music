@@ -1,6 +1,7 @@
 package com.mapr.music.service;
 
 import com.mapr.music.dao.AlbumDao;
+import com.mapr.music.dao.LanguageDao;
 import com.mapr.music.service.impl.AlbumServiceImpl;
 import com.mapr.music.service.impl.SlugService;
 import org.junit.Rule;
@@ -19,8 +20,9 @@ public class AlbumServiceTest {
         thrown.expect(IllegalArgumentException.class);
 
         AlbumDao albumDao = mock(AlbumDao.class);
+        LanguageDao languageDao = mock(LanguageDao.class);
         SlugService slugService = mock(SlugService.class);
-        AlbumService albumService = new AlbumServiceImpl(albumDao, slugService);
+        AlbumService albumService = new AlbumServiceImpl(albumDao, languageDao, slugService);
         albumService.getAlbumsPage(-1L);
     }
 
@@ -29,8 +31,9 @@ public class AlbumServiceTest {
         thrown.expect(IllegalArgumentException.class);
 
         AlbumDao albumDao = mock(AlbumDao.class);
+        LanguageDao languageDao = mock(LanguageDao.class);
         SlugService slugService = mock(SlugService.class);
-        AlbumService albumService = new AlbumServiceImpl(albumDao, slugService);
+        AlbumService albumService = new AlbumServiceImpl(albumDao, languageDao, slugService);
         albumService.getAlbumById("");
     }
 
