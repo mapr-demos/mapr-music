@@ -1,7 +1,7 @@
 package com.mapr.music.service;
 
-import com.mapr.music.dao.MaprDbDao;
-import com.mapr.music.model.Album;
+import com.mapr.music.dao.AlbumDao;
+import com.mapr.music.dao.LanguageDao;
 import com.mapr.music.service.impl.AlbumServiceImpl;
 import com.mapr.music.service.impl.SlugService;
 import org.junit.Rule;
@@ -19,9 +19,10 @@ public class AlbumServiceTest {
     public void getNegativePageTest() {
         thrown.expect(IllegalArgumentException.class);
 
-        MaprDbDao<Album> albumDao = mock(MaprDbDao.class);
+        AlbumDao albumDao = mock(AlbumDao.class);
+        LanguageDao languageDao = mock(LanguageDao.class);
         SlugService slugService = mock(SlugService.class);
-        AlbumService albumService = new AlbumServiceImpl(albumDao, slugService);
+        AlbumService albumService = new AlbumServiceImpl(albumDao, languageDao, slugService);
         albumService.getAlbumsPage(-1L);
     }
 
@@ -29,9 +30,10 @@ public class AlbumServiceTest {
     public void getByNullId() {
         thrown.expect(IllegalArgumentException.class);
 
-        MaprDbDao<Album> albumDao = mock(MaprDbDao.class);
+        AlbumDao albumDao = mock(AlbumDao.class);
+        LanguageDao languageDao = mock(LanguageDao.class);
         SlugService slugService = mock(SlugService.class);
-        AlbumService albumService = new AlbumServiceImpl(albumDao, slugService);
+        AlbumService albumService = new AlbumServiceImpl(albumDao, languageDao, slugService);
         albumService.getAlbumById("");
     }
 

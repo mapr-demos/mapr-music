@@ -9,6 +9,7 @@ import com.mapr.music.model.Track;
 import com.mapr.music.service.AlbumService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -32,23 +33,28 @@ public class AlbumEndpoint {
     @GET
     @Path("{id}")
     @ApiOperation(value = "Get single album by it's identifier")
-    public AlbumDto getAlbum(@PathParam("id") String id) {
+    public AlbumDto getAlbum(@ApiParam(value = "Album's identifier", required = true) @PathParam("id") String id) {
         return albumService.getAlbumById(id);
     }
 
     @GET
     @Path("/slug/{slug}")
     @ApiOperation(value = "Get single album by it's slug name")
-    public AlbumDto getAlbumBySlugName(@PathParam("slug") String slug) {
+    public AlbumDto getAlbumBySlugName(@ApiParam(value = "Slug name", required = true) @PathParam("slug") String slug) {
         return albumService.getAlbumBySlugName(slug);
     }
 
     @GET
     @Path("/")
     @ApiOperation(value = "Get list of albums, which is represented by page")
-    public ResourceDto<AlbumDto> getAlbumsList(@QueryParam("per_page") Long perPage,
+    public ResourceDto<AlbumDto> getAlbumsPage(@QueryParam("per_page") Long perPage,
                                                @QueryParam("page") Long page,
-                                               @QueryParam("sort") List<SortOption> sortOptions) {
+                                               @QueryParam("sort") List<SortOption> sortOptions,
+                                               @QueryParam("language") String language) {
+
+        if (language != null) {
+            return albumService.getAlbumsPageByLanguage(perPage, page, sortOptions, language);
+        }
 
         return albumService.getAlbumsPage(perPage, page, sortOptions);
     }

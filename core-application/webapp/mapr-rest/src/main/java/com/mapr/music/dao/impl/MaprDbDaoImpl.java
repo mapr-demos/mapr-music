@@ -49,6 +49,29 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
     /**
      * {@inheritDoc}
      *
+     * @return list of all documents.
+     */
+    @Override
+    public List<T> getList() {
+        return processStore((connection, store) -> {
+
+            // Fetch all OJAI Documents from this store
+            DocumentStream documentStream = store.find();
+            List<T> documents = new ArrayList<>();
+            for (Document document : documentStream) {
+                T doc = mapOjaiDocument(document);
+                if (doc != null) {
+                    documents.add(doc);
+                }
+            }
+
+            return documents;
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * @param offset offset value.
      * @param limit  limit value.
      * @return list of document.

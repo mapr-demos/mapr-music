@@ -2,15 +2,17 @@ package com.mapr.music.dao.impl;
 
 import com.mapr.music.dao.AlbumDao;
 import com.mapr.music.dao.AlbumMutationBuilder;
+import com.mapr.music.dao.SortOption;
 import com.mapr.music.model.Album;
 import com.mapr.music.model.Track;
 import org.ojai.Document;
+import org.ojai.DocumentStream;
+import org.ojai.store.Query;
+import org.ojai.store.QueryCondition;
+import org.ojai.store.SortOrder;
 
 import javax.inject.Named;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -23,6 +25,91 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
         super(Album.class);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param offset  offset value.
+     * @param limit   limit value.
+     * @param options define the order of documents.
+     * @param lang    language code.
+     * @param fields  list of fields that will present in document.
+     * @return list of albums with specified language code.
+     */
+    @Override
+    public List<Album> getByLanguage(long offset, long limit, List<SortOption> options, String lang, String... fields) {
+        return processStore((connection, store) -> {
+
+            Query query = connection.newQuery();
+
+            // Select only specified field
+            if (fields != null && fields.length > 0) {
+                query.select(fields);
+            } else {
+                query.select("*");
+            }
+
+            // Build Query Condition to fetch documents by specified language
+            QueryCondition languageEqualsCondition = connection.newCondition()
+                    .is("language", QueryCondition.Op.EQUAL, lang)
+                    .build();
+
+            // Add Condition to the Query
+            query.where(languageEqualsCondition);
+
+            // Add ordering if sort options specified
+            if (options != null && !options.isEmpty()) {
+                for (SortOption opt : options) {
+                    SortOrder ojaiOrder = (SortOption.Order.DESC == opt.getOrder()) ? SortOrder.DESC : SortOrder.ASC;
+                    for (String field : opt.getFields()) {
+                        query = query.orderBy(field, ojaiOrder);
+                    }
+                }
+            }
+
+            // Add specified offset and limit to the Query
+            query.offset(offset)
+                    .limit(limit)
+                    .build();
+
+            DocumentStream documentStream = store.findQuery(query);
+            List<Album> albums = new ArrayList<>();
+            for (Document doc : documentStream) {
+                albums.add(mapOjaiDocument(doc));
+            }
+
+            return albums;
+        });
+
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param language language code.
+     * @return number of albums with specified language code.
+     */
+    @Override
+    public long getTotalNumByLanguage(String language) {
+        return processStore((connection, store) -> {
+
+            QueryCondition languageEqualsCondition = connection.newCondition()
+                    .is("language", QueryCondition.Op.EQUAL, language)
+                    .build();
+
+            Query query = connection.newQuery()
+                    .select("_id")
+                    .where(languageEqualsCondition)
+                    .build();
+
+            DocumentStream documentStream = store.findQuery(query);
+            long totalNum = 0;
+            for (Document ignored : documentStream) {
+                totalNum++;
+            }
+
+            return totalNum;
+        });
+    }
 
     /**
      * {@inheritDoc}
@@ -55,7 +142,6 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
                     .setName(album.getName())
                     .setBarcode(album.getBarcode())
                     .setCountry(album.getCountry())
-                    .setFormat(album.getFormat())
                     .setLanguage(album.getLanguage())
                     .setPackaging(album.getPackaging())
                     .setFormat(album.getFormat());

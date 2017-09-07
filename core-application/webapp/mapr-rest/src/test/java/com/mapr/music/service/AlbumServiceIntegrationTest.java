@@ -1,9 +1,17 @@
 package com.mapr.music.service;
 
+import com.mapr.music.dao.AlbumDao;
+import com.mapr.music.dao.LanguageDao;
+import com.mapr.music.dao.MaprDbDao;
+import com.mapr.music.dao.impl.AlbumDaoImpl;
+import com.mapr.music.dao.impl.ArtistDaoImpl;
+import com.mapr.music.dao.impl.LanguageDaoImpl;
+import com.mapr.music.dao.impl.MaprDbDaoImpl;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
 import com.mapr.music.service.impl.AlbumServiceImpl;
+import com.mapr.music.service.impl.SlugService;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -15,7 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.inject.Inject;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -26,7 +34,10 @@ public class AlbumServiceIntegrationTest {
     @Deployment
     public static WebArchive createDeployment() {
         return ShrinkWrap.create(WebArchive.class)
-                .addClasses(AlbumService.class, AlbumServiceImpl.class)
+                .addClasses(
+                        AlbumService.class, AlbumServiceImpl.class, AlbumDao.class, ArtistDaoImpl.class,
+                        LanguageDao.class, LanguageDaoImpl.class, AlbumDaoImpl.class, MaprDbDao.class,
+                        MaprDbDaoImpl.class, SlugService.class)
                 .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
@@ -102,7 +113,7 @@ public class AlbumServiceIntegrationTest {
     public void should_be_ordered() {
 
         // Specify per page value as 1, to be sure that second page may exist
-        ResourceDto<AlbumDto> firstPage = albumService.getAlbumsPage(null, 1L, "desc", Arrays.asList("name"));
+        ResourceDto<AlbumDto> firstPage = albumService.getAlbumsPage(null, 1L, "desc", Collections.singletonList("name"));
 
         assertNotNull(firstPage);
 
@@ -141,8 +152,14 @@ public class AlbumServiceIntegrationTest {
 
     @Test(expected = Exception.class)
     public void should_delete() {
-        albumService.deleteAlbumById(firstSample.getId());
-        albumService.getAlbumById(firstSample.getId());
+
+        Album sample = new Album().setName("Sample").setGenre("Sample").setStyle("Sample");
+        AlbumDto created = albumService.createAlbum(sample);
+
+        assertNotNull(created);
+
+        albumService.deleteAlbumById(sample.getId());
+        albumService.getAlbumById(sample.getId());
     }
 
 }

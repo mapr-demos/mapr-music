@@ -4,6 +4,7 @@ import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.Album;
+import com.mapr.music.model.Language;
 import com.mapr.music.model.Track;
 
 import java.util.List;
@@ -61,12 +62,27 @@ public interface AlbumService {
      *
      * @param perPage     specifies number of albums per page. In case when value is <code>null</code> the
      *                    default value will be used. Default value depends on implementation class.
-     * @param page        specifies number of page, which will be returned. In case when page value is <code>null</code> the
-     *                    first page will be returned.
-     * @param sortOptions sortOptions specifies albums ordering.
+     * @param page        specifies number of page, which will be returned. In case when page value is <code>null</code>
+     *                    the first page will be returned.
+     * @param sortOptions specifies albums ordering.
      * @return albums page resource.
      */
     ResourceDto<AlbumDto> getAlbumsPage(Long perPage, Long page, List<SortOption> sortOptions);
+
+    /**
+     * Returns list of albums by language code. List of albums is represented by page with default number of albums.
+     * Default number of albums depends on implementation class. Albums will be ordered according to the specified list
+     * of sort options.
+     *
+     * @param perPage     specifies number of albums per page. In case when value is <code>null</code> the
+     *                    default value will be used. Default value depends on implementation class.
+     * @param page        specifies number of page, which will be returned. In case when page value is <code>null</code>
+     *                    the first page will be returned.
+     * @param sortOptions specifies albums ordering.
+     * @param lang        language code.
+     * @return albums page resource.
+     */
+    ResourceDto<AlbumDto> getAlbumsPageByLanguage(Long perPage, Long page, List<SortOption> sortOptions, String lang);
 
     /**
      * Returns single album according to it's identifier.
@@ -118,18 +134,74 @@ public interface AlbumService {
      */
     AlbumDto updateAlbum(String id, Album album);
 
+    /**
+     * Returns single track according to the specified track identifier and album identifier.
+     *
+     * @param id      identifier of album, which is associated with track.
+     * @param trackId track identifier.
+     * @return single track according to the specified track identifier and album identifier.
+     */
     Track getTrackById(String id, String trackId);
 
+    /**
+     * Returns list of tracks for the album with specified identifier.
+     *
+     * @param id identifier of album, whose track list will be returned.
+     * @return list of tracks for the album with specified identifier.
+     */
     List<Track> getAlbumTracksList(String id);
 
+    /**
+     * Adds single track to the album with specified identifier.
+     *
+     * @param id    identifier of album, for which track will be added.
+     * @param track track, which will be added to the album's track list.
+     * @return newly created track with id field set.
+     */
     Track addTrackToAlbumTrackList(String id, Track track);
 
+    /**
+     * Adds list of tracks to the album with specified identifier.
+     *
+     * @param id     identifier of album, for which tracks will be added.
+     * @param tracks list of tracks, which will be added to the album's track list.
+     * @return list of newly created tracks, each of tracks has id field set.
+     */
     List<Track> addTracksToAlbumTrackList(String id, List<Track> tracks);
 
+    /**
+     * Updates single track.
+     *
+     * @param id      identifier of album, for which track will be updated.
+     * @param trackId identifier of track, which will be updated.
+     * @param track   contains update information.
+     * @return updated track.
+     */
     Track updateAlbumTrack(String id, String trackId, Track track);
 
+    /**
+     * Sets track list for the album with specified identifier. Note, that in case when track's identifier corresponds
+     * to the existing track, track will be updated, otherwise new track will be created.
+     *
+     * @param id        identifier of album, for which track list will be set.
+     * @param trackList list of tracks. Some of them may correspond to existing tracks, that will be updated.
+     * @return album's track list.
+     */
     List<Track> setAlbumTrackList(String id, List<Track> trackList);
 
+    /**
+     * Deletes single track according to the specified album identifier and track identifier.
+     *
+     * @param id      identifier of album, for which track will be deleted.
+     * @param trackId identifier of track, which will be deleted.
+     */
     void deleteAlbumTrack(String id, String trackId);
+
+    /**
+     * Returns list of supported albums languages.
+     *
+     * @return list of supported albums languages.
+     */
+    List<Language> getSupportedAlbumsLanguages();
 
 }
