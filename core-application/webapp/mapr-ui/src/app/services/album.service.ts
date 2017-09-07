@@ -124,7 +124,7 @@ export class AlbumService {
  * @desc returns URL for albums page request
  * */
   getAlbumsPageURL({pageNumber, sortType}: PageRequest): string {
-    const url = `${this.config.apiURL}/mapr-music/api/1.0/albums?page=${pageNumber}&per_page=${PAGE_SIZE}`;
+    const url = `${this.config.apiURL}/api/1.0/albums?page=${pageNumber}&per_page=${PAGE_SIZE}`;
     return SORT_HASH[sortType](url);
   }
 
@@ -148,7 +148,7 @@ export class AlbumService {
  * @desc get album by slug URL
  * */
   getAlbumBySlugURL(albumSlug: string): string {
-    return `${this.config.apiURL}/mapr-music/api/1.0/albums/slug/${albumSlug}`;
+    return `${this.config.apiURL}/api/1.0/albums/slug/${albumSlug}`;
   }
 
 /**
@@ -164,26 +164,25 @@ export class AlbumService {
   }
 
   deleteTrackInAlbum(albumId: string, trackId: string): Promise<Object> {
-    return this.http.delete(`${this.config.apiURL}/mapr-music/api/1.0/albums/${albumId}/tracks/${trackId}`)
+    return this.http.delete(`${this.config.apiURL}/api/1.0/albums/${albumId}/tracks/${trackId}`)
       .toPromise()
   }
 
   saveAlbumTracks(albumId: string, tracks: Array<Track>): Promise<Object> {
-    return this.http.put(`${this.config.apiURL}/mapr-music/api/1.0/albums/${albumId}/tracks`, tracks)
+    return this.http.put(`${this.config.apiURL}/api/1.0/albums/${albumId}/tracks`, tracks)
       .toPromise()
   }
 
   updateAlbumTrack(albumId: string, track: Track): Promise<Object> {
-    return this.http.put(`${this.config.apiURL}/mapr-music/api/1.0/albums/${albumId}/tracks/${track.id}`, track)
+    return this.http.put(`${this.config.apiURL}/api/1.0/albums/${albumId}/tracks/${track.id}`, track)
       .toPromise();
   }
 
   addTrackToAlbum(albumId: string, track: Track): Promise<Track> {
     const request = track as any;
     request.length = track.duration;
-    return this.http.post(`${this.config.apiURL}/mapr-music/api/1.0/albums/${albumId}/tracks/`, request)
+    return this.http.post(`${this.config.apiURL}/api/1.0/albums/${albumId}/tracks/`, request)
       .map((response) => {
-        console.log(response);
         return mapToTrack(response as any);
       })
       .toPromise();

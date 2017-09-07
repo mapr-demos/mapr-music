@@ -1,4 +1,6 @@
-<app-bar></app-bar>
+<app-bar
+  [sourceURL]="sourceURL"
+></app-bar>
 <div class="album-detail-page">
   <div class="container">
     <div *ngIf="album" class="album-container">
@@ -164,15 +166,5 @@
     >
       Cancel
     </div>
-  </div>
-  <div
-    *ngIf="sourceURL"
-    class="source-link"
-  >
-    <a
-      href="{{sourceURL}}"
-    >
-      View Source
-    </a>
   </div>
 </div>

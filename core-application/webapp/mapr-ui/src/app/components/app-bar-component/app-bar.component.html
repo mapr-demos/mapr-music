@@ -1,11 +1,23 @@
-<div
-  style="background-color: black"
->
-  <img
-    src="https://mapr.com/assets/images/logo_mapr_red.svg"
-    width="150"
-    height="60"
-    routerLink="/"
-    style="margin: 10px"
-  >
-</div>
+<nav class="navbar navbar-inverse">
+  <div class="container">
+    <div class="navbar-collapse collapse">
+      <a class="navbar-brand" routerLink="/">
+        <img alt="Brand" src="https://mapr.com/assets/images/logo_mapr_red.svg" width="80" height="26">
+      </a>
+      <ul class="nav navbar-nav">
+        <li><a routerLink="/"><i class="fa fa-home fa-fw" aria-hidden="true"></i>&nbsp;<b>Albums</b></a></li>
+      </ul>
+      <ul class="nav navbar-nav">
+        <li><a routerLink="/reporting"><i class="fa fa-bars fa-fw" aria-hidden="true"></i>&nbsp;<b>Reporting</b></a></li>
+      </ul>
+      <ul
+        class="nav navbar-nav navbar-right"
+        *ngIf = "sourceURL"
+      >
+        <li>
+          <a href="{{sourceURL}}">View Source</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
