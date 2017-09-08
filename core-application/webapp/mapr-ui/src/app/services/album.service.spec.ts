@@ -64,14 +64,14 @@ describe('Service: Album Service', () => {
       country: 'Test Country',
       style: 'Some Style',
       format: 'Test_format'
-      track_list: [
+      tracks: [
         {
           id: '',
           name: 'Test_Track_name',
           length: '10000'
         }
       ],
-      artist_list: [
+      artits: [
         {
           artist_id: 'Test_artist_id',
           artist_name: 'Test_Artist_name'

@@ -185,7 +185,7 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
      */
     @Override
     public List<Track> getTracksList(String albumId) {
-        Album album = getById(albumId, "track_list");
+        Album album = getById(albumId, "tracks");
         return (album == null) ? null : album.getTrackList();
     }
 
@@ -278,7 +278,7 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
             // Update the OJAI Document with specified identifier
             store.update(albumId, mutationBuilder.build());
 
-            Document updatedOjaiDoc = store.findById(albumId, "track_list");
+            Document updatedOjaiDoc = store.findById(albumId, "tracks");
 
             // Map Ojai document to the actual instance of model class
             Album updatedAlbum = mapOjaiDocument(updatedOjaiDoc);
@@ -321,7 +321,7 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
             // Update the OJAI Document with specified identifier
             store.update(albumId, mutationBuilder.build());
 
-            Document updatedOjaiDoc = store.findById(albumId, "track_list");
+            Document updatedOjaiDoc = store.findById(albumId, "tracks");
 
             // Map Ojai document to the actual instance of model class
             Album updatedAlbum = mapOjaiDocument(updatedOjaiDoc);

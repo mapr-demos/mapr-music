@@ -44,7 +44,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             "catalog_numbers",
             "released_date",
             "cover_image_url",
-            "artist_list"
+            "artists"
     };
 
 

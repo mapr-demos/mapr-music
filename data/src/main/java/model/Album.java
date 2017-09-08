@@ -43,13 +43,13 @@ public class Album {
     private String country;
     private List reviews;
 
-    @JsonProperty("artist_list")
+    @JsonProperty("artists")
     private List<Artist> artistList = new ArrayList<>();
 
     @JsonProperty("catalog_numbers")
     private List catalogNumbers;
 
-    @JsonProperty("track_list")
+    @JsonProperty("tracks")
     private List<Track> trackList = new ArrayList<>();
 
     @JsonProperty("cover_image_url")

@@ -35,13 +35,13 @@ public class Album {
     @JsonProperty("slug_postfix")
     private Long slugPostfix;
 
-    @JsonProperty("artist_list")
+    @JsonProperty("artists")
     private List artistList;
 
     @JsonProperty("catalog_numbers")
     private List catalogNumbers;
 
-    @JsonProperty("track_list")
+    @JsonProperty("tracks")
     private List<Track> trackList;
 
     @JsonProperty("cover_image_url")
