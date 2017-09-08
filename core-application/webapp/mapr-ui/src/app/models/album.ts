@@ -17,7 +17,6 @@ export interface Album {
   format: string,
   style: string,
   slug: string,
-  genre: string,
   trackList: Array<Track>,
   country: string,
   artists: Array<Artist>

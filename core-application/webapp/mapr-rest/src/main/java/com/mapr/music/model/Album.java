@@ -18,7 +18,6 @@ public class Album {
     @JsonProperty("_id")
     private String id;
     private String name;
-    private String genre;
     private String style;
     private String barcode;
     private String status;
@@ -168,15 +167,6 @@ public class Album {
 
     public Album setReleasedDate(Long releasedDate) {
         this.releasedDate = releasedDate;
-        return this;
-    }
-
-    public String getGenre() {
-        return genre;
-    }
-
-    public Album setGenre(String genre) {
-        this.genre = genre;
         return this;
     }
 

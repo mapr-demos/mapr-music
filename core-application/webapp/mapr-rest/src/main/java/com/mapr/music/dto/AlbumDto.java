@@ -17,7 +17,6 @@ public class AlbumDto {
     @JsonProperty("_id")
     private String id;
     private String name;
-    private String genre;
     private String style;
     private String barcode;
     private String status;
@@ -144,14 +143,6 @@ public class AlbumDto {
 
     public void setReleasedDate(Long releasedDate) {
         this.releasedDate = releasedDate;
-    }
-
-    public String getGenre() {
-        return genre;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
     }
 
     public String getStyle() {
