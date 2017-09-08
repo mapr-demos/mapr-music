@@ -3,6 +3,8 @@ package parser;
 import model.Artist;
 import model.ArtistUrlLink;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.SlugUtil;
 
 import java.io.File;
@@ -10,10 +12,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ArtistParser {
+
+    private static final Logger log = LoggerFactory.getLogger(ArtistParser.class);
 
     private static final String VALUE_NOT_DEFINED_SYMBOL = "\\N";
     private static final String TAB_SYMBOL = "\t";
@@ -30,7 +35,7 @@ public class ArtistParser {
     private String linkPath;
     private String linkTypePath;
 
-    public List<Artist> parseArtists(String dumpPath, int size) {
+    public List<Artist> parseArtists(String dumpPath, long size, boolean chooseWithImages) {
         artistFilePath = dumpPath + File.separator + "artist";
         areaFilePath = dumpPath + File.separator + "area";
         artistIsniFilePath = dumpPath + File.separator + "artist_isni";
@@ -42,26 +47,79 @@ public class ArtistParser {
         linkPath = dumpPath + File.separator + "link";
         linkTypePath = dumpPath + File.separator + "link_type";
 
-        List<Artist> artists = parseArtistFile(size);
-        generateSlugs(artists);
+        // TODO refactor
+        if (!chooseWithImages) {
 
-        parseAreaFile(artists);
-        parseArtistIsniFile(artists);
-        parseArtistIpiFile(artists);
-        parseGenderFile(artists);
-        parseArtistCreditNameFile(artists);
+            log.info("Parsing 'artist' file ...");
+            List<Artist> artists = parseArtistFile(size);
 
+            log.info("Generating slugs ...");
+            generateSlugs(artists);
 
-        parseArtistLinks(artists);
-        parseLinks(artists);
-        parseLinkTypes(artists);
-        parseUrls(artists);
+            log.info("Parsing 'area' file ...");
+            parseAreaFile(artists);
 
+            log.info("Parsing 'artist_isni' file ...");
+            parseArtistIsniFile(artists);
 
-        return artists;
+            log.info("Parsing 'artist_ipi' file ...");
+            parseArtistIpiFile(artists);
+
+            log.info("Parsing 'gender' file ...");
+            parseGenderFile(artists);
+
+            log.info("Parsing 'artist_credit_name' file ...");
+            parseArtistCreditNameFile(artists);
+
+            log.info("Parsing 'l_artist_url' file ...");
+            parseArtistLinks(artists);
+
+            log.info("Parsing 'link' file ...");
+            parseLinks(artists);
+
+            log.info("Parsing 'link_type' file ...");
+            parseLinkTypes(artists);
+
+            log.info("Parsing 'url' file ...");
+            parseUrls(artists);
+
+            return artists;
+        } else {
+
+            log.info("Finding artists' images ...");
+            String artistUrlLinksTypeId = findArtistImageLinkTypeId();
+
+            Set<ArtistUrlLink> artistUrlLinks = findArtistImageLinksIds(artistUrlLinksTypeId);
+            artistUrlLinks = findArtistAndUrlIds(artistUrlLinks);
+            List<Artist> artists = findArtistsByUrlLinks(artistUrlLinks, size);
+
+            log.info("Generating slugs ...");
+            generateSlugs(artists);
+
+            log.info("Parsing 'area' file ...");
+            parseAreaFile(artists);
+
+            log.info("Parsing 'artist_isni' file ...");
+            parseArtistIsniFile(artists);
+
+            log.info("Parsing 'artist_ipi' file ...");
+            parseArtistIpiFile(artists);
+
+            log.info("Parsing 'gender' file ...");
+            parseGenderFile(artists);
+
+            log.info("Parsing 'artist_credit_name' file ...");
+            parseArtistCreditNameFile(artists);
+
+            log.info("Parsing 'url' file ...");
+            parseUrls(artists);
+
+            return artists;
+        }
+
     }
 
-    private List<Artist> parseArtistFile(int size) {
+    private List<Artist> parseArtistFile(long size) {
         List<Artist> artists = null;
         //read file into stream, try-with-resources
         try (Stream<String> stream = Files.lines(Paths.get(artistFilePath))) {
@@ -352,6 +410,90 @@ public class ArtistParser {
         artist.setGender(values[12]); // gender id
 
         return artist;
+    }
+
+    private String findArtistImageLinkTypeId() {
+
+        Optional<String> artistUrlLinkTypeIdOptional = null;
+
+        //read file into stream, try-with-resources
+        try (Stream<String> stream = Files.lines(Paths.get(linkTypePath))) {
+
+            artistUrlLinkTypeIdOptional = stream.map(strRow -> strRow.split(TAB_SYMBOL))
+                    .filter(row -> "artist".equals(row[4]) && "image".equals(row[6])) // filter only artist images links
+                    .map(row -> row[0]) // map to stream of link type ids
+                    .findAny();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return (artistUrlLinkTypeIdOptional != null && artistUrlLinkTypeIdOptional.isPresent())
+                ? artistUrlLinkTypeIdOptional.get()
+                : "";
+    }
+
+    private Set<ArtistUrlLink> findArtistImageLinksIds(String artistUrlLinkTypeId) {
+
+        Set<ArtistUrlLink> artistUrlLinks = null;
+        //read file into stream, try-with-resources
+        try (Stream<String> stream = Files.lines(Paths.get(linkPath))) {
+            artistUrlLinks = stream.map(strRow -> strRow.split(TAB_SYMBOL))
+                    .filter(row -> artistUrlLinkTypeId.equals(row[1]))
+                    .map(row -> row[0]) //map to stream of link ids
+                    .map(linkId -> new ArtistUrlLink(linkId, null, artistUrlLinkTypeId))
+                    .collect(Collectors.toSet());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return (artistUrlLinks != null) ? artistUrlLinks : Collections.emptySet();
+    }
+
+    private Set<ArtistUrlLink> findArtistAndUrlIds(Set<ArtistUrlLink> artistUrlLinks) {
+
+        Map<String, ArtistUrlLink> linkIdLinkMap = artistUrlLinks.stream()
+                .filter(urlLink -> StringUtils.isNotEmpty(urlLink.getLinkId()))
+                .collect(Collectors.toMap(ArtistUrlLink::getLinkId, Function.identity()));
+
+        Set<ArtistUrlLink> resultingLinks = null;
+        //read file into stream, try-with-resources
+        try (Stream<String> stream = Files.lines(Paths.get(artistUrlsPath))) {
+            resultingLinks = stream.map(strRow -> strRow.split(TAB_SYMBOL))
+                    .filter(row -> linkIdLinkMap.containsKey(row[1]))
+                    .map(row -> {
+                        ArtistUrlLink artistUrlLink = linkIdLinkMap.get(row[1]);
+                        return new ArtistUrlLink(artistUrlLink.getLinkId(), row[3], artistUrlLink.getLinkTypeId(), row[2]);
+                    })
+                    .collect(Collectors.toSet());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return (resultingLinks != null) ? resultingLinks : Collections.emptySet();
+    }
+
+    private List<Artist> findArtistsByUrlLinks(Set<ArtistUrlLink> artistUrlLinks, long size) {
+
+        Map<String, List<ArtistUrlLink>> artistPkLinkMap = artistUrlLinks.stream()
+                .filter(urlLink -> StringUtils.isNotEmpty(urlLink.getArtistPk()))
+                .collect(Collectors.groupingBy(ArtistUrlLink::getArtistPk));
+
+        List<Artist> artistList = null;
+        //read file into stream, try-with-resources
+        try (Stream<String> stream = Files.lines(Paths.get(artistFilePath))) {
+            artistList = stream.map(strRow -> strRow.split(TAB_SYMBOL))
+                    .filter(row -> artistPkLinkMap.containsKey(row[0]))
+                    .map(this::parseArtistRow)
+                    .peek(artist -> artist.addLinks(artistPkLinkMap.get(artist.getPk())))
+                    .limit(size)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return (artistList != null) ? artistList : Collections.emptyList();
     }
 
 }

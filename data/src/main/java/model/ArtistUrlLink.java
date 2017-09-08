@@ -5,14 +5,27 @@ public class ArtistUrlLink {
     private String linkId;
     private String urlId;
     private String linkTypeId;
+    private String artistPk;
 
     public ArtistUrlLink() {
 
     }
 
     public ArtistUrlLink(String linkId, String urlId) {
+        this(linkId, urlId, null);
+    }
+
+    public ArtistUrlLink(String linkId, String urlId, String linkTypeId) {
         this.linkId = linkId;
         this.urlId = urlId;
+        this.linkTypeId = linkTypeId;
+    }
+
+    public ArtistUrlLink(String linkId, String urlId, String linkTypeId, String artistPk) {
+        this.linkId = linkId;
+        this.urlId = urlId;
+        this.linkTypeId = linkTypeId;
+        this.artistPk = artistPk;
     }
 
     public String getLinkId() {
@@ -37,5 +50,13 @@ public class ArtistUrlLink {
 
     public void setLinkTypeId(String linkTypeId) {
         this.linkTypeId = linkTypeId;
+    }
+
+    public String getArtistPk() {
+        return artistPk;
+    }
+
+    public void setArtistPk(String artistPk) {
+        this.artistPk = artistPk;
     }
 }

@@ -6,6 +6,8 @@ import model.Artist;
 import model.Language;
 import model.Track;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.SlugUtil;
 
 import java.io.File;
@@ -18,9 +20,12 @@ import java.util.stream.Stream;
 
 public class AlbumParser {
 
+
     private static final String VALUE_NOT_DEFINED_SYMBOL = "\\N";
     private static final String TAB_SYMBOL = "\t";
     private static final String EMPTY_STRING = "";
+
+    private static final Logger log = LoggerFactory.getLogger(AlbumParser.class);
 
     private List<Artist> artists;
     private String albumFilePath;
@@ -30,10 +35,13 @@ public class AlbumParser {
     private String mediumFilePath;
     private String trackFilePath;
 
+    private boolean chooseWithImages;
+
     private Set<Language> existingLanguages = new HashSet<>();
 
-    public List<Album> parsAlbums(String dumpPath, List<Artist> artists) {
+    public List<Album> parseAlbums(String dumpPath, List<Artist> artists, boolean chooseWithImages) {
         this.artists = artists;
+        this.chooseWithImages = chooseWithImages;
 
         albumFilePath = dumpPath + File.separator + "release";
         albumStatusFilePath = dumpPath + File.separator + "release_status";
@@ -42,17 +50,29 @@ public class AlbumParser {
         mediumFilePath = dumpPath + File.separator + "medium";
         trackFilePath = dumpPath + File.separator + "track";
 
+        log.info("Parsing 'release' file ...");
         List<Album> albums = parseAlbumFile();
+
+        log.info("Generating slugs");
         generateSlugs(albums);
 
+        log.info("Parsing 'release_status' file ...");
         parseReleaseStatusFile(albums);
+
+        log.info("Parsing 'release_packaging' file ...");
         parseReleasePackagingFile(albums);
+
+        log.info("Parsing 'language' file ...");
         parseReleaseLanguageFile(albums);
 
+        log.info("Parsing 'medium' file ...");
         parseMediumFile(albums);
+
+        log.info("Parsing 'track' file ...");
         parseTrackFile(albums);
 
         return albums;
+
     }
 
     private List<Album> parseAlbumFile() {
@@ -75,8 +95,10 @@ public class AlbumParser {
                 if (artistList != null) {
                     artistList.forEach(artist -> {
                         Album album = parseAlbumRow(row, artist);
-                        album.getArtistList().add(artist);
-                        albumList.add(album);
+                        if (album != null) {
+                            album.getArtistList().add(artist);
+                            albumList.add(album);
+                        }
                     });
                 }
 
@@ -249,12 +271,17 @@ public class AlbumParser {
         album.setMBID(values[1]);
         album.setSlugPostfix(0);
 
-        artist.getAlbumsIds().add(album.getId());
-
         CoverArtArchiveClient artArchiveClient = new CoverArtArchiveClient(album.getMBID());
         album.setCoverImageUrl(artArchiveClient.getCoverImage());
         album.setImagesUrls(artArchiveClient.getImages());
 
+        // Ignore albums if it does not have cover and chooseWithImages == true
+        if (chooseWithImages && (album.getCoverImageUrl() == null || album.getCoverImageUrl().isEmpty()
+                || album.getImagesUrls() == null || album.getImagesUrls().isEmpty())) {
+            return null;
+        }
+
+        artist.getAlbumsIds().add(album.getId());
         return album;
     }
 

@@ -6,10 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -65,6 +62,10 @@ public class Artist {
 
     public Set<ArtistUrlLink> getLinks() {
         return links;
+    }
+
+    public void addLinks(Collection<ArtistUrlLink> links) {
+        this.links.addAll(links);
     }
 
     public String getId() {

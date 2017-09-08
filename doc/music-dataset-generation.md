@@ -1,4 +1,4 @@
-# Generating Music dataset
+  # Generating Music dataset
 
 ### Download Music Brainz Database Dump
 
@@ -29,16 +29,19 @@ ready to import into MapR-DB.
 2. Build and package conversion util: `mvn clean package`
 3. Run the util. Note, that it takes three arguments:
 
-* DumpPath - Required argument which is used to point to Brainz Database dump directory, which contains table data.
-* ResultDirectory - Required argument which is used to point to dataset output directory. Dump conversion util will 
+* -s | --src - Required argument which is used to point to Brainz Database dump directory, which contains table data.
+* -d | --dst - Required argument which is used to point to dataset output directory. Dump conversion util will 
 create two directories at this specified output directory for storing albums/artists JSON documents .
-* DocsNum - Optional argument which specifies number of artists documents that will be created. Default value is 
+* -n | --num - Optional argument which specifies number of artists documents that will be created. Default value is 
 10_000. Note, that number of albums documents may differ from number of artists documents, since one artist can have 
 none or several albums.
+* -c | --chosen - Optional argument. When specified only data with images will be converted. Note that execution time 
+will be raised.
+* -h | --help - Prints usage information.
 
 ```
 $ cd target
-$ java -jar mb-dump-converter-1.0-SNAPSHOT.jar /path/to/dump/mbdump /path/to/output/ 1000
+$ java -jar mb-dump-converter-1.0-SNAPSHOT.jar --src /path/to/dump/mbdump --dst /path/to/output/ --num 1000 --chosen
 ```
 
 4. Check output directory for generated data:
