@@ -51,6 +51,16 @@ public class ArtistEndpoint {
         return artistService.getArtistsPage(perPage, page, sortOptions);
     }
 
+
+    @GET
+    @Path("/search/")
+    @ApiOperation(value = "Search artists by specified parameters")
+    public List<ArtistDto> searchArtists(@QueryParam("name_entry") String nameEntry,
+                                         @QueryParam("limit") Long limit) {
+
+        return artistService.searchArtists(nameEntry, limit);
+    }
+
     @DELETE
     @Path("{id}")
     @ApiOperation(value = "Delete single artist by it's identifier")

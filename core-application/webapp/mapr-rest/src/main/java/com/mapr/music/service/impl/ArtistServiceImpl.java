@@ -1,5 +1,6 @@
 package com.mapr.music.service.impl;
 
+import com.mapr.music.dao.ArtistDao;
 import com.mapr.music.dao.MaprDbDao;
 import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.AlbumDto;
@@ -27,6 +28,7 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
 
     private static final long ARTISTS_PER_PAGE_DEFAULT = 50;
     private static final long FIRST_PAGE_NUM = 1;
+    private static final long MAX_SEARCH_LIMIT = 15;
 
     private static final String[] ARTIST_SHORT_INFO_FIELDS = {
             "_id",
@@ -47,12 +49,12 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
     };
 
 
-    private final MaprDbDao<Artist> artistDao;
+    private final ArtistDao artistDao;
     private final MaprDbDao<Album> albumDao;
     private final SlugService slugService;
 
     @Inject
-    public ArtistServiceImpl(@Named("artistDao") MaprDbDao<Artist> artistDao,
+    public ArtistServiceImpl(@Named("artistDao") ArtistDao artistDao,
                              @Named("albumDao") MaprDbDao<Album> albumDao, SlugService slugService) {
 
         this.artistDao = artistDao;
@@ -288,6 +290,26 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
 
         return artistToDto(artistDao.update(id, artist));
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param nameEntry specifies search criteria.
+     * @param limit     specifies number of artists, which will be returned. Can be overridden by actual service
+     *                  implementation.
+     * @return list of artists which names start with name entry.
+     */
+    @Override
+    public List<ArtistDto> searchArtists(String nameEntry, Long limit) {
+
+        long actualLimit = (limit != null && limit > 0 && limit < MAX_SEARCH_LIMIT) ? limit : MAX_SEARCH_LIMIT;
+        List<Artist> artists = artistDao.getByNameStartsWith(nameEntry, actualLimit, ARTIST_SHORT_INFO_FIELDS);
+
+        return artists.stream()
+                .map(this::artistToDto)
+                .collect(Collectors.toList());
+    }
+
 
     private ArtistDto artistToDto(Artist artist) {
         ArtistDto artistDto = new ArtistDto();

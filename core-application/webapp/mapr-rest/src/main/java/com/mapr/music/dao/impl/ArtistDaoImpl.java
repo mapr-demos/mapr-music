@@ -2,18 +2,24 @@ package com.mapr.music.dao.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.mapr.music.dao.ArtistDao;
 import com.mapr.music.model.Artist;
 import org.ojai.Document;
+import org.ojai.DocumentStream;
 import org.ojai.store.DocumentMutation;
+import org.ojai.store.Query;
+import org.ojai.store.QueryCondition;
 
 import javax.inject.Named;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Actual implementation of {@link com.mapr.music.dao.MaprDbDao} to manage {@link Artist} model.
  */
 @Named("artistDao")
-public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> {
+public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -94,6 +100,48 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> {
 
             // Map Ojai document to the actual instance of model class
             return mapOjaiDocument(createdOjaiDoc);
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param nameEntry specifies query criteria.
+     * @param limit     specified limit.
+     * @param fields    specifies fields that will be fetched.
+     * @return list of artists which names start with the specified name entry.
+     */
+    @Override
+    public List<Artist> getByNameStartsWith(String nameEntry, long limit, String... fields) {
+        return processStore((connection, store) -> {
+
+            Query query = connection.newQuery();
+
+            // Select only specified field
+            if (fields != null && fields.length > 0) {
+                query.select(fields);
+            } else {
+                query.select("*");
+            }
+
+            // Build Query Condition to fetch documents by specified language
+            String nameStartsWithPattern = nameEntry + "%";
+            QueryCondition nameStartsWithCondition = connection.newCondition()
+                    .like("name", nameStartsWithPattern)
+                    .build();
+
+            // Add Condition and specified limit to the Query
+            query.where(nameStartsWithCondition)
+                    .limit(limit)
+                    .build();
+
+            DocumentStream documentStream = store.findQuery(query);
+            List<Artist> artists = new ArrayList<>();
+            for (Document doc : documentStream) {
+                artists.add(mapOjaiDocument(doc));
+            }
+
+            return artists;
         });
     }
 }

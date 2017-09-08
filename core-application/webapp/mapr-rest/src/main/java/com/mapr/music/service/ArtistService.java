@@ -114,4 +114,15 @@ public interface ArtistService {
      */
     ArtistDto updateArtist(String id, Artist artist);
 
+
+    /**
+     * Search artists according to the specified name entry. Returns artists which names start with name entry.
+     *
+     * @param nameEntry specifies search criteria.
+     * @param limit     specifies number of artists, which will be returned. Can be overridden by actual service
+     *                  implementation.
+     * @return list of artists which names start with name entry.
+     */
+    List<ArtistDto> searchArtists(String nameEntry, Long limit);
+
 }

@@ -79,7 +79,6 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
 
             return albums;
         });
-
     }
 
     /**
