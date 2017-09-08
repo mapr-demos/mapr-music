@@ -29,7 +29,6 @@ public class Album {
     @JsonProperty("slug_postfix")
     private JsonNumberLong slugPostfix;
 
-    private String genre;
     private String style;
     private String barcode;
     private String status;
@@ -184,15 +183,6 @@ public class Album {
         return this;
     }
 
-    public String getGenre() {
-        return genre;
-    }
-
-    public Album setGenre(String genre) {
-        this.genre = genre;
-        return this;
-    }
-
     public String getStyle() {
         return style;
     }
@@ -279,7 +269,6 @@ public class Album {
                 .append("mediumId", mediumId)
                 .append("id", id)
                 .append("name", name)
-                .append("genre", genre)
                 .append("style", style)
                 .append("barcode", barcode)
                 .append("status", status)

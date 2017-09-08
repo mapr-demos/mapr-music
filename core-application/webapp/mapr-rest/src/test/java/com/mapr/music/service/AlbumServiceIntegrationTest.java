@@ -52,9 +52,9 @@ public class AlbumServiceIntegrationTest {
     public void create_sample_albums() {
 
         // Create several albums to be sure that second page may exist
-        firstSample = new Album().setName("Test1").setGenre("Test1").setStyle("Test1");
-        secondSample = new Album().setName("Test2").setGenre("Test2").setStyle("Test2");
-        thirdSample = new Album().setName("Test3").setGenre("Test3").setStyle("Test3");
+        firstSample = new Album().setName("Test1").setLanguage("Test1").setStyle("Test1");
+        secondSample = new Album().setName("Test2").setLanguage("Test2").setStyle("Test2");
+        thirdSample = new Album().setName("Test3").setLanguage("Test3").setStyle("Test3");
 
         albumService.createAlbum(firstSample);
         albumService.createAlbum(secondSample);
@@ -75,7 +75,7 @@ public class AlbumServiceIntegrationTest {
         assertNotNull(albumDto);
         assertEquals(firstSample.getId(), albumDto.getId());
         assertEquals(firstSample.getName(), albumDto.getName());
-        assertEquals(firstSample.getGenre(), albumDto.getGenre());
+        assertEquals(firstSample.getLanguage(), albumDto.getLanguage());
         assertEquals(firstSample.getStyle(), albumDto.getStyle());
     }
 
@@ -153,7 +153,7 @@ public class AlbumServiceIntegrationTest {
     @Test(expected = Exception.class)
     public void should_delete() {
 
-        Album sample = new Album().setName("Sample").setGenre("Sample").setStyle("Sample");
+        Album sample = new Album().setName("Sample").setLanguage("Sample").setStyle("Sample");
         AlbumDto created = albumService.createAlbum(sample);
 
         assertNotNull(created);

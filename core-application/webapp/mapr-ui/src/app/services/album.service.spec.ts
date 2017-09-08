@@ -30,8 +30,7 @@ describe('Service: Album Service', () => {
           cover_image_url: 'Test_image',
           country: 'Test Country',
           style: 'Some Style',
-          format: 'Test_format',
-          genre: 'test_genre'
+          format: 'Test_format'
         }
       ],
       pagination: {
@@ -64,8 +63,7 @@ describe('Service: Album Service', () => {
       cover_image_url: 'Test_image',
       country: 'Test Country',
       style: 'Some Style',
-      format: 'Test_format',
-      genre: 'test_genre',
+      format: 'Test_format'
       track_list: [
         {
           id: '',

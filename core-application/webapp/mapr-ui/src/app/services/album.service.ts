@@ -89,7 +89,6 @@ function mapToAlbum({
   artist_list,
   style,
   format,
-  genre,
   track_list,
   slug
 }): Album {
@@ -100,7 +99,6 @@ function mapToAlbum({
     country,
     style,
     format,
-    genre,
     slug,
     trackList: track_list
       ? track_list.map(mapToTrack)
