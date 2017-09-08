@@ -33,7 +33,7 @@
         <div *ngFor="let album of albums" class="col-md-3">
           <div class="album-container">
             <div style="text-align: center">
-              <a routerLink="/album/{{album.id}}">
+              <a routerLink="/album/{{album.slug}}">
                 <img src={{album.coverImageURL}} width="150" height="150" onerror="this.src='https://s.discogs.com/images/default-release.png'">
               </a>
             </div>
