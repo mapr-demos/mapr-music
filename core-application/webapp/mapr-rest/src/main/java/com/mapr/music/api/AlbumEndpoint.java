@@ -4,6 +4,7 @@ package com.mapr.music.api;
 import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
+import com.mapr.music.dto.TrackDto;
 import com.mapr.music.model.Album;
 import com.mapr.music.model.Track;
 import com.mapr.music.service.AlbumService;
@@ -90,14 +91,14 @@ public class AlbumEndpoint {
     @GET
     @Path("{id}/tracks")
     @ApiOperation(value = "Get list of album's tracks")
-    public List<Track> getAlbumTracks(@PathParam("id") String id) {
+    public List<TrackDto> getAlbumTracks(@PathParam("id") String id) {
         return albumService.getAlbumTracksList(id);
     }
 
     @GET
     @Path("{album-id}/tracks/{track-id}")
     @ApiOperation(value = "Get single album's track")
-    public Track getAlbumsSingleTrack(@PathParam("album-id") String albumId,
+    public TrackDto getAlbumsSingleTrack(@PathParam("album-id") String albumId,
                                       @PathParam("track-id") String trackId) {
 
         return albumService.getTrackById(albumId, trackId);
@@ -106,17 +107,17 @@ public class AlbumEndpoint {
     @PUT
     @Path("{id}/tracks")
     @ApiOperation(value = "Updates the whole list of album's tracks")
-    public List<Track> setAlbumTracks(@PathParam("id") String id, List<Track> trackList) {
+    public List<TrackDto> setAlbumTracks(@PathParam("id") String id, List<TrackDto> trackList) {
         return albumService.setAlbumTrackList(id, trackList);
     }
 
     @PUT
     @Path("{album-id}/tracks/{track-id}")
     @ApiOperation(value = "Update single album's track")
-    public Track updateAlbumsSingleTrack(@PathParam("album-id") String albumId,
-                                         @PathParam("track-id") String trackId, Track track) {
+    public TrackDto updateAlbumsSingleTrack(@PathParam("album-id") String albumId,
+                                         @PathParam("track-id") String trackId, TrackDto trackDto) {
 
-        return albumService.updateAlbumTrack(albumId, trackId, track);
+        return albumService.updateAlbumTrack(albumId, trackId, trackDto);
     }
 
     @DELETE
@@ -129,7 +130,7 @@ public class AlbumEndpoint {
     @POST
     @Path("{id}/tracks/")
     @ApiOperation(value = "Create single album's track")
-    public Track createAlbumsSingleTrack(@PathParam("id") String id, Track track) {
-        return albumService.addTrackToAlbumTrackList(id, track);
+    public TrackDto createAlbumsSingleTrack(@PathParam("id") String id, TrackDto trackDto) {
+        return albumService.addTrackToAlbumTrackList(id, trackDto);
     }
 }

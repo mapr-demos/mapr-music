@@ -3,9 +3,9 @@ package com.mapr.music.service;
 import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
+import com.mapr.music.dto.TrackDto;
 import com.mapr.music.model.Album;
 import com.mapr.music.model.Language;
-import com.mapr.music.model.Track;
 
 import java.util.List;
 
@@ -141,7 +141,7 @@ public interface AlbumService {
      * @param trackId track identifier.
      * @return single track according to the specified track identifier and album identifier.
      */
-    Track getTrackById(String id, String trackId);
+    TrackDto getTrackById(String id, String trackId);
 
     /**
      * Returns list of tracks for the album with specified identifier.
@@ -149,7 +149,7 @@ public interface AlbumService {
      * @param id identifier of album, whose track list will be returned.
      * @return list of tracks for the album with specified identifier.
      */
-    List<Track> getAlbumTracksList(String id);
+    List<TrackDto> getAlbumTracksList(String id);
 
     /**
      * Adds single track to the album with specified identifier.
@@ -158,7 +158,7 @@ public interface AlbumService {
      * @param track track, which will be added to the album's track list.
      * @return newly created track with id field set.
      */
-    Track addTrackToAlbumTrackList(String id, Track track);
+    TrackDto addTrackToAlbumTrackList(String id, TrackDto track);
 
     /**
      * Adds list of tracks to the album with specified identifier.
@@ -167,7 +167,7 @@ public interface AlbumService {
      * @param tracks list of tracks, which will be added to the album's track list.
      * @return list of newly created tracks, each of tracks has id field set.
      */
-    List<Track> addTracksToAlbumTrackList(String id, List<Track> tracks);
+    List<TrackDto> addTracksToAlbumTrackList(String id, List<TrackDto> tracks);
 
     /**
      * Updates single track.
@@ -177,7 +177,7 @@ public interface AlbumService {
      * @param track   contains update information.
      * @return updated track.
      */
-    Track updateAlbumTrack(String id, String trackId, Track track);
+    TrackDto updateAlbumTrack(String id, String trackId, TrackDto track);
 
     /**
      * Sets track list for the album with specified identifier. Note, that in case when track's identifier corresponds
@@ -187,7 +187,7 @@ public interface AlbumService {
      * @param trackList list of tracks. Some of them may correspond to existing tracks, that will be updated.
      * @return album's track list.
      */
-    List<Track> setAlbumTrackList(String id, List<Track> trackList);
+    List<TrackDto> setAlbumTrackList(String id, List<TrackDto> trackList);
 
     /**
      * Deletes single track according to the specified album identifier and track identifier.

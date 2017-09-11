@@ -5,6 +5,7 @@ import com.mapr.music.dao.LanguageDao;
 import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
+import com.mapr.music.dto.TrackDto;
 import com.mapr.music.model.Album;
 import com.mapr.music.model.Language;
 import com.mapr.music.model.Track;
@@ -331,7 +332,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      * @return single track according to the specified track identifier and album identifier.
      */
     @Override
-    public Track getTrackById(String id, String trackId) {
+    public TrackDto getTrackById(String id, String trackId) {
 
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Album's identifier can not be empty");
@@ -341,7 +342,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             throw new IllegalArgumentException("Track's identifier can not be empty");
         }
 
-        return albumDao.getTrackById(id, trackId);
+        return trackToDto(albumDao.getTrackById(id, trackId));
     }
 
     /**
@@ -351,13 +352,13 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      * @return list of tracks for the album with specified identifier.
      */
     @Override
-    public List<Track> getAlbumTracksList(String id) {
+    public List<TrackDto> getAlbumTracksList(String id) {
 
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Album's identifier can not be empty");
         }
 
-        return albumDao.getTracksList(id);
+        return albumDao.getTracksList(id).stream().map(this::trackToDto).collect(Collectors.toList());
     }
 
     /**
@@ -368,7 +369,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      * @return newly created track with id field set.
      */
     @Override
-    public Track addTrackToAlbumTrackList(String id, Track track) {
+    public TrackDto addTrackToAlbumTrackList(String id, TrackDto track) {
 
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Album's identifier can not be empty");
@@ -378,7 +379,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             throw new IllegalArgumentException("Track can not be null");
         }
 
-        return albumDao.addTrack(id, track);
+        return trackToDto(albumDao.addTrack(id, dtoToTrack(track)));
     }
 
     /**
@@ -389,7 +390,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      * @return list of newly created tracks, each of tracks has id field set.
      */
     @Override
-    public List<Track> addTracksToAlbumTrackList(String id, List<Track> tracks) {
+    public List<TrackDto> addTracksToAlbumTrackList(String id, List<TrackDto> tracks) {
 
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Album's identifier can not be empty");
@@ -399,7 +400,9 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             throw new IllegalArgumentException("Track list can not be null");
         }
 
-        return albumDao.addTracks(id, tracks);
+        List<Track> trackList = tracks.stream().map(this::dtoToTrack).collect(Collectors.toList());
+
+        return albumDao.addTracks(id, trackList).stream().map(this::trackToDto).collect(Collectors.toList());
     }
 
     /**
@@ -411,7 +414,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      * @return updated track.
      */
     @Override
-    public Track updateAlbumTrack(String id, String trackId, Track track) {
+    public TrackDto updateAlbumTrack(String id, String trackId, TrackDto track) {
 
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Album's identifier can not be empty");
@@ -425,7 +428,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             throw new IllegalArgumentException("Track can not be null");
         }
 
-        return albumDao.updateTrack(id, trackId, track);
+        return trackToDto(albumDao.updateTrack(id, trackId, dtoToTrack(track)));
     }
 
     /**
@@ -436,7 +439,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      * @return album's track list.
      */
     @Override
-    public List<Track> setAlbumTrackList(String id, List<Track> trackList) {
+    public List<TrackDto> setAlbumTrackList(String id, List<TrackDto> trackList) {
 
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Album's identifier can not be empty");
@@ -446,7 +449,9 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             throw new IllegalArgumentException("Track list can not be null");
         }
 
-        return albumDao.setTrackList(id, trackList);
+        List<Track> tracks = trackList.stream().map(this::dtoToTrack).collect(Collectors.toList());
+
+        return albumDao.setTrackList(id, tracks).stream().map(this::trackToDto).collect(Collectors.toList());
     }
 
     /**
@@ -494,7 +499,43 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         String slug = slugService.getSlugForAlbum(album);
         albumDto.setSlug(slug);
 
+        if (album.getTrackList() != null && !album.getTrackList().isEmpty()) {
+
+            List<TrackDto> trackDtoList = album.getTrackList().stream()
+                    .map(this::trackToDto)
+                    .collect(Collectors.toList());
+
+            albumDto.setTrackList(trackDtoList);
+        }
+
         return albumDto;
     }
+
+    private TrackDto trackToDto(Track track) {
+
+        TrackDto trackDto = new TrackDto();
+        PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
+        try {
+            propertyUtilsBean.copyProperties(trackDto, track);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException("Can not create track Data Transfer Object", e);
+        }
+
+        return trackDto;
+    }
+
+    private Track dtoToTrack(TrackDto trackDto) {
+
+        Track track = new Track();
+        PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
+        try {
+            propertyUtilsBean.copyProperties(track, trackDto);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException("Can not create track from Data Transfer Object", e);
+        }
+
+        return track;
+    }
+
 
 }
