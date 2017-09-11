@@ -161,6 +161,8 @@ const mapToAlbumRequest = ({
 @Injectable()
 export class AlbumService {
 
+  private static SERVICE_URL = '/api/1.0/albums';
+
   constructor(
     private http: HttpClient,
     private config: AppConfig,
@@ -172,7 +174,7 @@ export class AlbumService {
  * @desc returns URL for albums page request
  * */
   getAlbumsPageURL({pageNumber, sortType, lang}: PageRequest): string {
-    let url = `${this.config.apiURL}/api/1.0/albums?page=${pageNumber}&per_page=${PAGE_SIZE}`;
+    let url = `${this.config.apiURL}${AlbumService.SERVICE_URL}?page=${pageNumber}&per_page=${PAGE_SIZE}`;
     console.log(lang);
     if (lang !== null) {
       url += `&language=${lang}`;
@@ -208,7 +210,7 @@ export class AlbumService {
  * @desc get album by slug URL
  * */
   getAlbumBySlugURL(albumSlug: string): string {
-    return `${this.config.apiURL}/api/1.0/albums/slug/${albumSlug}`;
+    return `${this.config.apiURL}${AlbumService.SERVICE_URL}/slug/${albumSlug}`;
   }
 
 /**
@@ -228,23 +230,23 @@ export class AlbumService {
   }
 
   deleteTrackInAlbum(albumId: string, trackId: string): Promise<Object> {
-    return this.http.delete(`${this.config.apiURL}/api/1.0/albums/${albumId}/tracks/${trackId}`)
+    return this.http.delete(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${albumId}/tracks/${trackId}`)
       .toPromise()
   }
 
   saveAlbumTracks(albumId: string, tracks: Array<Track>): Promise<Object> {
-    return this.http.put(`${this.config.apiURL}/api/1.0/albums/${albumId}/tracks`, tracks)
+    return this.http.put(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${albumId}/tracks`, tracks)
       .toPromise()
   }
 
   updateAlbumTrack(albumId: string, track: Track): Promise<Object> {
-    return this.http.put(`${this.config.apiURL}/api/1.0/albums/${albumId}/tracks/${track.id}`, track)
+    return this.http.put(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${albumId}/tracks/${track.id}`, track)
       .toPromise();
   }
 
   addTrackToAlbum(albumId: string, track: Track): Promise<Track> {
     const request = mapToTrackRequest(track);
-    return this.http.post(`${this.config.apiURL}/api/1.0/albums/${albumId}/tracks/`, request)
+    return this.http.post(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${albumId}/tracks/`, request)
       .map((response) => {
         return mapToTrack(response as any);
       })
@@ -262,7 +264,7 @@ export class AlbumService {
 
   createNewAlbum(album: Album): Promise<Album> {
     return this.http
-      .post(`${this.config.apiURL}/api/1.0/albums/`, mapToAlbumRequest(album))
+      .post(`${this.config.apiURL}${AlbumService.SERVICE_URL}/`, mapToAlbumRequest(album))
       .map((response: any) => {
         console.log('Creation response: ', response);
         return mapToAlbum(response);
@@ -272,7 +274,7 @@ export class AlbumService {
 
   updateAlbum(album: Album): Promise<Album> {
     return this.http
-      .put(`${this.config.apiURL}/api/1.0/albums/${album.id}`, mapToAlbumRequest(album))
+      .put(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${album.id}`, mapToAlbumRequest(album))
       .map((response: any) => {
         console.log('Updated response: ', response);
         return mapToAlbum(response);
