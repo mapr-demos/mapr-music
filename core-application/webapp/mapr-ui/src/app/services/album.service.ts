@@ -5,6 +5,7 @@ import {HttpClient} from "@angular/common/http";
 import "rxjs/add/operator/toPromise";
 import "rxjs/add/operator/map";
 import {AppConfig} from "../app.config";
+import {Observable} from "rxjs";
 
 const PAGE_SIZE = 12;
 
@@ -64,24 +65,27 @@ interface PageRequest {
   sortType: string
 }
 
-function mapToArtist({artist_id, name}): Artist {
-  return {
-    id: artist_id,
-    name
-  }
-}
+const mapToArtist = ({
+  _id,
+  name
+}): Artist => ({
+  id: _id,
+  name
+});
 
-function mapToTrack({id, name, length, position}): Track {
-  return {
-    id,
-    //convert to miliseconds
-    duration: length ? `${length}` + '' : '0',
-    name,
-    position
-  };
-}
+const mapToTrack = ({
+  id,
+  name,
+  length,
+  position
+}): Track  => ({
+  id,
+  duration: length ? `${length}` + '' : '0',
+  name,
+  position
+});
 
-function mapToAlbum({
+const mapToAlbum = ({
   _id,
   name,
   cover_image_url,
@@ -91,23 +95,61 @@ function mapToAlbum({
   format,
   tracks,
   slug
-}): Album {
-  return {
-    id: _id,
-    title: name,
-    coverImageURL: cover_image_url,
-    country,
-    style,
-    format,
-    slug,
-    trackList: tracks
-      ? tracks.map(mapToTrack)
-      : [],
-    artists: artists
-      ? artists.map(mapToArtist)
-      : []
-  };
-}
+}): Album => ({
+  id: _id,
+  title: name,
+  coverImageURL: cover_image_url,
+  country,
+  style,
+  format,
+  slug,
+  trackList: tracks
+    ? tracks.map(mapToTrack)
+    : [],
+  artists: artists
+    ? artists.map(mapToArtist)
+    : []
+});
+
+const mapToTrackRequest = ({
+  id,
+  name,
+  duration,
+  position
+}: Track) => ({
+  id,
+  length: duration,
+  name,
+  position
+});
+
+const mapToArtistRequest = ({
+  id,
+  name
+}: Artist) => ({
+  _id: id,
+  name
+});
+
+const mapToAlbumRequest = ({
+  title,
+  coverImageURL,
+  country,
+  style,
+  format,
+  slug,
+  trackList,
+  artists
+}: Album) => ({
+  name: title,
+  cover_image_url: coverImageURL,
+  country,
+  style,
+  format,
+  slug,
+  artists: artists.map(mapToArtistRequest),
+  tracks: trackList.map(mapToTrackRequest)
+});
 
 @Injectable()
 export class AlbumService {
@@ -177,11 +219,39 @@ export class AlbumService {
   }
 
   addTrackToAlbum(albumId: string, track: Track): Promise<Track> {
-    const request = track as any;
-    request.length = track.duration;
+    const request = mapToTrackRequest(track);
     return this.http.post(`${this.config.apiURL}/api/1.0/albums/${albumId}/tracks/`, request)
       .map((response) => {
         return mapToTrack(response as any);
+      })
+      .toPromise();
+  }
+
+  searchForArtists(query: string): Observable<Array<Artist>> {
+    return this.http
+      .get(`${this.config.apiURL}/api/1.0/artists/search?name_entry=${query}&limit=5`)
+      .map((response: any) => {
+        console.log('Search response: ', response);
+        return response.map(mapToArtist);
+      });
+  }
+
+  createNewAlbum(album: Album): Promise<Album> {
+    return this.http
+      .post(`${this.config.apiURL}/api/1.0/albums/`, mapToAlbumRequest(album))
+      .map((response: any) => {
+        console.log('Creation response: ', response);
+        return mapToAlbum(response);
+      })
+      .toPromise()
+  }
+
+  updateAlbum(album: Album): Promise<Album> {
+    return this.http
+      .put(`${this.config.apiURL}/api/1.0/albums/${album.id}`, mapToAlbumRequest(album))
+      .map((response: any) => {
+        console.log('Updated response: ', response);
+        return mapToAlbum(response);
       })
       .toPromise();
   }

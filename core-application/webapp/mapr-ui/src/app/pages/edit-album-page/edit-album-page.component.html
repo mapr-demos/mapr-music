@@ -1,0 +1,19 @@
+<app-bar></app-bar>
+
+<album-edit-form
+  *ngIf="album"
+  [album] = "album"
+>
+</album-edit-form>
+<div
+  class="container"
+>
+  <div class="form-group" style="padding: 10px">
+    <div
+      class="btn btn-primary btn-block"
+      (click)="onAlbumSave()"
+    >
+      Save
+    </div>
+  </div>
+</div>

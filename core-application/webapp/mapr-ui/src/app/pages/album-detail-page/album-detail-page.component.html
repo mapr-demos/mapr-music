@@ -3,165 +3,179 @@
 ></app-bar>
 <div class="album-detail-page">
   <div class="container">
-    <div *ngIf="album" class="album-container">
-      <div>
-        <img src="{{album.coverImageURL}}" width="150" height="150" onerror="this.src='https://s.discogs.com/images/default-release.png'">
-      </div>
-      <div style="padding: 5px">
-        <div>{{album.title}}</div>
-        <div>
-          Artist{{album.artists > 1 ? 's' : ''}}:
-          <a
-            *ngFor="let artist of album.artists"
-            routerLink="/artist/{{artist.id}}"
-          >
-            {{artist.name}}
-          </a>
-        </div>
-        <div>
-          Country: {{album.country}}
-        </div>
-        <div>
-          Style: {{album.style}}
-        </div>
-        <div>
-          Format: {{album.format}}
-        </div>
-      </div>
-    </div>
-    <div
-      *ngIf="album"
-      style="padding-top: 10px"
-    >
-      <div style="display: flex">
-        <div style="padding: 5px">
-          Tracks:
+    <div style="display: flex;" *ngIf="album">
+      <div style="width: 100%">
+        <div class="album-container">
+          <div>
+            <img src="{{album.coverImageURL}}" width="150" height="150" onerror="this.src='https://s.discogs.com/images/default-release.png'">
+          </div>
+          <div style="padding: 5px">
+            <div>{{album.title}}</div>
+            <div>
+              Artist{{album.artists > 1 ? 's' : ''}}:
+              <a
+                *ngFor="let artist of album.artists"
+                routerLink="/artist/{{artist.id}}"
+              >
+                {{artist.name}}
+              </a>
+            </div>
+            <div>
+              Country: {{album.country}}
+            </div>
+            <div>
+              Style: {{album.style}}
+            </div>
+            <div>
+              Format: {{album.format}}
+            </div>
+          </div>
         </div>
         <div
-          style="margin: 5px"
-          (click)="toggleReorderMode()"
+          *ngIf="album"
+          style="padding-top: 10px"
         >
-          <i class="fa fa-exchange fa-rotate-90" aria-hidden="true" style="font-size: 20px;"></i>
+          <div style="display: flex">
+            <div style="padding: 5px">
+              Tracks:
+            </div>
+            <div
+              style="margin: 5px"
+              (click)="toggleReorderMode()"
+            >
+              <i class="fa fa-exchange fa-rotate-90" aria-hidden="true" style="font-size: 20px;"></i>
+            </div>
+            <div
+              *ngIf="reorderedTracks"
+              class="btn btn-primary"
+              style="margin: 0 5px"
+              (click)="saveTracks()"
+            >
+              Save
+            </div>
+          </div>
+          <table
+            style="margin: 10px 0;border-collapse: separate;border-spacing: 0 10px;"
+          >
+            <tr
+              *ngFor="let track of (reorderedTracks || album.trackList); let i = index"
+              style="padding: 20px 0;"
+            >
+              <td
+                style="padding: 0px 10px"
+                (click)="setEditTrackId(track.id)"
+              >
+                <div
+                  *ngIf="editedTrackId === track.id; then saveTrackIcon else editTrackIcon"
+                >
+                </div>
+
+                <ng-template #editTrackIcon>
+                  <i class="fa fa-pencil" aria-hidden="true"></i>
+                </ng-template>
+                <ng-template #saveTrackIcon>
+                  <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                </ng-template>
+              </td>
+              <td>
+                <div>
+                  <div
+                    *ngIf="editedTrackId === track.id; then editedTrackName else staticTrackName"
+                  >
+                  </div>
+                  <ng-template #staticTrackName>
+                    {{track.name}}
+                  </ng-template>
+                  <ng-template #editedTrackName>
+                    <input [(ngModel)] = "nameEditedTrack">
+                  </ng-template>
+                  <div>Duration: {{track.duration | date:'mm:ss' }}</div>
+                </div>
+              </td>
+              <td
+                *ngIf="reorderedTracks"
+              >
+                <div
+                  *ngIf = "!isFirstTrack(i)"
+                  (click)="moveTrackUp(i)"
+                >
+                  <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                </div>
+                <div
+                  *ngIf = "!isLastTrack(i)"
+                  (click)="moveTrackDown(i)"
+                >
+                  <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                </div>
+              </td>
+              <td
+                style="padding: 0 5px"
+              >
+                <div
+                  (click)="removeTrack(track.id)"
+                >
+                  <i class="fa fa-trash" aria-hidden="true"></i>
+                </div>
+              </td>
+            </tr>
+          </table>
         </div>
         <div
-          *ngIf="reorderedTracks"
+          *ngIf = "newTrack"
+          style="padding: 5px;"
+        >
+          <div
+            style="padding: 5px 0;"
+          >
+            <input
+              [(ngModel)] = "newTrack.name"
+              placeholder="New Track Name"
+            >
+          </div>
+          <div
+            style="padding: 5px 0;"
+          >
+            <input
+              [(ngModel)] = "newTrack.duration"
+              placeholder="New Track Duration(ms)"
+            >
+          </div>
+        </div>
+        <div
           class="btn btn-primary"
           style="margin: 0 5px"
-          (click)="saveTracks()"
+          (click)="onAddNewTrackClick()"
         >
-          Save
+          <span
+            *ngIf="!newTrack"
+          >
+            Add new Track
+          </span>
+          <span
+            *ngIf="newTrack"
+          >
+            Save
+          </span>
+        </div>
+        <div
+          class="btn btn-primary"
+          style="margin: 0 5px"
+          *ngIf="newTrack"
+          (click)="onCancelAddClick()"
+        >
+          Cancel
         </div>
       </div>
-      <table
-        style="margin: 10px 0;border-collapse: separate;border-spacing: 0 10px;"
-      >
-        <tr
-          *ngFor="let track of (reorderedTracks || album.trackList); let i = index"
-          style="padding: 20px 0;"
-        >
-          <td
-            style="padding: 0px 10px"
-            (click)="setEditTrackId(track.id)"
-          >
-            <div
-              *ngIf="editedTrackId === track.id; then saveTrackIcon else editTrackIcon"
-            >
-            </div>
-
-            <ng-template #editTrackIcon>
-              <i class="fa fa-pencil" aria-hidden="true"></i>
-            </ng-template>
-            <ng-template #saveTrackIcon>
-              <i class="fa fa-floppy-o" aria-hidden="true"></i>
-            </ng-template>
-          </td>
-          <td>
-            <div>
-              <div
-                *ngIf="editedTrackId === track.id; then editedTrackName else staticTrackName"
-              >
-              </div>
-              <ng-template #staticTrackName>
-                {{track.name}}
-              </ng-template>
-              <ng-template #editedTrackName>
-                <input [(ngModel)] = "nameEditedTrack">
-              </ng-template>
-              <div>Duration: {{track.duration | date:'mm:ss' }}</div>
-            </div>
-          </td>
-          <td
-            *ngIf="reorderedTracks"
-          >
-            <div
-              *ngIf = "!isFirstTrack(i)"
-              (click)="moveTrackUp(i)"
-            >
-              <i class="fa fa-arrow-up" aria-hidden="true"></i>
-            </div>
-            <div
-              *ngIf = "!isLastTrack(i)"
-              (click)="moveTrackDown(i)"
-            >
-              <i class="fa fa-arrow-down" aria-hidden="true"></i>
-            </div>
-          </td>
-          <td
-            style="padding: 0 5px"
-          >
-            <div
-              (click)="removeTrack(track.id)"
-            >
-              <i class="fa fa-trash" aria-hidden="true"></i>
-            </div>
-          </td>
-        </tr>
-      </table>
-    </div>
-    <div
-      *ngIf = "newTrack"
-      style="padding: 5px;"
-    >
-      <div
-        style="padding: 5px 0;"
-      >
-        <input
-          [(ngModel)] = "newTrack.name"
-          placeholder="New Track Name"
-        >
+      <div style="margin: 0 10px">
+        <div class="btn btn-primary" routerLink="/album/edit/{{album.slug}}">
+          Edit
+        </div>
       </div>
-      <div
-        style="padding: 5px 0;"
-      >
-        <input
-          [(ngModel)] = "newTrack.duration"
-          placeholder="New Track Duration(ms)"
-        >
+      <div>
+        <div class="btn btn-primary" routerLink="/add/album">
+          Add new
+        </div>
       </div>
-    </div>
-    <div
-      class="btn btn-primary"
-      style="margin: 0 5px"
-      (click)="onAddNewTrackClick()"
-    >
-      <span
-        *ngIf="!newTrack"
-      >
-        Add new Track
-      </span>
-      <span
-        *ngIf="newTrack"
-      >
-        Save
-      </span>
-    </div>
-    <div
-      class="btn btn-primary"
-      style="margin: 0 5px"
-      *ngIf="newTrack"
-      (click)="onCancelAddClick()"
-    >
-      Cancel
     </div>
   </div>
 </div>

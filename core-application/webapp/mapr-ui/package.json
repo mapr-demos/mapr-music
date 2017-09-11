@@ -22,6 +22,7 @@
     "@angular/platform-browser-dynamic": "^4.0.0",
     "@angular/router": "^4.0.0",
     "@ng-bootstrap/ng-bootstrap": "^1.0.0-alpha.30",
+    "bootstrap-3-typeahead": "^4.0.2",
     "core-js": "^2.4.1",
     "lodash": "^4.17.4",
     "rxjs": "^5.4.1",
