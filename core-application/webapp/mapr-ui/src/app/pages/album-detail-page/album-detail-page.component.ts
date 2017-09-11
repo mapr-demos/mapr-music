@@ -113,6 +113,7 @@ export class AlbumDetailPage implements OnInit{
       })
       .subscribe((album) => {
         this.album = album;
+        console.log(album);
       });
   }
 

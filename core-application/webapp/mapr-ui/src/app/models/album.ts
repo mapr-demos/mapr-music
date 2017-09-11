@@ -10,6 +10,11 @@ export interface Track {
   position: string
 }
 
+export interface Language {
+  code: string,
+  name: string
+}
+
 export interface Album {
   id: string,
   title: string,
@@ -17,6 +22,7 @@ export interface Album {
   format: string,
   style: string,
   slug: string,
+  language: Language,
   trackList: Array<Track>,
   country: string,
   artists: Array<Artist>

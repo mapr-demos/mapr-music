@@ -12,7 +12,8 @@ const createNewAlbum = (): Album => ({
   slug: '',
   trackList: [],
   country: '',
-  artists: []
+  artists: [],
+  language: null
 });
 
 @Component({

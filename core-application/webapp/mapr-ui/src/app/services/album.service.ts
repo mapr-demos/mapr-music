@@ -6,6 +6,8 @@ import "rxjs/add/operator/toPromise";
 import "rxjs/add/operator/map";
 import {AppConfig} from "../app.config";
 import {Observable} from "rxjs";
+import {LanguageService} from "./language.service";
+import find from 'lodash/find';
 
 const PAGE_SIZE = 12;
 
@@ -62,7 +64,8 @@ const SORT_HASH = {
 
 interface PageRequest {
   pageNumber: number,
-  sortType: string
+  sortType: string,
+  lang: string
 }
 
 const mapToArtist = ({
@@ -94,7 +97,10 @@ const mapToAlbum = ({
   style,
   format,
   tracks,
-  slug
+  slug,
+  //this property is injected on ui
+  // TODO add to document
+  language
 }): Album => ({
   id: _id,
   title: name,
@@ -103,6 +109,7 @@ const mapToAlbum = ({
   style,
   format,
   slug,
+  language,
   trackList: tracks
     ? tracks.map(mapToTrack)
     : [],
@@ -156,15 +163,20 @@ export class AlbumService {
 
   constructor(
     private http: HttpClient,
-    private config: AppConfig
+    private config: AppConfig,
+    private languageService: LanguageService
   ) {
   }
 
 /**
  * @desc returns URL for albums page request
  * */
-  getAlbumsPageURL({pageNumber, sortType}: PageRequest): string {
-    const url = `${this.config.apiURL}/api/1.0/albums?page=${pageNumber}&per_page=${PAGE_SIZE}`;
+  getAlbumsPageURL({pageNumber, sortType, lang}: PageRequest): string {
+    let url = `${this.config.apiURL}/api/1.0/albums?page=${pageNumber}&per_page=${PAGE_SIZE}`;
+    console.log(lang);
+    if (lang !== null) {
+      url += `&language=${lang}`;
+    }
     return SORT_HASH[sortType](url);
   }
 
@@ -173,9 +185,17 @@ export class AlbumService {
  * */
   getAlbumsPage(request: PageRequest): Promise<AlbumsPage> {
     return this.http.get(this.getAlbumsPageURL(request))
-      .map((response: any) => {
+      .flatMap((response: any) => {
+        return this.languageService.getAllLanguages().then((languages) => ({languages, response}))
+      })
+      .map(({response, languages}) => {
         console.log('Albums: ', response);
-        const albums = response.results.map(mapToAlbum);
+        const albums = response.results
+          .map((album) => {
+            album.language = find(languages, (language) => language.code === album.language);
+            return album;
+          })
+          .map(mapToAlbum);
         return {
           albums,
           totalNumber: response.pagination.items
@@ -196,8 +216,12 @@ export class AlbumService {
  * */
   getAlbumBySlug(albumSlug: string):Promise<Album> {
     return this.http.get(this.getAlbumBySlugURL(albumSlug))
-      .map((response: any) => {
+      .flatMap((response: any) => {
+        return this.languageService.getAllLanguages().then((languages) => ({languages, response}))
+      })
+      .map(({response, languages}) => {
         console.log('Album: ', response);
+        response.language = find(languages, (language) => language.code === response.language);
         return mapToAlbum(response);
       })
       .toPromise();

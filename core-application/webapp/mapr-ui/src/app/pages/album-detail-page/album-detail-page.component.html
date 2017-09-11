@@ -27,7 +27,7 @@
               Style: {{album.style}}
             </div>
             <div>
-              Format: {{album.format}}
+              Language: <a routerLink="/" [queryParams]="{lang: album.language.code}">{{album.language.name}}</a>
             </div>
           </div>
         </div>

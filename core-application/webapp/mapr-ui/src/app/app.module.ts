@@ -8,6 +8,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AlbumService } from './services/album.service';
 import { ArtistService } from './services/artist.service';
 import { AppConfig } from "./app.config";
+import {LanguageService} from "./services/language.service";
 
 
 @NgModule({
@@ -23,7 +24,8 @@ import { AppConfig } from "./app.config";
   providers: [
     AlbumService,
     ArtistService,
-    AppConfig
+    AppConfig,
+    LanguageService
   ],
   bootstrap: [
     AppComponent
