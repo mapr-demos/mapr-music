@@ -110,7 +110,8 @@ public class DumpConverter {
         long conversionTookMillis = System.currentTimeMillis() - startTime;
         long hours = TimeUnit.MILLISECONDS.toHours(conversionTookMillis);
         long minutes = TimeUnit.MILLISECONDS.toMinutes(conversionTookMillis) - TimeUnit.HOURS.toMinutes(hours);
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(conversionTookMillis) - TimeUnit.MINUTES.toSeconds(minutes);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(conversionTookMillis) - TimeUnit.HOURS.toSeconds(hours) -
+                TimeUnit.MINUTES.toSeconds(minutes);
 
         String conversionTookFormatted = String.format("%02d:%02d:%02d", hours, minutes, seconds);
         log.info("Music Brainz dump converted in '{}'. '{}' Artist, '{}' Album and '{}' Language JSON documents " +

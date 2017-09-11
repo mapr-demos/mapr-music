@@ -275,9 +275,8 @@ public class AlbumParser {
         album.setCoverImageUrl(artArchiveClient.getCoverImage());
         album.setImagesUrls(artArchiveClient.getImages());
 
-        // Ignore albums if it does not have cover and chooseWithImages == true
-        if (chooseWithImages && (album.getCoverImageUrl() == null || album.getCoverImageUrl().isEmpty()
-                || album.getImagesUrls() == null || album.getImagesUrls().isEmpty())) {
+        // Ignore album if it does not have cover and chooseWithImages == true
+        if (chooseWithImages && (album.getCoverImageUrl() == null || album.getCoverImageUrl().isEmpty())) {
             return null;
         }
 
