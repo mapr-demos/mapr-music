@@ -86,10 +86,10 @@ function mapToAlbum({
   name,
   cover_image_url,
   country,
-  artist_list,
+  artists,
   style,
   format,
-  track_list,
+  tracks,
   slug
 }): Album {
   return {
@@ -100,11 +100,11 @@ function mapToAlbum({
     style,
     format,
     slug,
-    trackList: track_list
-      ? track_list.map(mapToTrack)
+    trackList: tracks
+      ? tracks.map(mapToTrack)
       : [],
-    artists: artist_list
-      ? artist_list.map(mapToArtist)
+    artists: artists
+      ? artists.map(mapToArtist)
       : []
   };
 }

@@ -30,13 +30,13 @@ public class AlbumDto {
     @JsonProperty("slug")
     private String slug;
 
-    @JsonProperty("artist_list")
+    @JsonProperty("artists")
     private List artistList;
 
     @JsonProperty("catalog_numbers")
     private List catalogNumbers;
 
-    @JsonProperty("track_list")
+    @JsonProperty("tracks")
     private List<TrackDto> trackList;
 
     @JsonProperty("cover_image_url")

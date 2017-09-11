@@ -32,7 +32,7 @@ public class AlbumMutationBuilder {
     private static final String FORMAT_FIELD = "format";
     private static final String COUNTRY_FIELD = "country";
 
-    private static final String TRACK_LIST_FIELD = "track_list";
+    private static final String TRACKS_FIELD = "tracks";
     private static final String TRACK_NAME_FIELD = "name";
     private static final String TRACK_POSITION_FIELD = "position";
     private static final String TRACK_LENGTH_FIELD = "length";
@@ -124,7 +124,7 @@ public class AlbumMutationBuilder {
                 .map(track -> objectMapper.convertValue(track, Map.class))
                 .collect(Collectors.toList());
 
-        this.mutation.set(TRACK_LIST_FIELD, tracks);
+        this.mutation.set(TRACKS_FIELD, tracks);
         return this;
     }
 
@@ -135,7 +135,7 @@ public class AlbumMutationBuilder {
                 .map(track -> objectMapper.convertValue(track, Map.class))
                 .collect(Collectors.toList());
 
-        this.mutation.append(TRACK_LIST_FIELD, tracks);
+        this.mutation.append(TRACKS_FIELD, tracks);
         return this;
     }
 
@@ -150,17 +150,17 @@ public class AlbumMutationBuilder {
     public AlbumMutationBuilder editTrack(int trackIndex, Track track, boolean setNullValues) {
 
         if (track.getName() != null || setNullValues) {
-            String fieldName = String.format(ARRAY_FIELD_TEMPLATE, TRACK_LIST_FIELD, trackIndex, TRACK_NAME_FIELD);
+            String fieldName = String.format(ARRAY_FIELD_TEMPLATE, TRACKS_FIELD, trackIndex, TRACK_NAME_FIELD);
             this.mutation.set(fieldName, track.getName());
         }
 
         if (track.getLength() != null || setNullValues) {
-            String fieldName = String.format(ARRAY_FIELD_TEMPLATE, TRACK_LIST_FIELD, trackIndex, TRACK_LENGTH_FIELD);
+            String fieldName = String.format(ARRAY_FIELD_TEMPLATE, TRACKS_FIELD, trackIndex, TRACK_LENGTH_FIELD);
             this.mutation.set(fieldName, track.getLength());
         }
 
         if (track.getPosition() != null || setNullValues) {
-            String fieldName = String.format(ARRAY_FIELD_TEMPLATE, TRACK_LIST_FIELD, trackIndex, TRACK_POSITION_FIELD);
+            String fieldName = String.format(ARRAY_FIELD_TEMPLATE, TRACKS_FIELD, trackIndex, TRACK_POSITION_FIELD);
             this.mutation.set(fieldName, track.getPosition());
         }
 
@@ -169,7 +169,7 @@ public class AlbumMutationBuilder {
 
     public AlbumMutationBuilder deleteTrack(int trackIndex) {
 
-        String trackEntry = String.format("%s[%d]", TRACK_LIST_FIELD, trackIndex);
+        String trackEntry = String.format("%s[%d]", TRACKS_FIELD, trackIndex);
         this.mutation.delete(trackEntry);
         return this;
     }
