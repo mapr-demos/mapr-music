@@ -343,16 +343,25 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             throw new NotFoundException("Album with id '" + id + "' not found");
         }
 
-
         List<String> albumArtistsIds = (album.getArtistList() == null)
                 ? null
                 : album.getArtistList().stream()
-                .map(Artist::getId)
-                .peek(artistId -> {
-                    if (artistId == null) {
+                .peek(artist -> {
+                    if (artist.getId() == null) {
                         throw new BadRequestException("Album's artist must have 'id' field set");
                     }
                 })
+                .peek(artist -> {
+
+                    Artist storedArtist = artistDao.getById(artist.getId());
+                    if (storedArtist == null) {
+                        throw new NotFoundException("Artist with id ='" + artist.getId() + "' not found");
+                    }
+
+                    artist.setSlugName(storedArtist.getSlugName());
+                    artist.setSlugPostfix(storedArtist.getSlugPostfix());
+                })
+                .map(Artist::getId)
                 .collect(toList());
 
         List<String> existingAlbumArtistsIds = (existingAlbum.getArtistList() == null)
@@ -360,6 +369,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
                 : existingAlbum.getArtistList().stream()
                 .map(Artist::getId)
                 .collect(toList());
+
 
         List<String> addedArtistsIds = null;
         List<String> removedArtistsIds = null;
@@ -379,15 +389,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         if (addedArtistsIds != null && !addedArtistsIds.isEmpty()) {
 
             addedArtistsIds.stream()
-                    .map(artistId -> {
-
-                        Artist artist = artistDao.getById(artistId);
-                        if (artist == null) {
-                            throw new NotFoundException("Artist with id ='" + artistId + "' not found");
-                        }
-
-                        return artist;
-                    })
+                    .map(artistDao::getById)
                     .filter(Objects::nonNull)
                     .peek(artist -> artist.addAlbumId(id))
                     .forEach(artist -> artistDao.update(artist.getId(), artist));
