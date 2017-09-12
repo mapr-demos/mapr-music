@@ -26,6 +26,27 @@
         </select>
       </div>
     </div>
+    <div class="sort-selector-container">
+      <div>
+        Language:
+      </div>
+      <div>
+        <select class="form-control" (change)="onLanguageChange($event.target.value)">
+          <option
+            value="null"
+          >
+            Nothing selected
+          </option>
+          <option
+            *ngFor="let language of languageOptions"
+            value="{{language.code}}"
+            [attr.selected]="language.code === selectedLanguageCode ? '': null"
+          >
+            {{language.name}}
+          </option>
+        </select>
+      </div>
+    </div>
   </div>
   <div style="display: flex">
     <div class="container albums-container">

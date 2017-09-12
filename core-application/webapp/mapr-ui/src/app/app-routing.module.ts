@@ -7,7 +7,11 @@ import {AlbumDetailPage} from "./pages/album-detail-page/album-detail-page.compo
 import {ArtistPage} from "./pages/artist-page/artist-page.component";
 import {NotFoundPage} from "./pages/not-found-page/not-found-page.component";
 import {ReportingPage} from "./pages/reporting-page/reporting-page.component";
+import {AddAlbumPage} from "./pages/add-album-page/add-album-page.component";
+import {EditAlbumPage} from "./pages/edit-album-page/edit-album-page.component";
 import {AppBar} from './components/app-bar-component/app-bar.component';
+import {AlbumEditForm} from './components/album-edit-form-component/album-edit-form.component';
+
 import { FormsModule }   from '@angular/forms';
 
 
@@ -15,6 +19,10 @@ const appRoutes: Routes = [
   {
     path: '',
     component: HomePage
+  },
+  {
+    path: 'album/edit/:albumSlug',
+    component: EditAlbumPage
   },
   {
     path: 'album/:albumSlug',
@@ -29,6 +37,10 @@ const appRoutes: Routes = [
     component: ArtistPage
   },
   {
+    path: 'add/album',
+    component: AddAlbumPage
+  },
+  {
     path: '**',
     component: NotFoundPage
   }
@@ -41,7 +53,10 @@ const appRoutes: Routes = [
     ReportingPage,
     AlbumDetailPage,
     ArtistPage,
-    AppBar
+    AppBar,
+    AlbumEditForm,
+    AddAlbumPage,
+    EditAlbumPage
   ],
   imports: [
     FormsModule,

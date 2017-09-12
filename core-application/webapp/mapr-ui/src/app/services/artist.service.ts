@@ -27,6 +27,8 @@ function mapToAlbum({_id, name, cover_image_url}): Album {
 @Injectable()
 export class ArtistService {
 
+  private static SERVICE_URL = '/api/1.0/artists';
+
   constructor(
     private http: HttpClient,
     private config: AppConfig
@@ -34,7 +36,7 @@ export class ArtistService {
   }
 
   getArtistByIdURL(artistId: string): string {
-    return `${this.config.apiURL}/api/1.0/artists/${artistId}`;
+    return `${this.config.apiURL}${ArtistService.SERVICE_URL}/${artistId}`;
   }
 
   getArtistById(artistId: string): Promise<Artist> {
