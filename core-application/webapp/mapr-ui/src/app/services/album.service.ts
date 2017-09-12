@@ -281,4 +281,9 @@ export class AlbumService {
       })
       .toPromise();
   }
+  deleteAlbum(album: Album): Promise<void> {
+    return this.http.delete(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${album.id}`)
+      .map(() => {})
+      .toPromise()
+  }
 }

@@ -1,5 +1,5 @@
 import {Component, OnInit} from "@angular/core";
-import {ActivatedRoute, ParamMap} from "@angular/router";
+import {ActivatedRoute, ParamMap, Router} from "@angular/router";
 import "rxjs/add/operator/switchMap";
 import {Album, Track} from "../../models/album";
 import {AlbumService} from "../../services/album.service";
@@ -21,8 +21,9 @@ function removeAtInd(arr, ind) {
 })
 export class AlbumDetailPage implements OnInit{
   constructor(
-    private router: ActivatedRoute,
-    private albumService: AlbumService
+    private activatedRoute: ActivatedRoute,
+    private albumService: AlbumService,
+    private router: Router
   ) {}
 
   album: Album;
@@ -104,8 +105,15 @@ export class AlbumDetailPage implements OnInit{
     this.newTrack = null;
   }
 
+  deleteAlbum() {
+    this.albumService.deleteAlbum(this.album)
+      .then(() => {
+        this.router.navigateByUrl('');
+      });
+  }
+
   ngOnInit(): void {
-    this.router.paramMap
+    this.activatedRoute.paramMap
       .switchMap((params: ParamMap) => {
         const albumSlug = params.get('albumSlug');
         this.sourceURL = this.albumService.getAlbumBySlugURL(albumSlug);
