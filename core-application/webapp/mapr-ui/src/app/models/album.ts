@@ -1,5 +1,6 @@
 export interface Artist {
   id: string,
+  slug: string,
   name: string
 }
 

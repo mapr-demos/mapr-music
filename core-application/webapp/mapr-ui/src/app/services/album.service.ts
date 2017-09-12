@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {AlbumsPage, Album, Artist, Track} from "../models/album";
+import {Album, AlbumsPage, Artist, Track} from "../models/album";
 import identity from "lodash/identity";
 import {HttpClient} from "@angular/common/http";
 import "rxjs/add/operator/toPromise";
@@ -7,7 +7,7 @@ import "rxjs/add/operator/map";
 import {AppConfig} from "../app.config";
 import {Observable} from "rxjs";
 import {LanguageService} from "./language.service";
-import find from 'lodash/find';
+import find from "lodash/find";
 
 const PAGE_SIZE = 12;
 
@@ -70,10 +70,12 @@ interface PageRequest {
 
 const mapToArtist = ({
   _id,
-  name
+  name,
+  slug
 }): Artist => ({
   id: _id,
-  name
+  name,
+  slug
 });
 
 const mapToTrack = ({

@@ -1,0 +1,34 @@
+<app-bar
+  [sourceURL]="sourceURL"
+></app-bar>
+<div class="artists-page">
+  <div class="container controls-container">
+    <div>
+      <ngb-pagination
+        [collectionSize]="totalAlbums"
+        [page]="pageNumber"
+        [maxSize]="5"
+        [pageSize]="12"
+        (pageChange)="onChangePage($event)"
+      ></ngb-pagination>
+    </div>
+  </div>
+  <div style="display: flex">
+    <div class="container albums-container">
+      <div class="row">
+        <div *ngFor="let artist of artists" class="col-md-3">
+          <div class="album-container">
+            <div style="text-align: center">
+              <a routerLink="/artist/{{artist.slug}}">
+                <img src={{artist.avatarURL}} width="150" height="150" onerror="this.src='https://s.discogs.com/images/default-artist.png'">
+              </a>
+            </div>
+            <div class="album-title">
+              Name: <a routerLink="/artist/{{artist.slug}}">{{artist.name}}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

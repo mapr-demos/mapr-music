@@ -15,7 +15,7 @@
               Artist{{album.artists > 1 ? 's' : ''}}:
               <a
                 *ngFor="let artist of album.artists"
-                routerLink="/artist/{{artist.id}}"
+                routerLink="/artist/{{artist.slug}}"
               >
                 {{artist.name}}
               </a>

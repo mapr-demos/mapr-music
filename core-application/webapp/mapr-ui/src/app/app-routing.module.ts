@@ -3,8 +3,9 @@ import {RouterModule, Routes} from "@angular/router";
 import {CommonModule} from "@angular/common";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {HomePage} from "./pages/home-page/home-page.component";
+import {ArtistsPageComponent} from "./pages/artists-page/artists-page.component";
 import {AlbumDetailPage} from "./pages/album-detail-page/album-detail-page.component";
-import {ArtistPage} from "./pages/artist-page/artist-page.component";
+import {ArtistPage} from "./pages/artist-detail-page/artist-detail-page.component";
 import {NotFoundPage} from "./pages/not-found-page/not-found-page.component";
 import {ReportingPage} from "./pages/reporting-page/reporting-page.component";
 import {AddAlbumPage} from "./pages/add-album-page/add-album-page.component";
@@ -33,7 +34,11 @@ const appRoutes: Routes = [
     component: ReportingPage
   },
   {
-    path: 'artist/:artistId',
+    path: 'artists',
+    component: ArtistsPageComponent
+  },
+  {
+    path: 'artist/:artistSlug',
     component: ArtistPage
   },
   {
@@ -51,6 +56,7 @@ const appRoutes: Routes = [
     HomePage,
     NotFoundPage,
     ReportingPage,
+    ArtistsPageComponent,
     AlbumDetailPage,
     ArtistPage,
     AppBar,

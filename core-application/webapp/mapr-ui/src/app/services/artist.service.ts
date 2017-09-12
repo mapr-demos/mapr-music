@@ -1,25 +1,29 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
-import {Artist, Album} from "../models/artist";
+import {Album, Artist, ArtistsPage} from "../models/artist";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/toPromise";
 import "rxjs/add/operator/mergeMap";
 import {AppConfig} from "../app.config";
 
-function mapToArtist({_id, name, profile_image_url, gender}):Artist {
+const PAGE_SIZE = 12;
+
+function mapToArtist({_id, name, profile_image_url, gender, slug}): Artist {
   return {
     id: _id,
     name,
     gender,
     avatarURL: profile_image_url,
+    slug,
     albums: []
   }
 }
 
-function mapToAlbum({_id, name, cover_image_url}): Album {
+function mapToAlbum({_id, name, cover_image_url, slug}): Album {
   return {
     id: _id,
     title: name,
+    slug,
     coverImageURL: cover_image_url
   };
 }
@@ -29,10 +33,8 @@ export class ArtistService {
 
   private static SERVICE_URL = '/api/1.0/artists';
 
-  constructor(
-    private http: HttpClient,
-    private config: AppConfig
-  ) {
+  constructor(private http: HttpClient,
+              private config: AppConfig) {
   }
 
   getArtistByIdURL(artistId: string): string {
@@ -48,6 +50,44 @@ export class ArtistService {
           ? response.albums.map(mapToAlbum)
           : [];
         return artist;
+      })
+      .toPromise();
+  }
+
+  getArtistPageURL(pageNum: number): string {
+    return `${this.config.apiURL}${ArtistService.SERVICE_URL}?page=${pageNum}&per_page=${PAGE_SIZE}`;
+  }
+
+  /**
+   * @desc get albums page from server side
+   * */
+  getArtistPage(pageNum: number): Promise<ArtistsPage> {
+    return this.http.get(this.getArtistPageURL(pageNum))
+      .map((response: any) => {
+        const artists = response.results.map(mapToArtist);
+        return {
+          artists,
+          totalNumber: response.pagination.items
+        };
+      })
+      .toPromise();
+  }
+
+  /**
+   * @desc get album by slug URL
+   * */
+  getArtistBySlugURL(artistSlug: string): string {
+    return `${this.config.apiURL}${ArtistService.SERVICE_URL}/slug/${artistSlug}`;
+  }
+
+  /**
+   * @desc get album by slug from server side
+   * */
+  getArtistBySlug(artistSlug: string):Promise<Artist> {
+    return this.http.get(this.getArtistBySlugURL(artistSlug))
+      .map((response: any) =>{
+        console.log('Artist: ', response);
+        return mapToArtist(response);
       })
       .toPromise();
   }
