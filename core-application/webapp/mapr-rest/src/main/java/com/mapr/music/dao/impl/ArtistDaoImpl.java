@@ -48,8 +48,13 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
             if (artist.getGender() != null) {
                 mutation.set("gender", artist.getGender());
             }
+
             if (artist.getArea() != null) {
                 mutation.set("area", artist.getArea());
+            }
+
+            if (artist.getAlbumsIds() != null) {
+                mutation.set("albums", artist.getAlbumsIds());
             }
 
             // Update the OJAI Document with specified identifier

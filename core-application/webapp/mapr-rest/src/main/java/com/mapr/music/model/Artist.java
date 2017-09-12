@@ -1,10 +1,9 @@
 package com.mapr.music.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import com.mapr.music.annotation.MaprDbTable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,11 +14,7 @@ import java.util.List;
 @MaprDbTable("/apps/artists")
 public class Artist {
 
-    @JsonProperty("_id")
     private String id;
-    private String name;
-    private String gender;
-    private String area;
 
     @JsonProperty("slug_name")
     private String slugName;
@@ -54,11 +49,23 @@ public class Artist {
     @JsonProperty("end_date")
     private Long endDate;
 
+    private String name;
+    private String gender;
+    private String area;
+
+    @JsonGetter("_id")
     public String getId() {
         return id;
     }
 
+    @JsonSetter("_id")
     public Artist setId(String id) {
+        this.id = id;
+        return this;
+    }
+
+    @JsonSetter("id")
+    public Artist setIdWithoutUnderscore(String id) {
         this.id = id;
         return this;
     }
@@ -150,6 +157,16 @@ public class Artist {
 
     public Artist setAlbumsIds(List<String> albumsIds) {
         this.albumsIds = albumsIds;
+        return this;
+    }
+
+    public Artist addAlbumId(String albumsId) {
+
+        if (this.albumsIds == null) {
+            this.albumsIds = new ArrayList<>();
+        }
+        this.albumsIds.add(albumsId);
+
         return this;
     }
 

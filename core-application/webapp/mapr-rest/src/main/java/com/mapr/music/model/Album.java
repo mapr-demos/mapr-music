@@ -17,17 +17,6 @@ public class Album {
 
     @JsonProperty("_id")
     private String id;
-    private String name;
-    private String style;
-    private String barcode;
-    private String status;
-    private String packaging;
-    private String language;
-    private String script;
-    private String MBID;
-    private String format;
-    private String country;
-    private List reviews;
 
     @JsonProperty("slug_name")
     private String slugName;
@@ -36,7 +25,7 @@ public class Album {
     private Long slugPostfix;
 
     @JsonProperty("artists")
-    private List artistList;
+    private List<Artist> artistList;
 
     @JsonProperty("catalog_numbers")
     private List catalogNumbers;
@@ -52,6 +41,18 @@ public class Album {
 
     @JsonProperty("released_date")
     private Long releasedDate;
+
+    private String name;
+    private String style;
+    private String barcode;
+    private String status;
+    private String packaging;
+    private String language;
+    private String script;
+    private String MBID;
+    private String format;
+    private String country;
+    private List reviews;
 
     public String getId() {
         return id;
@@ -89,11 +90,11 @@ public class Album {
         return this;
     }
 
-    public List getArtistList() {
+    public List<Artist> getArtistList() {
         return artistList;
     }
 
-    public Album setArtistList(List artistList) {
+    public Album setArtistList(List<Artist> artistList) {
         this.artistList = artistList;
         return this;
     }

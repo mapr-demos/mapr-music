@@ -31,7 +31,7 @@ public class AlbumDto {
     private String slug;
 
     @JsonProperty("artists")
-    private List artistList;
+    private List<ArtistDto> artistList;
 
     @JsonProperty("catalog_numbers")
     private List catalogNumbers;
@@ -72,11 +72,11 @@ public class AlbumDto {
         this.slug = slug;
     }
 
-    public List getArtistList() {
+    public List<ArtistDto> getArtistList() {
         return artistList;
     }
 
-    public void setArtistList(List artistList) {
+    public void setArtistList(List<ArtistDto> artistList) {
         this.artistList = artistList;
     }
 

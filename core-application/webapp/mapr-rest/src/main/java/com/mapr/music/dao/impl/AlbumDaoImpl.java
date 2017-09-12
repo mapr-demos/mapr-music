@@ -15,6 +15,8 @@ import javax.inject.Named;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  * Actual implementation of {@link com.mapr.music.dao.MaprDbDao} to manage {@link Album} model.
  */
@@ -133,6 +135,7 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
      * @return updated album.
      */
     @Override
+    @SuppressWarnings("unchecked")
     public Album update(String id, Album album) {
         return processStore((connection, store) -> {
 
@@ -143,6 +146,8 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
                     .setCountry(album.getCountry())
                     .setLanguage(album.getLanguage())
                     .setPackaging(album.getPackaging())
+                    .setTrackList(album.getTrackList())
+                    .setArtists(album.getArtistList())
                     .setFormat(album.getFormat());
 
             // Update the OJAI Document with specified identifier
@@ -245,7 +250,7 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
         });
 
         Set<String> createdTracksIds = tracks.stream().map(Track::getId).collect(Collectors.toSet());
-        return getTracksList(albumId).stream().filter(track -> createdTracksIds.contains(track.getId())).collect(Collectors.toList());
+        return getTracksList(albumId).stream().filter(track -> createdTracksIds.contains(track.getId())).collect(toList());
     }
 
     /**

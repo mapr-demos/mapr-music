@@ -1,6 +1,7 @@
 package com.mapr.music.dao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mapr.music.model.Artist;
 import com.mapr.music.model.Track;
 import org.ojai.store.Connection;
 import org.ojai.store.DocumentMutation;
@@ -31,6 +32,7 @@ public class AlbumMutationBuilder {
     private static final String SCRIPT_FIELD = "script";
     private static final String FORMAT_FIELD = "format";
     private static final String COUNTRY_FIELD = "country";
+    private static final String ARTISTS_FIELD = "artists";
 
     private static final String TRACKS_FIELD = "tracks";
     private static final String TRACK_NAME_FIELD = "name";
@@ -136,6 +138,27 @@ public class AlbumMutationBuilder {
                 .collect(Collectors.toList());
 
         this.mutation.append(TRACKS_FIELD, tracks);
+        return this;
+    }
+
+    public AlbumMutationBuilder setArtists(List<Artist> artists) {
+        return setArtists(artists, SET_NULL_VALUE_DEFAULT);
+    }
+
+    public AlbumMutationBuilder setArtists(List<Artist> artists, boolean setNullValue) {
+
+        if (artists == null && !setNullValue) {
+            return this;
+        }
+
+        List<Map> artistMapList = (artists == null) ? null
+                : artists.stream()
+                .map(artist -> objectMapper.convertValue(artist, Map.class))
+                .peek(artistMap -> artistMap.put("id", artistMap.get("_id"))) // nested Artist document must have 'id'
+                .peek(artistMap -> artistMap.remove("_id")) // field instead of '_id'
+                .collect(Collectors.toList());
+
+        this.mutation.set(ARTISTS_FIELD, artistMapList);
         return this;
     }
 
