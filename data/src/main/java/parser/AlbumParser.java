@@ -96,7 +96,7 @@ public class AlbumParser {
                     artistList.forEach(artist -> {
                         Album album = parseAlbumRow(row, artist);
                         if (album != null) {
-                            album.getArtistList().add(artist);
+                            album.getArtistList().add(artist.getShortInfo());
                             albumList.add(album);
                         }
                     });

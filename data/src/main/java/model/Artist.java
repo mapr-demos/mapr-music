@@ -1,9 +1,6 @@
 package model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.*;
@@ -12,8 +9,42 @@ import java.util.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Artist {
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public class ShortInfo {
+
+        @JsonGetter("id")
+        public String getId() {
+            return Artist.this.getId();
+        }
+
+        @JsonGetter("name")
+        public String getName() {
+            return Artist.this.getName();
+        }
+
+        @JsonGetter("slug_name")
+        public String getSlugName() {
+            return Artist.this.getSlugName();
+        }
+
+        @JsonGetter("slug_postfix")
+        public JsonNumberLong getSlugPostfix() {
+            return Artist.this.getSlugPostfix();
+        }
+
+        @JsonGetter("profile_image_url")
+        public String getProfileImageUrl() {
+            return Artist.this.getProfileImageUrl();
+        }
+    }
+
+    @JsonIgnore
+    private ShortInfo shortInfo;
+
     @JsonIgnore
     private String pk;
+
     @JsonIgnore
     private String artistCreditId;
 
@@ -224,6 +255,15 @@ public class Artist {
     public Artist setArtistCreditId(String artistCreditId) {
         this.artistCreditId = artistCreditId;
         return this;
+    }
+
+    public ShortInfo getShortInfo() {
+
+        if (shortInfo == null) {
+            shortInfo = new ShortInfo();
+        }
+
+        return shortInfo;
     }
 
     @Override

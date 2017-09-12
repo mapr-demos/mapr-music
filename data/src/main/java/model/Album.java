@@ -44,7 +44,7 @@ public class Album {
     private List reviews;
 
     @JsonProperty("artists")
-    private List<Artist> artistList = new ArrayList<>();
+    private List<Artist.ShortInfo> artistList = new ArrayList<>();
 
     @JsonProperty("catalog_numbers")
     private List catalogNumbers;
@@ -97,11 +97,11 @@ public class Album {
         return this;
     }
 
-    public List<Artist> getArtistList() {
+    public List<Artist.ShortInfo> getArtistList() {
         return artistList;
     }
 
-    public Album setArtistList(List<Artist> artistList) {
+    public Album setArtistList(List<Artist.ShortInfo> artistList) {
         this.artistList = artistList;
         return this;
     }
@@ -261,7 +261,6 @@ public class Album {
     public void setMediumId(String mediumId) {
         this.mediumId = mediumId;
     }
-
     @Override
     public String toString() {
         return new ToStringBuilder(this)
