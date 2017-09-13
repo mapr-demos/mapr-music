@@ -11,7 +11,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
-import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -63,7 +62,6 @@ public class AlbumEndpoint {
     @DELETE
     @Path("{id}")
     @ApiOperation(value = "Delete single album by it's identifier")
-    @RolesAllowed("ADMIN")
     public void deleteAlbum(@PathParam("id") String id) {
         albumService.deleteAlbumById(id);
     }
@@ -72,7 +70,6 @@ public class AlbumEndpoint {
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update single album")
-    @RolesAllowed("ADMIN")
     public AlbumDto updateAlbum(@PathParam("id") String id, Album album) {
         return albumService.updateAlbum(id, album);
     }
@@ -80,7 +77,6 @@ public class AlbumEndpoint {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create album")
-    @RolesAllowed("ADMIN")
     public Response createAlbum(Album album, @Context UriInfo uriInfo) {
 
         AlbumDto createdAlbum = albumService.createAlbum(album);
@@ -102,7 +98,7 @@ public class AlbumEndpoint {
     @Path("{album-id}/tracks/{track-id}")
     @ApiOperation(value = "Get single album's track")
     public TrackDto getAlbumsSingleTrack(@PathParam("album-id") String albumId,
-                                      @PathParam("track-id") String trackId) {
+                                         @PathParam("track-id") String trackId) {
 
         return albumService.getTrackById(albumId, trackId);
     }
@@ -110,7 +106,6 @@ public class AlbumEndpoint {
     @PUT
     @Path("{id}/tracks")
     @ApiOperation(value = "Updates the whole list of album's tracks")
-    @RolesAllowed("ADMIN")
     public List<TrackDto> setAlbumTracks(@PathParam("id") String id, List<TrackDto> trackList) {
         return albumService.setAlbumTrackList(id, trackList);
     }
@@ -118,9 +113,8 @@ public class AlbumEndpoint {
     @PUT
     @Path("{album-id}/tracks/{track-id}")
     @ApiOperation(value = "Update single album's track")
-    @RolesAllowed("ADMIN")
     public TrackDto updateAlbumsSingleTrack(@PathParam("album-id") String albumId,
-                                         @PathParam("track-id") String trackId, TrackDto trackDto) {
+                                            @PathParam("track-id") String trackId, TrackDto trackDto) {
 
         return albumService.updateAlbumTrack(albumId, trackId, trackDto);
     }
@@ -128,7 +122,6 @@ public class AlbumEndpoint {
     @DELETE
     @Path("{album-id}/tracks/{track-id}")
     @ApiOperation(value = "Delete single album's track")
-    @RolesAllowed("ADMIN")
     public void updateAlbumsSingleTrack(@PathParam("album-id") String albumId, @PathParam("track-id") String trackId) {
         albumService.deleteAlbumTrack(albumId, trackId);
     }
@@ -136,7 +129,6 @@ public class AlbumEndpoint {
     @POST
     @Path("{id}/tracks/")
     @ApiOperation(value = "Create single album's track")
-    @RolesAllowed("ADMIN")
     public TrackDto createAlbumsSingleTrack(@PathParam("id") String id, TrackDto trackDto) {
         return albumService.addTrackToAlbumTrackList(id, trackDto);
     }

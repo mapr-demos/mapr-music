@@ -5,12 +5,22 @@
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>api</web-resource-name>
-            <url-pattern>/api/1.0/*</url-pattern>
+            <url-pattern>/api/1.0/albums/*</url-pattern>
+            <url-pattern>/api/1.0/artists/*</url-pattern>
+            <url-pattern>/api/1.0/languages/*</url-pattern>
             <http-method>POST</http-method>
             <http-method>PUT</http-method>
             <http-method>DELETE</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
 
-            <!--TODO delete. Added for testing-->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>api</web-resource-name>
+            <url-pattern>/api/1.0/users/current</url-pattern>
             <http-method>GET</http-method>
         </web-resource-collection>
         <auth-constraint>
