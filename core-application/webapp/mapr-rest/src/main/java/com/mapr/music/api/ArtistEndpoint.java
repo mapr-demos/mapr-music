@@ -8,6 +8,7 @@ import com.mapr.music.service.ArtistService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
@@ -64,6 +65,7 @@ public class ArtistEndpoint {
     @DELETE
     @Path("{id}")
     @ApiOperation(value = "Delete single artist by it's identifier")
+    @RolesAllowed("ADMIN")
     public void deleteArtist(@PathParam("id") String id) {
         artistService.deleteArtistById(id);
     }
@@ -72,6 +74,7 @@ public class ArtistEndpoint {
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update single artist")
+    @RolesAllowed("ADMIN")
     public ArtistDto updateArtist(@PathParam("id") String id, Artist artist) {
         return artistService.updateArtist(id, artist);
     }
@@ -79,6 +82,7 @@ public class ArtistEndpoint {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create artist")
+    @RolesAllowed("ADMIN")
     public Response createAlbum(Artist artist, @Context UriInfo uriInfo) {
 
         ArtistDto createdArtist = artistService.createArtist(artist);
