@@ -3,7 +3,6 @@ package com.mapr.music.api;
 import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.ResourceDto;
-import com.mapr.music.model.Artist;
 import com.mapr.music.service.ArtistService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -72,14 +71,14 @@ public class ArtistEndpoint {
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update single artist")
-    public ArtistDto updateArtist(@PathParam("id") String id, Artist artist) {
-        return artistService.updateArtist(id, artist);
+    public ArtistDto updateArtist(@PathParam("id") String id, ArtistDto artistDto) {
+        return artistService.updateArtist(id, artistDto);
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create artist")
-    public Response createAlbum(Artist artist, @Context UriInfo uriInfo) {
+    public Response createArtist(ArtistDto artist, @Context UriInfo uriInfo) {
 
         ArtistDto createdArtist = artistService.createArtist(artist);
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();

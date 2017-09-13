@@ -16,9 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.NotFoundException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -236,59 +234,135 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
     /**
      * {@inheritDoc}
      *
-     * @param artist contains artist info.
+     * @param artistDto contains artist info.
      * @return created artist.
      */
     @Override
-    public ArtistDto createArtist(Artist artist) {
+    public ArtistDto createArtist(ArtistDto artistDto) {
 
-        if (artist == null) {
+        if (artistDto == null) {
             throw new IllegalArgumentException("Artist can not be null");
         }
+
+        Artist artist = dtoToArtist(artistDto);
 
         String id = UUID.randomUUID().toString();
         artist.setId(id);
 
         slugService.setSlugForArtist(artist);
+        Artist createdArtist = artistDao.create(artist);
 
-        return artistToDto(artistDao.create(artist));
+        if (createdArtist.getAlbumsIds() != null) {
+            createdArtist.getAlbumsIds().stream()
+                    .filter(albumId -> albumId != null && !albumId.isEmpty())
+                    .map(albumDao::getById)
+                    .filter(Objects::nonNull)
+                    .forEach(album -> {
+                        album.addArtist(createdArtist);
+                        albumDao.update(album.getId(), album);
+                    });
+        }
+
+        return artistToDto(createdArtist);
     }
 
     /**
      * {@inheritDoc}
      *
-     * @param artist artist which will be updated. Note, that artist's id must be set, otherwise
-     *               {@link IllegalArgumentException} will be thrown.
+     * @param artistDto artist which will be updated. Note, that artist's id must be set, otherwise
+     *                  {@link IllegalArgumentException} will be thrown.
      * @return updated artist.
      */
     @Override
-    public ArtistDto updateArtist(Artist artist) {
-        return updateArtist(artist.getId(), artist);
+    public ArtistDto updateArtist(ArtistDto artistDto) {
+        return updateArtist(artistDto.getId(), artistDto);
     }
 
     /**
      * {@inheritDoc}
      *
-     * @param id     identifier of artist which will be updated.
-     * @param artist artist which will be updated.
+     * @param id        identifier of artist which will be updated.
+     * @param artistDto artist which will be updated.
      * @return updated artist.
      */
     @Override
-    public ArtistDto updateArtist(String id, Artist artist) {
+    public ArtistDto updateArtist(String id, ArtistDto artistDto) {
 
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Artist's identifier can not be empty");
         }
 
-        if (artist == null) {
+        if (artistDto == null) {
             throw new IllegalArgumentException("Artist can not be null");
         }
 
-        if (!artistDao.exists(id)) {
+        Artist artist = dtoToArtist(artistDto);
+        Artist existingArtist = artistDao.getById(id);
+        if (existingArtist == null) {
             throw new NotFoundException("Artist with id '" + id + "' not found");
         }
 
-        return artistToDto(artistDao.update(id, artist));
+        List<String> artistAlbumsIds = artist.getAlbumsIds();
+
+        if (artistAlbumsIds != null) {
+            artistAlbumsIds.forEach(albumId -> {
+                if (!albumDao.exists(albumId)) {
+                    throw new NotFoundException("Albums with id " + albumId + "' not found");
+                }
+            });
+        }
+
+        List<String> existingArtistAlbumsIds = existingArtist.getAlbumsIds();
+
+        List<String> addedAlbumsIds = null;
+        List<String> removedAlbumsIds = null;
+        if (artistAlbumsIds == null || artistAlbumsIds.isEmpty()) {
+            removedAlbumsIds = existingArtistAlbumsIds;
+        } else if (existingArtistAlbumsIds == null || existingArtistAlbumsIds.isEmpty()) {
+            addedAlbumsIds = artistAlbumsIds;
+        } else {
+
+            addedAlbumsIds = new ArrayList<>(artistAlbumsIds);
+            addedAlbumsIds.removeAll(existingArtistAlbumsIds);
+
+            removedAlbumsIds = new ArrayList<>(existingArtistAlbumsIds);
+            removedAlbumsIds.removeAll(artistAlbumsIds);
+        }
+
+        if (addedAlbumsIds != null && !addedAlbumsIds.isEmpty()) {
+
+            addedAlbumsIds.stream()
+                    .map(albumDao::getById)
+                    .filter(Objects::nonNull)
+                    .peek(album -> album.addArtist(existingArtist))
+                    .forEach(album -> albumDao.update(album.getId(), album));
+        }
+
+        if (removedAlbumsIds != null && !removedAlbumsIds.isEmpty()) {
+
+            removedAlbumsIds.stream()
+                    .map(albumDao::getById)
+                    .filter(Objects::nonNull)
+                    .filter(album -> album.getArtistList() != null)
+                    .peek(album -> { // remove artist from albums
+                        Artist artistToRemove = null;
+                        for (Artist albumArtist : album.getArtistList()) {
+                            if (existingArtist.getId().equals(albumArtist.getId())) {
+                                artistToRemove = albumArtist;
+                                break;
+                            }
+                        }
+                        album.getArtistList().remove(artistToRemove);
+                    })
+                    .forEach(album -> albumDao.update(album.getId(), album));
+        }
+
+        Artist updatedArtist = artistDao.update(id, artist);
+        ArtistDto updatedArtistDto = artistToDto(updatedArtist);
+        List<AlbumDto> albumsDtoList = albumsIdsToDtoList(updatedArtist.getAlbumsIds());
+        updatedArtistDto.setAlbums(albumsDtoList);
+
+        return updatedArtistDto;
     }
 
     /**
@@ -326,8 +400,24 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
         return artistDto;
     }
 
-    private AlbumDto albumToDto(Album album) {
+    private Artist dtoToArtist(ArtistDto artistDto) {
+        Artist artist = new Artist();
+        PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
+        try {
+            propertyUtilsBean.copyProperties(artist, artistDto);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException("Can not create Artist from Data Transfer Object", e);
+        }
 
+        if (artistDto.getAlbums() != null) {
+            List<String> albumsIds = artistDto.getAlbums().stream().map(AlbumDto::getId).collect(Collectors.toList());
+            artist.setAlbumsIds(albumsIds);
+        }
+
+        return artist;
+    }
+
+    private AlbumDto albumToDto(Album album) {
         AlbumDto albumDto = new AlbumDto();
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {

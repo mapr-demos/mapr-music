@@ -90,10 +90,10 @@ public interface ArtistService {
     /**
      * Creates artist according to the specified instance of {@link Artist} class.
      *
-     * @param artist contains artist info.
+     * @param artistDto contains artist info.
      * @return created artist.
      */
-    ArtistDto createArtist(Artist artist);
+    ArtistDto createArtist(ArtistDto artistDto);
 
     /**
      * Updates single artist according to the specified instance of {@link Artist} class.
@@ -103,16 +103,16 @@ public interface ArtistService {
      * @return updated artist.
      * @throws IllegalArgumentException in case when specified artist is <code>null</code> or it does not contain id.
      */
-    ArtistDto updateArtist(Artist artist);
+    ArtistDto updateArtist(ArtistDto artist);
 
     /**
      * Updates single artist according to the specified instance of {@link Artist} class.
      *
-     * @param id     identifier of artist which will be updated.
-     * @param artist artist which will be updated.
+     * @param id        identifier of artist which will be updated.
+     * @param artistDto artist which will be updated.
      * @return updated artist.
      */
-    ArtistDto updateArtist(String id, Artist artist);
+    ArtistDto updateArtist(String id, ArtistDto artistDto);
 
 
     /**

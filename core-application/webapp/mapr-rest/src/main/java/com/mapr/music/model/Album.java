@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mapr.music.annotation.MaprDbTable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -96,6 +97,16 @@ public class Album {
 
     public Album setArtistList(List<Artist> artistList) {
         this.artistList = artistList;
+        return this;
+    }
+
+    public Album addArtist(Artist artist) {
+
+        if (this.artistList == null) {
+            this.artistList = new ArrayList<>();
+        }
+
+        this.artistList.add(artist);
         return this;
     }
 

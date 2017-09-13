@@ -6,7 +6,6 @@ import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.dto.TrackDto;
 import com.mapr.music.model.Album;
-import com.mapr.music.model.Track;
 import com.mapr.music.service.AlbumService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -99,7 +98,7 @@ public class AlbumEndpoint {
     @Path("{album-id}/tracks/{track-id}")
     @ApiOperation(value = "Get single album's track")
     public TrackDto getAlbumsSingleTrack(@PathParam("album-id") String albumId,
-                                      @PathParam("track-id") String trackId) {
+                                         @PathParam("track-id") String trackId) {
 
         return albumService.getTrackById(albumId, trackId);
     }
@@ -115,7 +114,7 @@ public class AlbumEndpoint {
     @Path("{album-id}/tracks/{track-id}")
     @ApiOperation(value = "Update single album's track")
     public TrackDto updateAlbumsSingleTrack(@PathParam("album-id") String albumId,
-                                         @PathParam("track-id") String trackId, TrackDto trackDto) {
+                                            @PathParam("track-id") String trackId, TrackDto trackDto) {
 
         return albumService.updateAlbumTrack(albumId, trackId, trackDto);
     }
