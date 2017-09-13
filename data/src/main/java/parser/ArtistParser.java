@@ -1,8 +1,13 @@
 package parser;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import model.Artist;
 import model.ArtistUrlLink;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.SlugUtil;
@@ -358,7 +363,8 @@ public class ArtistParser {
                         List<Artist> artistsWithSuchUrlList = urlArtistMap.get(row[0]);
                         if (artistsWithSuchUrlList != null) {
 
-                            String pictureUrl = row[2];
+                            String pictureUrl = (row[2].contains("commons.wikimedia")) ? getActualWikiImageURL(row[2]) : row[2];
+
                             artistsWithSuchUrlList.forEach(artist -> {
 
                                 if (artist.getProfileImageUrl() == null || artist.getProfileImageUrl().isEmpty()) {
@@ -374,6 +380,44 @@ public class ArtistParser {
         }
 
         return artists;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private String getActualWikiImageURL(String wikimediaCommonsUrl) {
+
+        String imageNameDelimiter = "File:";
+        int indexOfImageName = wikimediaCommonsUrl.lastIndexOf(imageNameDelimiter);
+        String imageName = wikimediaCommonsUrl.substring(indexOfImageName + imageNameDelimiter.length(), wikimediaCommonsUrl.length());
+        String wikipediaApiUrl = "https://en.wikipedia.org/w/api.php?action=query&prop=imageinfo&iilimit=50&iiend=2007-12-31T23%3A59%3A59Z&iiprop=timestamp%7Cuser%7Curl&format=json&titles=File%3A" + imageName;
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet getRequest = new HttpGet(wikipediaApiUrl);
+        getRequest.addHeader("accept", "application/json");
+
+        String result = wikimediaCommonsUrl;
+        try {
+            HttpResponse response = httpClient.execute(getRequest);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                return result;
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, ?> mapResponse = mapper.readValue(response.getEntity().getContent(), Map.class);
+            Map<String, ?> queryMap = (Map<String, ?>) mapResponse.get("query");
+            Map<String, ?> pagesMap = (Map<String, ?>) queryMap.get("pages");
+
+            String key = pagesMap.keySet().iterator().next();
+            Map<String, ?> imageInfoEnclosingMap = (Map<String, ?>) pagesMap.get(key);
+            List<Map<String, String>> imageInfoMapList = (List<Map<String, String>>) imageInfoEnclosingMap.get("imageinfo");
+            Map<String, String> imageInfoMap = imageInfoMapList.get(0);
+
+            result = imageInfoMap.get("url");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     private void generateSlugs(List<Artist> artists) {
