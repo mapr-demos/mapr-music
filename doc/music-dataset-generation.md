@@ -59,13 +59,14 @@ respectively.
 * Copy the newly generated dataset to one of the nodes of your cluster:
 
 ```
-$ scp -r /path/to/output/artists /path/to/output/albums youruser@nodehostname:/dataset/path/at/node
+$ scp -r /path/to/output/artists /path/to/output/albums /path/to/output/languages youruser@nodehostname:/dataset/path/at/node
 ```
 
 * Load data into MapR-FS:
 ```
 $ hadoop fs -copyFromLocal /path/to/output/albums /tmp/albums
 $ hadoop fs -copyFromLocal /path/to/output/artists /tmp/artists
+$ hadoop fs -copyFromLocal /path/to/output/languages /tmp/languages
 ```
 
 * Create `artists` and `albums` tables:
@@ -73,18 +74,21 @@ $ hadoop fs -copyFromLocal /path/to/output/artists /tmp/artists
 ```
 $ maprcli table create -path /apps/albums -tabletype json
 $ maprcli table create -path /apps/artists -tabletype json
+$ maprcli table create -path /apps/languages -tabletype json
 ```
 
 * Import data into MapR-DB using `importJSON` tool:
 ```
 $ mapr importJSON -idField _id -src /tmp/albums/* -dst /apps/albums -mapreduce false
 $ mapr importJSON -idField _id -src /tmp/artists/* -dst /apps/artists -mapreduce false
+$ mapr importJSON -idField _id -src /tmp/languages/* -dst /apps/languages -mapreduce false
 ```
 
 * Change table permissions to allow access for the MapR-Music application:
 ```
 $ maprcli table cf edit -path /apps/albums -cfname default -readperm p -writeperm p -traverseperm  p
 $ maprcli table cf edit -path /apps/artists -cfname default -readperm p -writeperm p -traverseperm  p
+$ maprcli table cf edit -path /apps/languages -cfname default -readperm p -writeperm p -traverseperm  p
 ```
 
 After that dataset is ready to be used by MapR-Music application.

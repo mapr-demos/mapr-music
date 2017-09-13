@@ -12,15 +12,13 @@ public class Language {
 
     @JsonProperty("_id")
     private String id;
-    private String code;
     private String name;
 
     public Language() {
     }
 
     public Language(String code, String name) {
-        this.id = UUID.randomUUID().toString();
-        this.code = code;
+        this.id = code;
         this.name = name;
     }
 
@@ -30,14 +28,6 @@ public class Language {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
     }
 
     public String getName() {
