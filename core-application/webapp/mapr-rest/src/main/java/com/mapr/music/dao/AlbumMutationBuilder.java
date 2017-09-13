@@ -121,6 +121,14 @@ public class AlbumMutationBuilder {
     }
 
     public AlbumMutationBuilder setTrackList(List<Track> trackList) {
+        return setTrackList(trackList, SET_NULL_VALUE_DEFAULT);
+    }
+
+    public AlbumMutationBuilder setTrackList(List<Track> trackList, boolean setNullValue) {
+
+        if (trackList == null && !setNullValue) {
+            return this;
+        }
 
         List<Map> tracks = trackList.stream()
                 .map(track -> objectMapper.convertValue(track, Map.class))
