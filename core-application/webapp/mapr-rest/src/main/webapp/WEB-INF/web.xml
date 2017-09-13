@@ -2,35 +2,16 @@
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
 
-    <context-param>
-        <param-name>resteasy.role.based.security</param-name>
-        <param-value>true</param-value>
-    </context-param>
-
-    <listener>
-        <listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>
-    </listener>
-
-    <servlet>
-        <servlet-name>Resteasy</servlet-name>
-        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
-        <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
-            <param-value>com.mapr.music.MaprMusicApp</param-value>
-        </init-param>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>Resteasy</servlet-name>
-        <url-pattern>/*</url-pattern>
-    </servlet-mapping>
-
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>api</web-resource-name>
             <url-pattern>/api/1.0/*</url-pattern>
             <http-method>POST</http-method>
             <http-method>PUT</http-method>
+            <http-method>DELETE</http-method>
+
+            <!--TODO delete. Added for testing-->
+            <http-method>GET</http-method>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
@@ -39,7 +20,7 @@
 
     <login-config>
         <auth-method>BASIC</auth-method>
-        <realm-name>Test</realm-name>
+        <realm-name>ApplicationRealm</realm-name>
     </login-config>
 
     <security-role>

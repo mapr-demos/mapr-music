@@ -24,7 +24,7 @@ public class MaprMusicApp extends Application {
         beanConfig.setVersion("1.0.0");
         beanConfig.setSchemes(new String[]{"http"});
         beanConfig.setHost("localhost:8080");
-        beanConfig.setBasePath("/mapr-music/api/1.0/");
+        beanConfig.setBasePath("/mapr-music-rest/api/1.0/");
         beanConfig.setResourcePackage("com.mapr.music.api");
         beanConfig.setScan(true);
     }
