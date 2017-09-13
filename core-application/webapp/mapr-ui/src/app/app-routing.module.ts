@@ -11,8 +11,10 @@ import {AddAlbumPage} from "./pages/add-album-page/add-album-page.component";
 import {EditAlbumPage} from "./pages/edit-album-page/edit-album-page.component";
 import {AppBar} from './components/app-bar-component/app-bar.component';
 import {AlbumEditForm} from './components/album-edit-form-component/album-edit-form.component';
+import {LoginPage} from './pages/login-page/login-page.component';
 
 import { FormsModule }   from '@angular/forms';
+import {AuthenticatedGuard} from "./guards/authenticated.guard";
 
 
 const appRoutes: Routes = [
@@ -22,7 +24,10 @@ const appRoutes: Routes = [
   },
   {
     path: 'album/edit/:albumSlug',
-    component: EditAlbumPage
+    component: EditAlbumPage,
+    canActivate: [
+      AuthenticatedGuard
+    ]
   },
   {
     path: 'album/:albumSlug',
@@ -38,7 +43,14 @@ const appRoutes: Routes = [
   },
   {
     path: 'add/album',
-    component: AddAlbumPage
+    component: AddAlbumPage,
+    canActivate: [
+      AuthenticatedGuard
+    ]
+  },
+  {
+    path: 'login',
+    component: LoginPage
   },
   {
     path: '**',
@@ -56,7 +68,8 @@ const appRoutes: Routes = [
     AppBar,
     AlbumEditForm,
     AddAlbumPage,
-    EditAlbumPage
+    EditAlbumPage,
+    LoginPage
   ],
   imports: [
     FormsModule,

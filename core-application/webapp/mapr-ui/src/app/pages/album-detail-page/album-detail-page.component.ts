@@ -3,6 +3,8 @@ import {ActivatedRoute, ParamMap, Router} from "@angular/router";
 import "rxjs/add/operator/switchMap";
 import {Album, Track} from "../../models/album";
 import {AlbumService} from "../../services/album.service";
+import {ReplaySubject} from "rxjs";
+import {AuthService} from "../../services/auth.service";
 
 function swap(arr, a: number, b: number): void {
   const t = arr[a];
@@ -20,11 +22,16 @@ function removeAtInd(arr, ind) {
   styleUrls: ['./album-detail-page.component.css']
 })
 export class AlbumDetailPage implements OnInit{
+  isAuthenticated: ReplaySubject<boolean>;
+
   constructor(
+    private authService: AuthService,
     private activatedRoute: ActivatedRoute,
     private albumService: AlbumService,
     private router: Router
-  ) {}
+  ) {
+    this.isAuthenticated = this.authService.isAuthenticated$;
+  }
 
   album: Album;
   sourceURL: string;
@@ -121,7 +128,6 @@ export class AlbumDetailPage implements OnInit{
       })
       .subscribe((album) => {
         this.album = album;
-        console.log(album);
       });
   }
 
