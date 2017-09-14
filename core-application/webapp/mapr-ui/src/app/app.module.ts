@@ -25,8 +25,8 @@ import {AuthInterceptor} from "./interceptors/auth.interceptor";
     NgbModule.forRoot()
   ],
   providers: [
-    AlbumService,
     ArtistService,
+    AlbumService,
     AppConfig,
     LanguageService,
     AuthService,

@@ -10,12 +10,15 @@ import {NotFoundPage} from "./pages/not-found-page/not-found-page.component";
 import {ReportingPage} from "./pages/reporting-page/reporting-page.component";
 import {AddAlbumPage} from "./pages/add-album-page/add-album-page.component";
 import {EditAlbumPage} from "./pages/edit-album-page/edit-album-page.component";
-import {AppBar} from './components/app-bar-component/app-bar.component';
-import {AlbumEditForm} from './components/album-edit-form-component/album-edit-form.component';
-import {LoginPage} from './pages/login-page/login-page.component';
+import {AppBar} from "./components/app-bar-component/app-bar.component";
+import {AlbumEditForm} from "./components/album-edit-form-component/album-edit-form.component";
+import {LoginPage} from "./pages/login-page/login-page.component";
 
-import { FormsModule }   from '@angular/forms';
+import {FormsModule} from "@angular/forms";
 import {AuthenticatedGuard} from "./guards/authenticated.guard";
+import {AddArtistPage} from "./pages/add-artist-page/add-artist-page.component";
+import {ArtistEditForm} from "./components/artist-edit-form-component/artist-edit-form.component";
+import {EditArtistPage} from "./pages/edit-artist-page/edit-artist-page.component";
 
 
 const appRoutes: Routes = [
@@ -54,6 +57,20 @@ const appRoutes: Routes = [
     ]
   },
   {
+    path: 'add/artist',
+    component: AddArtistPage,
+    canActivate: [
+      AuthenticatedGuard
+    ]
+  },
+  {
+    path: 'artist/edit/:artistSlug',
+    component: EditArtistPage,
+    canActivate: [
+      AuthenticatedGuard
+    ]
+  },
+  {
     path: 'login',
     component: LoginPage
   },
@@ -73,8 +90,11 @@ const appRoutes: Routes = [
     ArtistPage,
     AppBar,
     AlbumEditForm,
+    ArtistEditForm,
+    AddArtistPage,
     AddAlbumPage,
     EditAlbumPage,
+    EditArtistPage,
     LoginPage
   ],
   imports: [
@@ -87,4 +107,5 @@ const appRoutes: Routes = [
     RouterModule
   ]
 })
-export class AppRoutingModule{}
+export class AppRoutingModule {
+}

@@ -5,6 +5,7 @@ import "rxjs/add/operator/map";
 import "rxjs/add/operator/toPromise";
 import "rxjs/add/operator/mergeMap";
 import {AppConfig} from "../app.config";
+import {Observable} from "rxjs/Observable";
 
 const PAGE_SIZE = 12;
 
@@ -33,6 +34,37 @@ function mapToAlbum({_id, name, cover_image_url, slug}): Album {
     coverImageURL: cover_image_url
   };
 }
+
+const mapToAlbumRequest = ({
+                              id
+                            }: Album) => ({
+  _id: id
+});
+
+const mapToArtistRequest = ({
+                             name,
+                             avatarURL,
+                             gender,
+                             area,
+                             beginDate,
+                             endDate,
+                             slug,
+                             disambiguationComment,
+                             IPI,
+                             ISNI,
+                             albums
+                           }: Artist) => ({
+  name: name,
+  profile_image_url: avatarURL,
+  area,
+  begin_date: (beginDate) ? Date.parse(beginDate) : null,
+  end_date: (endDate) ? Date.parse(endDate) : null,
+  slug,
+  disambiguation_comment: disambiguationComment,
+  IPI,
+  ISNI,
+  albums: albums.map(mapToAlbumRequest)
+});
 
 @Injectable()
 export class ArtistService {
@@ -98,6 +130,41 @@ export class ArtistService {
           ? response.albums.map(mapToAlbum)
           : [];
         return artist;
+      })
+      .toPromise();
+  }
+
+  deleteArtist(artist: Artist): Promise<void> {
+    return this.http.delete(`${this.config.apiURL}${ArtistService.SERVICE_URL}/${artist.id}`)
+      .map(() => {})
+      .toPromise()
+  }
+
+  searchForAlbums(query: string): Observable<Array<Album>> {
+    return this.http
+      .get(`${this.config.apiURL}/api/1.0/albums/search?name_entry=${query}&limit=5`)
+      .map((response: any) => {
+        console.log('Search response: ', response);
+        return response.map(mapToAlbum);
+      });
+  }
+
+  createNewArtist(artist: Artist): Promise<Artist> {
+    return this.http
+      .post(`${this.config.apiURL}${ArtistService.SERVICE_URL}/`, mapToArtistRequest(artist))
+      .map((response: any) => {
+        console.log('Creation response: ', response);
+        return mapToArtist(response);
+      })
+      .toPromise()
+  }
+
+  updateArtist(artist: Artist): Promise<Artist> {
+    return this.http
+      .put(`${this.config.apiURL}${ArtistService.SERVICE_URL}/${artist.id}`, mapToArtistRequest(artist))
+      .map((response: any) => {
+        console.log('Updated response: ', response);
+        return mapToArtist(response);
       })
       .toPromise();
   }

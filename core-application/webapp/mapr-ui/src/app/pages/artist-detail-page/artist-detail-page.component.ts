@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
-import 'rxjs/add/operator/switchMap';
-import { ArtistService } from '../../services/artist.service';
-import {Artist} from '../../models/artist';
+import {Component, OnInit} from "@angular/core";
+import {ActivatedRoute, ParamMap, Router} from "@angular/router";
+import "rxjs/add/operator/switchMap";
+import {ArtistService} from "../../services/artist.service";
+import {Artist} from "../../models/artist";
+import {ReplaySubject} from "rxjs/ReplaySubject";
+import {AuthService} from "../../services/auth.service";
 
 @Component({
   selector: 'artist-page',
@@ -11,16 +13,20 @@ import {Artist} from '../../models/artist';
 })
 export class ArtistPage implements OnInit {
 
-  constructor(
-    private router: ActivatedRoute,
-    private artistService: ArtistService
-  ) {}
+  isAuthenticated: ReplaySubject<boolean>;
+
+  constructor(private authService: AuthService,
+              private activatedRoute: ActivatedRoute,
+              private router: Router,
+              private artistService: ArtistService) {
+    this.isAuthenticated = this.authService.isAuthenticated$;
+  }
 
   artist: Artist;
   sourceURL: string;
 
   ngOnInit(): void {
-    this.router.paramMap
+    this.activatedRoute.paramMap
       .switchMap((params: ParamMap) => {
         // const artistId = params.get('artistId');
         // this.sourceURL = this.artistService.getArtistByIdURL(artistId);
@@ -31,6 +37,13 @@ export class ArtistPage implements OnInit {
       })
       .subscribe((artist) => {
         this.artist = artist;
+      });
+  }
+
+  deleteArtist() {
+    this.artistService.deleteArtist(this.artist)
+      .then(() => {
+        this.router.navigateByUrl('');
       });
   }
 }
