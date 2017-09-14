@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppComponent } from './app.component';
@@ -9,6 +9,9 @@ import { AlbumService } from './services/album.service';
 import { ArtistService } from './services/artist.service';
 import { AppConfig } from "./app.config";
 import {LanguageService} from "./services/language.service";
+import {AuthService} from "./services/auth.service";
+import {AuthenticatedGuard} from "./guards/authenticated.guard";
+import {AuthInterceptor} from "./interceptors/auth.interceptor";
 
 
 @NgModule({
@@ -25,7 +28,14 @@ import {LanguageService} from "./services/language.service";
     AlbumService,
     ArtistService,
     AppConfig,
-    LanguageService
+    LanguageService,
+    AuthService,
+    AuthenticatedGuard,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true,
+    }
   ],
   bootstrap: [
     AppComponent

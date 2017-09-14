@@ -177,7 +177,6 @@ export class AlbumService {
  * */
   getAlbumsPageURL({pageNumber, sortType, lang}: PageRequest): string {
     let url = `${this.config.apiURL}${AlbumService.SERVICE_URL}?page=${pageNumber}&per_page=${PAGE_SIZE}`;
-    console.log(lang);
     if (lang !== null) {
       url += `&language=${lang}`;
     }
