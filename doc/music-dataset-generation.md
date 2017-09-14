@@ -12,12 +12,18 @@ and download the dump. For example to get latest version of dump via http or ftp
 $ export MB_MIRROR='https://mirrors.dotsrc.org/MusicBrainz/data/fullexport/'
 $ export MB_LATEST=`curl -X GET $MB_MIRROR/LATEST`
 $ wget $MB_MIRROR/$MB_LATEST/mbdump.tar.bz2
+$ wget $MB_MIRROR/$MB_LATEST/mbdump-derived.tar.bz2
 ```
 
 * Extract archive after download completes:
 
 ```
 $ tar xvjf mbdump.tar.bz2
+```
+
+* Extract `mbdump-derived.tar.bz2` archive, which contains additional meta information:
+```
+$ tar xvjf mbdump-derived.tar.bz2
 ```
 
 ### Use dump conversion util
