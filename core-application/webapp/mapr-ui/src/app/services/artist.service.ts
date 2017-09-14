@@ -8,13 +8,19 @@ import {AppConfig} from "../app.config";
 
 const PAGE_SIZE = 12;
 
-function mapToArtist({_id, name, profile_image_url, gender, slug}): Artist {
+function mapToArtist({_id, name, profile_image_url, gender, slug, area, disambiguation_comment, begin_date, end_date, IPI, ISNI}): Artist {
   return {
     id: _id,
     name,
     gender,
     avatarURL: profile_image_url,
     slug,
+    area,
+    disambiguationComment: disambiguation_comment,
+    beginDate: (begin_date) ? new Date(begin_date).toDateString() : null,
+    endDate: (end_date) ? new Date(end_date).toDateString() : null,
+    IPI,
+    ISNI,
     albums: []
   }
 }
@@ -83,11 +89,15 @@ export class ArtistService {
   /**
    * @desc get album by slug from server side
    * */
-  getArtistBySlug(artistSlug: string):Promise<Artist> {
+  getArtistBySlug(artistSlug: string): Promise<Artist> {
     return this.http.get(this.getArtistBySlugURL(artistSlug))
-      .map((response: any) =>{
+      .map((response: any) => {
         console.log('Artist: ', response);
-        return mapToArtist(response);
+        const artist = mapToArtist(response);
+        artist.albums = response.albums
+          ? response.albums.map(mapToAlbum)
+          : [];
+        return artist;
       })
       .toPromise();
   }

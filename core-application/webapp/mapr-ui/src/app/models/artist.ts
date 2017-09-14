@@ -11,6 +11,12 @@ export interface Artist {
   avatarURL: string,
   gender: string,
   slug: string,
+  area: string,
+  disambiguationComment: string,
+  beginDate: string,
+  endDate: string,
+  IPI,
+  ISNI
   albums: Array<Album>
 }
 
