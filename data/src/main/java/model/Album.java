@@ -19,6 +19,9 @@ public class Album {
     @JsonIgnore
     private String mediumId;
 
+    @JsonIgnore
+    private String releaseGroupId;
+
     @JsonProperty("_id")
     private String id;
     private String name;
@@ -60,6 +63,14 @@ public class Album {
 
     @JsonProperty("released_date")
     private JsonNumberLong releasedDate;
+
+    public String getReleaseGroupId() {
+        return releaseGroupId;
+    }
+
+    public void setReleaseGroupId(String releaseGroupId) {
+        this.releaseGroupId = releaseGroupId;
+    }
 
     public String getId() {
         return id;

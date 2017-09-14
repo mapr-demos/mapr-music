@@ -6,6 +6,8 @@ import model.ArtistUrlLink;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -41,6 +43,7 @@ public class ArtistParser {
     private String linkTypePath;
 
     public List<Artist> parseArtists(String dumpPath, long size, boolean chooseWithImages) {
+
         artistFilePath = dumpPath + File.separator + "artist";
         areaFilePath = dumpPath + File.separator + "area";
         artistIsniFilePath = dumpPath + File.separator + "artist_isni";
@@ -51,7 +54,6 @@ public class ArtistParser {
         urlsPath = dumpPath + File.separator + "url";
         linkPath = dumpPath + File.separator + "link";
         linkTypePath = dumpPath + File.separator + "link_type";
-
         // TODO refactor
         if (!chooseWithImages) {
 
@@ -391,7 +393,15 @@ public class ArtistParser {
         String imageName = wikimediaCommonsUrl.substring(indexOfImageName + imageNameDelimiter.length(), wikimediaCommonsUrl.length());
         String wikipediaApiUrl = "https://en.wikipedia.org/w/api.php?action=query&prop=imageinfo&iilimit=50&iiend=2007-12-31T23%3A59%3A59Z&iiprop=timestamp%7Cuser%7Curl&format=json&titles=File%3A" + imageName;
         HttpClient httpClient = HttpClientBuilder.create().build();
+
+        final RequestConfig requestConfig = RequestConfig
+                .custom()
+                .setCookieSpec(CookieSpecs.IGNORE_COOKIES)
+                .build();
+
         HttpGet getRequest = new HttpGet(wikipediaApiUrl);
+        getRequest.setConfig(requestConfig);
+
         getRequest.addHeader("accept", "application/json");
 
         String result = wikimediaCommonsUrl;
@@ -412,9 +422,8 @@ public class ArtistParser {
             Map<String, String> imageInfoMap = imageInfoMapList.get(0);
 
             result = imageInfoMap.get("url");
-
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Can not get actual wiki image URL. '{}' will be used as image URL.", result);
         }
 
         return result;

@@ -12,7 +12,7 @@ public class ParserUtils {
         int month = (VALUE_NOT_DEFINED_SYMBOL.equals(rawMonth) || rawMonth.isEmpty()) ? 1 : Integer.parseInt(rawMonth);
         int day = (VALUE_NOT_DEFINED_SYMBOL.equals(rawDay) || rawDay.isEmpty()) ? 1 : Integer.parseInt(rawDay);
 
-        if (year == 1 && month == 1 && day == 1) {
+        if (year == 1) {
             return null;
         } else {
             LocalDateTime dateTime = LocalDateTime.of(year, month, day, 0, 0);

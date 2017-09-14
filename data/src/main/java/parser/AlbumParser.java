@@ -34,6 +34,7 @@ public class AlbumParser {
     private String languageFilePath;
     private String mediumFilePath;
     private String trackFilePath;
+    private String releaseGroupMetaFilePath;
 
     private boolean chooseWithImages;
 
@@ -49,9 +50,14 @@ public class AlbumParser {
         languageFilePath = dumpPath + File.separator + "language";
         mediumFilePath = dumpPath + File.separator + "medium";
         trackFilePath = dumpPath + File.separator + "track";
+        releaseGroupMetaFilePath = dumpPath + File.separator + "release_group_meta";
 
         log.info("Parsing 'release' file ...");
         List<Album> albums = parseAlbumFile();
+
+        log.info("Parsing 'release_group_meta' file ...");
+        parseReleaseGroupMetaFile(albums);
+
 
         log.info("Generating slugs");
         generateSlugs(albums);
@@ -248,6 +254,27 @@ public class AlbumParser {
                 });
     }
 
+    private void parseReleaseGroupMetaFile(List<Album> albums) {
+
+        Map<String, List<Album>> releaseGroupIdAlbumMap = albums.stream()
+                .filter(album -> !StringUtils.isEmpty(album.getReleaseGroupId()))
+                .collect(Collectors.groupingBy(Album::getReleaseGroupId));
+
+        //read file into stream, try-with-resources
+        try (Stream<String> stream = Files.lines(Paths.get(releaseGroupMetaFilePath))) {
+            Stream<String[]> rows = stream.map(strRow -> strRow.split(TAB_SYMBOL));
+            rows.forEach(row -> {
+                List<Album> albumList = releaseGroupIdAlbumMap.get(row[0]);
+                if (albumList != null) {
+                    Long releasedDate = ParserUtils.parseTimeStamp(row[2], row[3], row[4]);
+                    albumList.forEach(album -> album.setReleasedDate(releasedDate));
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private Album parseAlbumRow(String[] values, Artist artist) {
 
         Album album = new Album();
@@ -270,6 +297,7 @@ public class AlbumParser {
         album.setBarcode(values[9]);
         album.setMBID(values[1]);
         album.setSlugPostfix(0);
+        album.setReleaseGroupId(values[4]);
 
         CoverArtArchiveClient artArchiveClient = new CoverArtArchiveClient(album.getMBID());
         album.setCoverImageUrl(artArchiveClient.getCoverImage());
