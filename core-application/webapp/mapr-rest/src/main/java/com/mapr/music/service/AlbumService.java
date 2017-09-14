@@ -204,4 +204,13 @@ public interface AlbumService {
      */
     List<Language> getSupportedAlbumsLanguages();
 
+    /**
+     * Search albums according to the specified name entry. Returns albums which titles start with name entry.
+     *
+     * @param nameEntry specifies search criteria.
+     * @param limit     specifies number of albums, which will be returned. Can be overridden by actual service
+     *                  implementation.
+     * @return list of albums which titles start with name entry.
+     */
+    List<AlbumDto> searchAlbums(String nameEntry, Long limit);
 }

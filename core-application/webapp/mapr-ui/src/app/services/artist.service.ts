@@ -60,6 +60,7 @@ const mapToArtistRequest = ({
   begin_date: (beginDate) ? Date.parse(beginDate) : null,
   end_date: (endDate) ? Date.parse(endDate) : null,
   slug,
+  gender,
   disambiguation_comment: disambiguationComment,
   IPI,
   ISNI,

@@ -114,7 +114,6 @@ public interface ArtistService {
      */
     ArtistDto updateArtist(String id, ArtistDto artistDto);
 
-
     /**
      * Search artists according to the specified name entry. Returns artists which names start with name entry.
      *

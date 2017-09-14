@@ -132,4 +132,13 @@ public class AlbumEndpoint {
     public TrackDto createAlbumsSingleTrack(@PathParam("id") String id, TrackDto trackDto) {
         return albumService.addTrackToAlbumTrackList(id, trackDto);
     }
+
+    @GET
+    @Path("/search/")
+    @ApiOperation(value = "Search albums by specified parameters")
+    public List<AlbumDto> searchAlbums(@QueryParam("name_entry") String nameEntry,
+                                       @QueryParam("limit") Long limit) {
+
+        return albumService.searchAlbums(nameEntry, limit);
+    }
 }

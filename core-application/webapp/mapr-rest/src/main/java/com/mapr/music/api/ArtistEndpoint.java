@@ -50,7 +50,6 @@ public class ArtistEndpoint {
         return artistService.getArtistsPage(perPage, page, sortOptions);
     }
 
-
     @GET
     @Path("/search/")
     @ApiOperation(value = "Search artists by specified parameters")

@@ -91,4 +91,13 @@ public interface AlbumDao extends MaprDbDao<Album> {
      */
     boolean deleteTrack(String albumId, String trackId);
 
+    /**
+     * Finds albums, which titles start with the specified name entry.
+     *
+     * @param nameEntry specifies query criteria.
+     * @param limit     specified limit.
+     * @param fields    specifies fields that will be fetched.
+     * @return list of albums which titles start with the specified name entry.
+     */
+    List<Album> getByNameStartsWith(String nameEntry, long limit, String... fields);
 }

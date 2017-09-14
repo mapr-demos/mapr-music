@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -35,6 +36,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
 
     private static final long ALBUMS_PER_PAGE_DEFAULT = 50;
     private static final long FIRST_PAGE_NUM = 1;
+    private static final long MAX_SEARCH_LIMIT = 15;
 
     /**
      * Array of album's fields that will be used for projection.
@@ -568,6 +570,25 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     @Override
     public List<Language> getSupportedAlbumsLanguages() {
         return languageDao.getList();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param nameEntry specifies search criteria.
+     * @param limit     specifies number of artists, which will be returned. Can be overridden by actual service
+     *                  implementation.
+     * @return list of albums which titles start with name entry.
+     */
+    @Override
+    public List<AlbumDto> searchAlbums(String nameEntry, Long limit) {
+
+        long actualLimit = (limit != null && limit > 0 && limit < MAX_SEARCH_LIMIT) ? limit : MAX_SEARCH_LIMIT;
+        List<Album> albums = albumDao.getByNameStartsWith(nameEntry, actualLimit, ALBUM_SHORT_INFO_FIELDS);
+
+        return albums.stream()
+                .map(this::albumToDto)
+                .collect(Collectors.toList());
     }
 
     private AlbumDto albumToDto(Album album) {

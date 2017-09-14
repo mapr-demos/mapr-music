@@ -22,6 +22,7 @@ export class ArtistEditForm implements OnInit {
 
   ngOnInit(): void {
     $('#new-album').typeahead({
+      displayText: (item) => item.title,
       source: this.getAlbums.bind(this),
       fitToElement: true,
       showHintOnFocus: true,
@@ -36,13 +37,14 @@ export class ArtistEditForm implements OnInit {
     }
     this.albumsDisposable = this.artistService.searchForAlbums(query)
       .subscribe((albums) => {
-        cb(albums)
+        console.log(albums);
+        cb(albums);
         this.albumsDisposable = null;
       });
   }
 
-  removeAlbumsById(artistId: string) {
-    this.artist.albums = this.artist.albums.filter((artist) => artist.id !== artistId)
+  removeAlbumsById(albumId: string) {
+    this.artist.albums = this.artist.albums.filter((album) => album.id !== albumId)
   }
 
   afterSelect(item) {

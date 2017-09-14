@@ -368,6 +368,48 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
 
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param nameEntry specifies query criteria.
+     * @param limit     specified limit.
+     * @param fields    specifies fields that will be fetched.
+     * @return list of albums which titles start with the specified name entry.
+     */
+    @Override
+    public List<Album> getByNameStartsWith(String nameEntry, long limit, String... fields) {
+        return processStore((connection, store) -> {
+
+            Query query = connection.newQuery();
+
+            // Select only specified field
+            if (fields != null && fields.length > 0) {
+                query.select(fields);
+            } else {
+                query.select("*");
+            }
+
+            // Build Query Condition to fetch documents by name entry
+            String nameStartsWithPattern = nameEntry + "%";
+            QueryCondition nameStartsWithCondition = connection.newCondition()
+                    .like("name", nameStartsWithPattern)
+                    .build();
+
+            // Add Condition and specified limit to the Query
+            query.where(nameStartsWithCondition)
+                    .limit(limit)
+                    .build();
+
+            DocumentStream documentStream = store.findQuery(query);
+            List<Album> albums = new ArrayList<>();
+            for (Document doc : documentStream) {
+                albums.add(mapOjaiDocument(doc));
+            }
+
+            return albums;
+        });
+    }
+
     private int getTrackIndexById(List<Track> trackList, String trackId) {
 
         for (int i = 0; i < trackList.size(); i++) {

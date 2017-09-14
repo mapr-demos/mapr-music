@@ -101,9 +101,8 @@ public class Artist {
         return gender;
     }
 
-    public Artist setGender(String gender) {
+    public void setGender(String gender) {
         this.gender = gender;
-        return this;
     }
 
     public String getArea() {
@@ -119,18 +118,16 @@ public class Artist {
         return ipi;
     }
 
-    public Artist setIpi(String ipi) {
+    public void setIpi(String ipi) {
         this.ipi = ipi;
-        return this;
     }
 
     public String getIsni() {
         return isni;
     }
 
-    public Artist setIsni(String isni) {
+    public void setIsni(String isni) {
         this.isni = isni;
-        return this;
     }
 
     public String getMbid() {

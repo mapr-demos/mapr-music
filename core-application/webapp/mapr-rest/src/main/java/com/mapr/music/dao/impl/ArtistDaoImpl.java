@@ -45,8 +45,25 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
             if (artist.getName() != null) {
                 mutation.set("name", artist.getName());
             }
+
             if (artist.getGender() != null) {
                 mutation.set("gender", artist.getGender());
+            }
+
+            if (artist.getBeginDate() != null) {
+                mutation.set("begin_date", artist.getBeginDate());
+            }
+
+            if (artist.getEndDate() != null) {
+                mutation.set("end_date", artist.getEndDate());
+            }
+
+            if (artist.getIpi() != null) {
+                mutation.set("IPI", artist.getIpi());
+            }
+
+            if (artist.getIsni() != null) {
+                mutation.set("ISNI", artist.getIsni());
             }
 
             if (artist.getArea() != null) {
@@ -129,7 +146,7 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
                 query.select("*");
             }
 
-            // Build Query Condition to fetch documents by specified language
+            // Build Query Condition to fetch documents by name entry
             String nameStartsWithPattern = nameEntry + "%";
             QueryCondition nameStartsWithCondition = connection.newCondition()
                     .like("name", nameStartsWithPattern)
