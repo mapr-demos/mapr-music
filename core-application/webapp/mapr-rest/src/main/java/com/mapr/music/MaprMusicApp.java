@@ -3,12 +3,14 @@ package com.mapr.music;
 import com.mapr.music.api.AlbumEndpoint;
 import com.mapr.music.api.ArtistEndpoint;
 import com.mapr.music.api.LanguageEndpoint;
+import com.mapr.music.api.UserEndpoint;
 import com.mapr.music.util.CORSFilter;
 import io.swagger.jaxrs.config.BeanConfig;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -18,13 +20,12 @@ public class MaprMusicApp extends Application {
     private Set<Object> singletons = new HashSet<>();
 
     public MaprMusicApp() {
-
         // Configure and Initialize Swagger
         BeanConfig beanConfig = new BeanConfig();
         beanConfig.setVersion("1.0.0");
         beanConfig.setSchemes(new String[]{"http"});
         beanConfig.setHost("localhost:8080");
-        beanConfig.setBasePath("/mapr-music/api/1.0/");
+        beanConfig.setBasePath("/mapr-music-rest/api/1.0/");
         beanConfig.setResourcePackage("com.mapr.music.api");
         beanConfig.setScan(true);
     }
@@ -41,6 +42,7 @@ public class MaprMusicApp extends Application {
         resources.add(AlbumEndpoint.class);
         resources.add(ArtistEndpoint.class);
         resources.add(LanguageEndpoint.class);
+        resources.add(UserEndpoint.class);
         resources.add(CORSFilter.class);
 
         // Hooking up Swagger-Core
