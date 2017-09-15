@@ -46,6 +46,7 @@ public class MaprMusicApp extends Application {
         resources.add(ValidationExceptionMapper.class);
         resources.add(ResourceNotFoundExceptionMapper.class);
         resources.add(ConstraintViolationExceptionMapper.class);
+        resources.add(DefaultOptionsExceptionMapper.class);
         resources.add(CommonExceptionMapper.class);
 
         // Hooking up Swagger-Core
