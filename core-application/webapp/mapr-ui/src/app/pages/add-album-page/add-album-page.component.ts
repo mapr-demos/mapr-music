@@ -1,7 +1,7 @@
 import {Component, OnInit} from "@angular/core";
-import {Album, Track} from "../../models/album";
+import {Album} from "../../models/album";
 import {AlbumService} from "../../services/album.service";
-import {Route, Router} from "@angular/router";
+import {Router} from "@angular/router";
 
 const createNewAlbum = (): Album => ({
   id: '',
@@ -13,7 +13,8 @@ const createNewAlbum = (): Album => ({
   trackList: [],
   country: '',
   artists: [],
-  language: null
+  language: null,
+  releasedDate: new Date()
 });
 
 @Component({

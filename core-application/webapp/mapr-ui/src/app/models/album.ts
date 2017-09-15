@@ -26,6 +26,7 @@ export interface Album {
   language: Language,
   trackList: Array<Track>,
   country: string,
+  releasedDate: Date,
   artists: Array<Artist>
 }
 
