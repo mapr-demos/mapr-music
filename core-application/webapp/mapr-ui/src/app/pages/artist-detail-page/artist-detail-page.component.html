@@ -1,0 +1,102 @@
+<app-bar
+  [sourceURL]="sourceURL"
+></app-bar>
+<div class="artist-page">
+  <div class="container">
+    <div style="display: flex;" *ngIf="artist">
+      <div style="width: 100%">
+        <div class="album-container">
+          <div>
+            <img src="{{artist.avatarURL}}" width="150" height="150" onerror="this.src='https://s.discogs.com/images/default-artist.png'">
+            <span style="padding: 5px">{{artist.name}}</span>
+          </div>
+          <i *ngIf="artist.disambiguationComment">({{artist.disambiguationComment}})</i>
+
+          <div style="padding-top: 20px">
+            <div *ngIf="artist.gender && artist.gender !== '\\N'" style="padding-top: 25px">Gender: {{artist.gender}}</div>
+            <div *ngIf="artist.area" style="padding-top: 5px">Area: {{artist.area}}</div>
+            <div *ngIf="artist.beginDate" style="padding-top: 5px">Begin date: {{artist.beginDate}}</div>
+            <div *ngIf="artist.endDate" style="padding-top: 5px">End date: {{artist.endDate}}</div>
+            <div *ngIf="artist.IPI" style="padding-top: 5px">IPI: {{artist.IPI}}</div>
+            <div *ngIf="artist.ISNI" style="padding-top: 5px">ISNI: {{artist.ISNI}}</div>
+          </div>
+        </div>
+        <div
+          *ngIf="artist"
+          style="padding-top: 10px"
+        >
+          <div style="display: flex; flex-direction: column;">
+            <div style="padding: 5px">
+              Releases:
+            </div>
+
+            <div
+              *ngFor="let album of artist.albums"
+              style="display: flex;"
+              class="artist-album-item"
+            >
+              <div>
+                <img src="{{album.coverImageURL}}" width="50" height="50">
+              </div>
+              <div
+                class="artist-album-item-title"
+                routerLink="/album/{{album.slug}}"
+              >
+                {{album.title}}
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div
+        style="margin: 0 10px"
+        *ngIf = "isAuthenticated | async"
+      >
+        <div class="btn btn-primary" routerLink="/artist/edit/{{artist.slug}}">
+          Edit
+        </div>
+      </div>
+      <div
+        style="margin: 0 10px"
+        *ngIf = "isAuthenticated | async"
+      >
+        <div class="btn btn-primary" data-toggle="modal" data-target="#deleteModal">
+          Delete
+        </div>
+      </div>
+      <div
+        *ngIf = "isAuthenticated | async"
+      >
+        <div class="btn btn-primary" routerLink="/add/artist">
+          Add new
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="deleteModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Delete</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure that you want to delete artist?</p>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="deleteArtist()"
+          data-dismiss="modal"
+        >
+          Yes
+        </button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+      </div>
+    </div>
+  </div>
+</div>

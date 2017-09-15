@@ -1,0 +1,19 @@
+<app-bar></app-bar>
+
+<artist-edit-form
+  *ngIf="artist"
+  [artist]="artist"
+>
+</artist-edit-form>
+<div
+  class="container"
+>
+  <div class="form-group" style="padding: 10px">
+    <div
+      class="btn btn-primary btn-block"
+      (click)="onArtistSave()"
+    >
+      Save
+    </div>
+  </div>
+</div>
