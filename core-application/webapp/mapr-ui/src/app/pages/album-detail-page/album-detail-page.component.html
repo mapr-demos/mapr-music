@@ -42,6 +42,7 @@
             <div
               style="margin: 5px"
               (click)="toggleReorderMode()"
+              *ngIf="isAuthenticated | async"
             >
               <i class="fa fa-exchange fa-rotate-90" aria-hidden="true" style="font-size: 20px;"></i>
             </div>
@@ -64,6 +65,7 @@
               <td
                 style="padding: 0px 10px"
                 (click)="setEditTrackId(track.id)"
+                *ngIf = "isAuthenticated | async"
               >
                 <div
                   *ngIf="editedTrackId === track.id; then saveTrackIcon else editTrackIcon"
@@ -110,6 +112,7 @@
               </td>
               <td
                 style="padding: 0 5px"
+                *ngIf="isAuthenticated | async"
               >
                 <div
                   (click)="removeTrack(track.id)"
@@ -144,6 +147,7 @@
         <div
           class="btn btn-primary"
           style="margin: 0 5px"
+          *ngIf = "isAuthenticated | async"
           (click)="onAddNewTrackClick()"
         >
           <span
