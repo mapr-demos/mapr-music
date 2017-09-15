@@ -102,7 +102,8 @@ const mapToAlbum = ({
   slug,
   //this property is injected on ui
   // TODO add to document
-  language
+  language,
+  released_date
 }): Album => ({
   id: _id,
   title: name,
@@ -111,6 +112,7 @@ const mapToAlbum = ({
   style,
   format,
   slug,
+  releasedDate: new Date(released_date),
   language,
   trackList: tracks
     ? tracks.map(mapToTrack)
@@ -148,7 +150,9 @@ const mapToAlbumRequest = ({
   format,
   slug,
   trackList,
-  artists
+  artists,
+  language,
+  releasedDate
 }: Album) => ({
   name: title,
   cover_image_url: coverImageURL,
@@ -156,6 +160,8 @@ const mapToAlbumRequest = ({
   style,
   format,
   slug,
+  released_date: releasedDate.getTime(),
+  language: language.code,
   artists: artists.map(mapToArtistRequest),
   tracks: trackList.map(mapToTrackRequest)
 });

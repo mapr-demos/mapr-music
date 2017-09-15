@@ -29,6 +29,9 @@
             <div>
               Language: <a routerLink="/" [queryParams]="{lang: album.language.code}">{{album.language.name}}</a>
             </div>
+            <div>
+              Date: {{album.releasedDate | date }}
+            </div>
           </div>
         </div>
         <div
