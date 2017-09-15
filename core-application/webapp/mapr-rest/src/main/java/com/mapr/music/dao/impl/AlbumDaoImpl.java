@@ -148,7 +148,8 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
                     .setPackaging(album.getPackaging())
                     .setTrackList(album.getTrackList())
                     .setArtists(album.getArtistList())
-                    .setFormat(album.getFormat());
+                    .setFormat(album.getFormat())
+                    .setReleasedDate(album.getReleasedDate());
 
             // Update the OJAI Document with specified identifier
             store.update(id, mutationBuilder.build());

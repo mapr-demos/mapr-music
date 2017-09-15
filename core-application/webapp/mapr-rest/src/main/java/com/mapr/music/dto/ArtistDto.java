@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -15,6 +16,8 @@ public class ArtistDto {
 
     @JsonProperty("_id")
     private String id;
+
+    @NotNull
     private String name;
     private String gender;
     private String area;

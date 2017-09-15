@@ -3,6 +3,7 @@ package com.mapr.music.model;
 import com.fasterxml.jackson.annotation.*;
 import com.mapr.music.annotation.MaprDbTable;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +50,7 @@ public class Artist {
     @JsonProperty("end_date")
     private Long endDate;
 
+    @NotNull
     private String name;
     private String gender;
     private String area;
@@ -74,27 +76,24 @@ public class Artist {
         return name;
     }
 
-    public Artist setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     public String getSlugName() {
         return slugName;
     }
 
-    public Artist setSlugName(String slugName) {
+    public void setSlugName(String slugName) {
         this.slugName = slugName;
-        return this;
     }
 
     public Long getSlugPostfix() {
         return slugPostfix;
     }
 
-    public Artist setSlugPostfix(Long slugPostfix) {
+    public void setSlugPostfix(Long slugPostfix) {
         this.slugPostfix = slugPostfix;
-        return this;
     }
 
     public String getGender() {
@@ -109,9 +108,8 @@ public class Artist {
         return area;
     }
 
-    public Artist setArea(String area) {
+    public void setArea(String area) {
         this.area = area;
-        return this;
     }
 
     public String getIpi() {
@@ -134,9 +132,8 @@ public class Artist {
         return mbid;
     }
 
-    public Artist setMbid(String mbid) {
+    public void setMbid(String mbid) {
         this.mbid = mbid;
-        return this;
     }
 
     public String getDisambiguationComment() {
@@ -152,54 +149,47 @@ public class Artist {
         return albumsIds;
     }
 
-    public Artist setAlbumsIds(List<String> albumsIds) {
+    public void setAlbumsIds(List<String> albumsIds) {
         this.albumsIds = albumsIds;
-        return this;
     }
 
-    public Artist addAlbumId(String albumsId) {
+    public void addAlbumId(String albumsId) {
 
         if (this.albumsIds == null) {
             this.albumsIds = new ArrayList<>();
         }
         this.albumsIds.add(albumsId);
-
-        return this;
     }
 
     public String getProfileImageUrl() {
         return profileImageUrl;
     }
 
-    public Artist setProfileImageUrl(String profileImageUrl) {
+    public void setProfileImageUrl(String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
-        return this;
     }
 
     public String[] getImagesUrls() {
         return imagesUrls;
     }
 
-    public Artist setImagesUrls(String[] imagesUrls) {
+    public void setImagesUrls(String[] imagesUrls) {
         this.imagesUrls = imagesUrls;
-        return this;
     }
 
     public Long getBeginDate() {
         return beginDate;
     }
 
-    public Artist setBeginDate(Long beginDate) {
+    public void setBeginDate(Long beginDate) {
         this.beginDate = beginDate;
-        return this;
     }
 
     public Long getEndDate() {
         return endDate;
     }
 
-    public Artist setEndDate(Long endDate) {
+    public void setEndDate(Long endDate) {
         this.endDate = endDate;
-        return this;
     }
 }
