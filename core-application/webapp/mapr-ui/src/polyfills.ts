@@ -48,7 +48,10 @@ import 'core-js/es7/reflect';
  **/
 // import 'web-animations-js';  // Run `npm install --save web-animations-js`.
 
+import {SwaggerUIBundle, SwaggerUIStandalonePreset} from 'swagger-ui-dist';
 
+export const swaggerUIBundle = SwaggerUIBundle;
+export const swaggerUIStandalonePreset = SwaggerUIStandalonePreset;
 
 /***************************************************************************************************
  * Zone JS is required by Angular itself.
