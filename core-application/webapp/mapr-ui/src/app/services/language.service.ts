@@ -4,10 +4,10 @@ import {AppConfig} from "../app.config";
 import {Language} from "../models/album";
 
 const mapToLanguage = ({
-  code,
+  _id,
   name
 }): Language => ({
-  code,
+  code: _id,
   name
 });
 
