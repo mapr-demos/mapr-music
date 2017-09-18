@@ -74,6 +74,10 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
                 mutation.set("albums", artist.getAlbumsIds());
             }
 
+            if (artist.getProfileImageUrl() != null) {
+                mutation.set("profile_image_url", artist.getProfileImageUrl());
+            }
+
             // Update the OJAI Document with specified identifier
             store.update(id, mutation);
 

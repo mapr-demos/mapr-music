@@ -1,6 +1,32 @@
 <div class="container">
   <div class="form-group" style="margin: 10px">
-    <input class="form-control form-group" [(ngModel)]="album.title" placeholder="Album name">
+    <div class="row">
+      <div class="col-md-4 form-group">
+        <label>Album Name:</label>
+        <input class="form-control" [(ngModel)]="album.title" placeholder="Album name">
+      </div>
+      <div class="col-md-4 form-group">
+        <label>Date:</label>
+        <input class="form-control" id="date-selector">
+      </div>
+      <div class="col-md-4 form-group">
+        <label>Language:</label>
+        <select class="form-control" (change)="onLanguageChange($event.target.value)">
+          <option
+            value="null"
+          >
+            Nothing selected
+          </option>
+          <option
+            *ngFor="let language of languageOptions"
+            value="{{language.code}}"
+            [attr.selected]="album.language && language.code === album.language.code ? '': null"
+          >
+            {{language.name}}
+          </option>
+        </select>
+      </div>
+    </div>
     <input class="form-control form-group" [(ngModel)]="album.coverImageURL" placeholder="Album cover">
     <div
       *ngIf="album.coverImageURL"

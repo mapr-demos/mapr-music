@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.net.URI;
@@ -70,14 +71,14 @@ public class AlbumEndpoint {
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update single album")
-    public AlbumDto updateAlbum(@PathParam("id") String id, Album album) {
+    public AlbumDto updateAlbum(@PathParam("id") String id, @Valid Album album) {
         return albumService.updateAlbum(id, album);
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create album")
-    public Response createAlbum(Album album, @Context UriInfo uriInfo) {
+    public Response createAlbum(@Valid Album album, @Context UriInfo uriInfo) {
 
         AlbumDto createdAlbum = albumService.createAlbum(album);
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();

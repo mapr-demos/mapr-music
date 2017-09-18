@@ -8,6 +8,8 @@ import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.dto.TrackDto;
+import com.mapr.music.exception.ResourceNotFoundException;
+import com.mapr.music.exception.ValidationException;
 import com.mapr.music.model.Album;
 import com.mapr.music.model.Artist;
 import com.mapr.music.model.Language;
@@ -18,8 +20,6 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.NotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -235,7 +235,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
 
         Album album = albumDao.getById(id);
         if (album == null) {
-            throw new NotFoundException("Album with id '" + id + "' not found");
+            throw new ResourceNotFoundException("Album with id '" + id + "' not found");
         }
 
         return albumToDto(album);
@@ -251,12 +251,12 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     public AlbumDto getAlbumBySlugName(String slugName) {
 
         if (slugName == null || slugName.isEmpty()) {
-            throw new IllegalArgumentException("Album's slug name can not be empty");
+            throw new ValidationException("Album's slug name can not be empty");
         }
 
         Album album = slugService.getAlbumBySlug(slugName);
         if (album == null) {
-            throw new NotFoundException("Album with slug name '" + slugName + "' not found");
+            throw new ResourceNotFoundException("Album with slug name '" + slugName + "' not found");
         }
 
         return albumToDto(album);
@@ -275,7 +275,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         }
 
         if (!albumDao.exists(id)) {
-            throw new NotFoundException("Album with id '" + id + "' not found");
+            throw new ResourceNotFoundException("Album with id '" + id + "' not found");
         }
 
         albumDao.deleteById(id);
@@ -291,7 +291,11 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     public AlbumDto createAlbum(Album album) {
 
         if (album == null) {
-            throw new IllegalArgumentException("Album can not be null");
+            throw new ValidationException("Album can not be null");
+        }
+
+        if (album.getName() == null) {
+            throw new ValidationException("Album's name can not be null");
         }
 
         slugService.setSlugForAlbum(album);
@@ -342,7 +346,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
 
         Album existingAlbum = albumDao.getById(id, "artists");
         if (existingAlbum == null) {
-            throw new NotFoundException("Album with id '" + id + "' not found");
+            throw new ResourceNotFoundException("Album with id '" + id + "' not found");
         }
 
         List<String> albumArtistsIds = (album.getArtistList() == null)
@@ -350,14 +354,15 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
                 : album.getArtistList().stream()
                 .peek(artist -> {
                     if (artist.getId() == null) {
-                        throw new BadRequestException("Album's artist must have 'id' field set");
+                        throw new ValidationException("Album's artist must have 'id' field set",
+                                "Artist's id can not be empty");
                     }
                 })
                 .peek(artist -> {
 
                     Artist storedArtist = artistDao.getById(artist.getId());
                     if (storedArtist == null) {
-                        throw new NotFoundException("Artist with id ='" + artist.getId() + "' not found");
+                        throw new ResourceNotFoundException("Artist with id ='" + artist.getId() + "' not found");
                     }
 
                     artist.setSlugName(storedArtist.getSlugName());
@@ -558,7 +563,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         }
 
         if (!albumDao.deleteTrack(id, trackId)) {
-            throw new NotFoundException("Can not find track with id = " + trackId + "' for album with id = " + id);
+            throw new ResourceNotFoundException("Can not find track with id = " + trackId + "' for album with id = " + id);
         }
     }
 

@@ -19,6 +19,7 @@ import {AuthenticatedGuard} from "./guards/authenticated.guard";
 import {AddArtistPage} from "./pages/add-artist-page/add-artist-page.component";
 import {ArtistEditForm} from "./components/artist-edit-form-component/artist-edit-form.component";
 import {EditArtistPage} from "./pages/edit-artist-page/edit-artist-page.component";
+import {ApiReferencePage} from "./pages/api-reference-page/api-reference-page.component";
 
 
 const appRoutes: Routes = [
@@ -75,6 +76,10 @@ const appRoutes: Routes = [
     component: LoginPage
   },
   {
+    path: 'api-reference',
+    component: ApiReferencePage
+  },
+  {
     path: '**',
     component: NotFoundPage
   }
@@ -95,7 +100,8 @@ const appRoutes: Routes = [
     AddAlbumPage,
     EditAlbumPage,
     EditArtistPage,
-    LoginPage
+    LoginPage,
+    ApiReferencePage
   ],
   imports: [
     FormsModule,

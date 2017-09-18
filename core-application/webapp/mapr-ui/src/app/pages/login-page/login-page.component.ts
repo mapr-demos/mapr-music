@@ -10,6 +10,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 export class LoginPage {
   login: string = '';
   pass: string = '';
+  hasError: boolean = false;
 
   constructor(
     private router: Router,
@@ -20,14 +21,16 @@ export class LoginPage {
 
   onLoginClick() {
     this.authService.auth(this.login, this.pass).then((isAuthenticated) => {
-      if (isAuthenticated) {
-        const {returnUrl} = this.activatedRoute.snapshot.queryParams;
-        if (!returnUrl) {
-          this.router.navigateByUrl('');
-          return;
-        }
-        this.router.navigateByUrl(returnUrl);
+      if (!isAuthenticated) {
+        this.hasError = true;
+        return;
       }
+      const {returnUrl} = this.activatedRoute.snapshot.queryParams;
+      if (!returnUrl) {
+        this.router.navigateByUrl('');
+        return;
+      }
+      this.router.navigateByUrl(returnUrl);
     });
   }
 }

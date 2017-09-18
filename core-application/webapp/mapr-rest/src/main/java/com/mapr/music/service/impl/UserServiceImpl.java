@@ -1,10 +1,10 @@
 package com.mapr.music.service.impl;
 
 
+import com.mapr.music.exception.ValidationException;
 import com.mapr.music.model.User;
 import com.mapr.music.service.UserService;
 
-import javax.ws.rs.BadRequestException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -30,15 +30,15 @@ public class UserServiceImpl implements UserService {
         }
 
         if (user.getUsername() == null || user.getUsername().isEmpty()) {
-            throw new BadRequestException("User name can not be empty");
+            throw new ValidationException("User name can not be empty");
         }
 
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
-            throw new BadRequestException("User password can not be empty");
+            throw new ValidationException("User password can not be empty");
         }
 
         if (!isUsernameAvailable(user.getUsername())) {
-            throw new BadRequestException("User name is not available");
+            throw new ValidationException("User name is not available");
         }
 
         try {

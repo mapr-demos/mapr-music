@@ -8,6 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.net.URI;
@@ -70,14 +71,14 @@ public class ArtistEndpoint {
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update single artist")
-    public ArtistDto updateArtist(@PathParam("id") String id, ArtistDto artistDto) {
+    public ArtistDto updateArtist(@PathParam("id") String id, @Valid ArtistDto artistDto) {
         return artistService.updateArtist(id, artistDto);
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create artist")
-    public Response createArtist(ArtistDto artist, @Context UriInfo uriInfo) {
+    public Response createArtist(@Valid ArtistDto artist, @Context UriInfo uriInfo) {
 
         ArtistDto createdArtist = artistService.createArtist(artist);
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();

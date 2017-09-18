@@ -26,6 +26,7 @@
         <weld.core.version>2.3.5.Final</weld.core.version>
         <slf4j.simple.version>1.6.4</slf4j.simple.version>
         <rest.easy.version>3.0.19.Final</rest.easy.version>
+        <icu4j.version>59.1</icu4j.version>
     </properties>
 
     <!-- Required by Arquillian -->
@@ -94,6 +95,13 @@
             <artifactId>jboss-javaee-7.0</artifactId>
             <type>pom</type>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.ibm.icu/icu4j -->
+        <dependency>
+            <groupId>com.ibm.icu</groupId>
+            <artifactId>icu4j</artifactId>
+            <version>${icu4j.version}</version>
         </dependency>
 
         <dependency>

@@ -1,5 +1,6 @@
 package com.mapr.music.service.impl;
 
+import com.ibm.icu.text.Transliterator;
 import com.mapr.music.dao.MaprDbDao;
 import com.mapr.music.model.Album;
 import com.mapr.music.model.Artist;
@@ -24,11 +25,19 @@ public class SlugService {
     private static final Pattern WHITESPACE = Pattern.compile("[\\s]");
     private static final Pattern EDGESDHASHES = Pattern.compile("(^-|-$)");
 
+    /**
+     * Separates accents from their base characters, removes the accents, and then puts the remaining text into an
+     * unaccented form.
+     */
+    private static final String ICU4J_TRANSLITERATOR_ID = "Any-Latin; NFD; [:Nonspacing Mark:] Remove";
+
     private static final String SLUG_POSTFIX_DELIMITER = "-";
     private static final Long SLUG_FIRST_POSTFIX = 0L;
 
     private final MaprDbDao<Artist> artistDao;
     private final MaprDbDao<Album> albumDao;
+
+    private final Transliterator transliterator;
 
     class GetLastPostfixAction implements MaprDbDao.OjaiStoreAction<Long> {
 
@@ -62,6 +71,7 @@ public class SlugService {
     public SlugService(@Named("artistDao") MaprDbDao<Artist> artistDao, @Named("albumDao") MaprDbDao<Album> albumDao) {
         this.artistDao = artistDao;
         this.albumDao = albumDao;
+        this.transliterator = Transliterator.getInstance(ICU4J_TRANSLITERATOR_ID);
     }
 
     /**
@@ -72,9 +82,10 @@ public class SlugService {
      * @return slug representation of string, which can be used to generate readable and SEO-friendly
      * URLs.
      */
-    public static String toSlug(String input) {
+    public String toSlug(String input) {
 
-        String noWhitespace = WHITESPACE.matcher(input).replaceAll("-");
+        String transliterated = transliterator.transform(input);
+        String noWhitespace = WHITESPACE.matcher(transliterated).replaceAll("-");
         String normalized = Normalizer.normalize(noWhitespace, Normalizer.Form.NFD);
         String slug = NONLATIN.matcher(normalized).replaceAll("");
         slug = EDGESDHASHES.matcher(slug).replaceAll("");
@@ -222,15 +233,15 @@ public class SlugService {
         }
 
         int indexOfPossiblePostfix = slug.lastIndexOf(SLUG_POSTFIX_DELIMITER);
-        String possiblePostifxAsString = slug.substring(indexOfPossiblePostfix + 1, slug.length());
+        String possiblePostfixAsString = slug.substring(indexOfPossiblePostfix + 1, slug.length());
 
-        if (!StringUtils.isNumeric(possiblePostifxAsString)) {
+        if (!StringUtils.isNumeric(possiblePostfixAsString)) {
             return new Pair<>(slug, null);
         }
 
         // slug name has numeric postfix
         String slugNameWithoutNumericPostfix = slug.substring(0, indexOfPossiblePostfix);
-        Long postfix = Long.parseLong(possiblePostifxAsString);
+        Long postfix = Long.parseLong(possiblePostfixAsString);
 
         return new Pair<>(slugNameWithoutNumericPostfix, postfix);
     }

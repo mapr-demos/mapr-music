@@ -15,7 +15,6 @@ public class Language {
 
     @JsonProperty("_id")
     private String id;
-    private String code;
     private String name;
 
     public String getId() {
@@ -24,14 +23,6 @@ public class Language {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
     }
 
     public String getName() {

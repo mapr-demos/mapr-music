@@ -4,13 +4,12 @@ import com.mapr.music.api.AlbumEndpoint;
 import com.mapr.music.api.ArtistEndpoint;
 import com.mapr.music.api.LanguageEndpoint;
 import com.mapr.music.api.UserEndpoint;
-import com.mapr.music.util.CORSFilter;
+import com.mapr.music.util.*;
 import io.swagger.jaxrs.config.BeanConfig;
 
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -44,6 +43,11 @@ public class MaprMusicApp extends Application {
         resources.add(LanguageEndpoint.class);
         resources.add(UserEndpoint.class);
         resources.add(CORSFilter.class);
+        resources.add(ValidationExceptionMapper.class);
+        resources.add(ResourceNotFoundExceptionMapper.class);
+        resources.add(ConstraintViolationExceptionMapper.class);
+        resources.add(DefaultOptionsExceptionMapper.class);
+        resources.add(CommonExceptionMapper.class);
 
         // Hooking up Swagger-Core
         resources.add(io.swagger.jaxrs.listing.ApiListingResource.class);

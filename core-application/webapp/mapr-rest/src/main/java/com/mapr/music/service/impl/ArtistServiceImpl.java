@@ -6,6 +6,8 @@ import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.ResourceDto;
+import com.mapr.music.exception.ResourceNotFoundException;
+import com.mapr.music.exception.ValidationException;
 import com.mapr.music.model.Album;
 import com.mapr.music.model.Artist;
 import com.mapr.music.service.ArtistService;
@@ -14,7 +16,6 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.ws.rs.NotFoundException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -117,7 +118,12 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
      */
     @Override
     public ResourceDto<ArtistDto> getArtistsPage(Long perPage, Long page, String order, List<String> orderFields) {
-        return getArtistsPage(perPage, page, Collections.singletonList(new SortOption(order, orderFields)));
+
+        List<SortOption> sortOptions = (order != null && orderFields != null)
+                ? Collections.singletonList(new SortOption(order, orderFields))
+                : Collections.emptyList();
+
+        return getArtistsPage(perPage, page, sortOptions);
     }
 
     /**
@@ -177,7 +183,7 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
 
         Artist artist = artistDao.getById(id);
         if (artist == null) {
-            throw new NotFoundException("Artist with id '" + id + "' not found");
+            throw new ResourceNotFoundException("Artist with id '" + id + "' not found");
         }
 
         ArtistDto artistDto = artistToDto(artist);
@@ -197,12 +203,12 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
     public ArtistDto getArtistBySlugName(String slugName) {
 
         if (slugName == null || slugName.isEmpty()) {
-            throw new IllegalArgumentException("Artist's slug name can not be empty");
+            throw new ValidationException("Artist's slug name can not be empty");
         }
 
         Artist artist = slugService.getArtistBySlug(slugName);
         if (artist == null) {
-            throw new NotFoundException("Artist with slug name '" + slugName + "' not found");
+            throw new ResourceNotFoundException("Artist with slug name '" + slugName + "' not found");
         }
 
         ArtistDto artistDto = artistToDto(artist);
@@ -225,7 +231,7 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
         }
 
         if (!artistDao.exists(id)) {
-            throw new NotFoundException("Artist with id '" + id + "' not found");
+            throw new ResourceNotFoundException("Artist with id '" + id + "' not found");
         }
 
         artistDao.deleteById(id);
@@ -241,7 +247,11 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
     public ArtistDto createArtist(ArtistDto artistDto) {
 
         if (artistDto == null) {
-            throw new IllegalArgumentException("Artist can not be null");
+            throw new ValidationException("Artist can not be null");
+        }
+
+        if (artistDto.getName() == null) {
+            throw new ValidationException("Artist's name can not be null");
         }
 
         Artist artist = dtoToArtist(artistDto);
@@ -299,7 +309,7 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
         Artist artist = dtoToArtist(artistDto);
         Artist existingArtist = artistDao.getById(id);
         if (existingArtist == null) {
-            throw new NotFoundException("Artist with id '" + id + "' not found");
+            throw new ResourceNotFoundException("Artist with id '" + id + "' not found");
         }
 
         List<String> artistAlbumsIds = artist.getAlbumsIds();
@@ -307,7 +317,7 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
         if (artistAlbumsIds != null) {
             artistAlbumsIds.forEach(albumId -> {
                 if (!albumDao.exists(albumId)) {
-                    throw new NotFoundException("Albums with id " + albumId + "' not found");
+                    throw new ResourceNotFoundException("Albums with id " + albumId + "' not found");
                 }
             });
         }

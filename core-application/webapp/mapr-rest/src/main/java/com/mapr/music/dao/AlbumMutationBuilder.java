@@ -31,8 +31,10 @@ public class AlbumMutationBuilder {
     private static final String LANGUAGE_FIELD = "language";
     private static final String SCRIPT_FIELD = "script";
     private static final String FORMAT_FIELD = "format";
+    private static final String RELEASED_DATE_FIELD = "released_date";
     private static final String COUNTRY_FIELD = "country";
     private static final String ARTISTS_FIELD = "artists";
+    private static final String COVER_FIELD = "cover_image_url";
 
     private static final String TRACKS_FIELD = "tracks";
     private static final String TRACK_NAME_FIELD = "name";
@@ -104,12 +106,34 @@ public class AlbumMutationBuilder {
         return setStringValue(SCRIPT_FIELD, script, setNullValue);
     }
 
+    public AlbumMutationBuilder setCover(String cover) {
+        return setCover(cover, SET_NULL_VALUE_DEFAULT);
+    }
+
+    public AlbumMutationBuilder setCover(String cover, boolean setNullValue) {
+        return setStringValue(COVER_FIELD, cover, setNullValue);
+    }
+
     public AlbumMutationBuilder setFormat(String format) {
         return setFormat(format, SET_NULL_VALUE_DEFAULT);
     }
 
     public AlbumMutationBuilder setFormat(String format, boolean setNullValue) {
         return setStringValue(FORMAT_FIELD, format, setNullValue);
+    }
+
+    public AlbumMutationBuilder setReleasedDate(Long releasedDate) {
+        return setReleasedDate(releasedDate, SET_NULL_VALUE_DEFAULT);
+    }
+
+    public AlbumMutationBuilder setReleasedDate(Long releasedDate, boolean setNullValue) {
+
+        if (releasedDate == null && !setNullValue) {
+            return this;
+        }
+
+        this.mutation.set(RELEASED_DATE_FIELD, releasedDate);
+        return this;
     }
 
     public AlbumMutationBuilder setCountry(String country) {
