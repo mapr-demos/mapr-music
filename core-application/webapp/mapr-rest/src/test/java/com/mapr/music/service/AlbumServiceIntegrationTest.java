@@ -9,6 +9,7 @@ import com.mapr.music.dao.impl.LanguageDaoImpl;
 import com.mapr.music.dao.impl.MaprDbDaoImpl;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
+import com.mapr.music.exception.ValidationException;
 import com.mapr.music.model.Album;
 import com.mapr.music.service.impl.AlbumServiceImpl;
 import com.mapr.music.service.impl.SlugService;
@@ -160,6 +161,28 @@ public class AlbumServiceIntegrationTest {
 
         albumService.deleteAlbumById(sample.getId());
         albumService.getAlbumById(sample.getId());
+    }
+
+    @Test
+    public void should_find_one_album() {
+
+        String sampleName = firstSample.getName();
+        String nameEntry = (sampleName.length() > 1) ? sampleName.substring(0, sampleName.length() - 1) : sampleName;
+        long limit = 1;
+        List<AlbumDto> albumDtoList = albumService.searchAlbums(nameEntry, limit);
+        assertNotNull(albumDtoList);
+        assertEquals(limit, albumDtoList.size());
+        assertTrue(albumDtoList.get(0).getName().contains(nameEntry));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void should_throw_exception_with_empty_slug() {
+        albumService.getAlbumBySlugName("");
+    }
+
+    @Test(expected = ValidationException.class)
+    public void should_not_create_with_null_name() {
+        albumService.createAlbum(new Album());
     }
 
 }

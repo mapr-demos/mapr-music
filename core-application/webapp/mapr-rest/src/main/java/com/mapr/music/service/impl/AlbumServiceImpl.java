@@ -251,7 +251,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     public AlbumDto getAlbumBySlugName(String slugName) {
 
         if (slugName == null || slugName.isEmpty()) {
-            throw new IllegalArgumentException("Album's slug name can not be empty");
+            throw new ValidationException("Album's slug name can not be empty");
         }
 
         Album album = slugService.getAlbumBySlug(slugName);
@@ -291,7 +291,11 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     public AlbumDto createAlbum(Album album) {
 
         if (album == null) {
-            throw new IllegalArgumentException("Album can not be null");
+            throw new ValidationException("Album can not be null");
+        }
+
+        if (album.getName() == null) {
+            throw new ValidationException("Album's name can not be null");
         }
 
         slugService.setSlugForAlbum(album);

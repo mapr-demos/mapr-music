@@ -7,6 +7,7 @@ import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.exception.ResourceNotFoundException;
+import com.mapr.music.exception.ValidationException;
 import com.mapr.music.model.Album;
 import com.mapr.music.model.Artist;
 import com.mapr.music.service.ArtistService;
@@ -117,7 +118,12 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
      */
     @Override
     public ResourceDto<ArtistDto> getArtistsPage(Long perPage, Long page, String order, List<String> orderFields) {
-        return getArtistsPage(perPage, page, Collections.singletonList(new SortOption(order, orderFields)));
+
+        List<SortOption> sortOptions = (order != null && orderFields != null)
+                ? Collections.singletonList(new SortOption(order, orderFields))
+                : Collections.emptyList();
+
+        return getArtistsPage(perPage, page, sortOptions);
     }
 
     /**
@@ -197,7 +203,7 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
     public ArtistDto getArtistBySlugName(String slugName) {
 
         if (slugName == null || slugName.isEmpty()) {
-            throw new IllegalArgumentException("Artist's slug name can not be empty");
+            throw new ValidationException("Artist's slug name can not be empty");
         }
 
         Artist artist = slugService.getArtistBySlug(slugName);
@@ -241,7 +247,11 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
     public ArtistDto createArtist(ArtistDto artistDto) {
 
         if (artistDto == null) {
-            throw new IllegalArgumentException("Artist can not be null");
+            throw new ValidationException("Artist can not be null");
+        }
+
+        if (artistDto.getName() == null) {
+            throw new ValidationException("Artist's name can not be null");
         }
 
         Artist artist = dtoToArtist(artistDto);

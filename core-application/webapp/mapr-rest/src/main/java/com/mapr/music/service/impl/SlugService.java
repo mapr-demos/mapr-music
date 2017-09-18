@@ -222,15 +222,15 @@ public class SlugService {
         }
 
         int indexOfPossiblePostfix = slug.lastIndexOf(SLUG_POSTFIX_DELIMITER);
-        String possiblePostifxAsString = slug.substring(indexOfPossiblePostfix + 1, slug.length());
+        String possiblePostfixAsString = slug.substring(indexOfPossiblePostfix + 1, slug.length());
 
-        if (!StringUtils.isNumeric(possiblePostifxAsString)) {
+        if (!StringUtils.isNumeric(possiblePostfixAsString)) {
             return new Pair<>(slug, null);
         }
 
         // slug name has numeric postfix
         String slugNameWithoutNumericPostfix = slug.substring(0, indexOfPossiblePostfix);
-        Long postfix = Long.parseLong(possiblePostifxAsString);
+        Long postfix = Long.parseLong(possiblePostfixAsString);
 
         return new Pair<>(slugNameWithoutNumericPostfix, postfix);
     }
