@@ -68,6 +68,13 @@
             <version>1.7.25</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.ibm.icu/icu4j -->
+        <dependency>
+            <groupId>com.ibm.icu</groupId>
+            <artifactId>icu4j</artifactId>
+            <version>59.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
