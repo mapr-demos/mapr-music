@@ -7,13 +7,15 @@
       <div style="width: 100%">
         <div class="album-container">
           <div>
-            <img src="{{artist.avatarURL}}" width="150" height="150" onerror="this.src='https://s.discogs.com/images/default-artist.png'">
+            <img src="{{artist.avatarURL}}" width="150" height="150"
+                 onerror="this.src='https://s.discogs.com/images/default-artist.png'">
             <span style="padding: 5px">{{artist.name}}</span>
           </div>
           <i *ngIf="artist.disambiguationComment">({{artist.disambiguationComment}})</i>
 
           <div style="padding-top: 20px">
-            <div *ngIf="artist.gender && artist.gender !== '\\N'" style="padding-top: 25px">Gender: {{artist.gender}}</div>
+            <div *ngIf="artist.gender && artist.gender !== '\\N'" style="padding-top: 25px">Gender: {{artist.gender}}
+            </div>
             <div *ngIf="artist.area" style="padding-top: 5px">Area: {{artist.area}}</div>
             <div *ngIf="artist.beginDate" style="padding-top: 5px">Begin date: {{artist.beginDate}}</div>
             <div *ngIf="artist.endDate" style="padding-top: 5px">End date: {{artist.endDate}}</div>
@@ -48,10 +50,37 @@
           </div>
         </div>
 
+        <div style="padding-top: 35px">
+          <h4>You might also like:</h4>
+        </div>
+        <div id="recommendations" class="container row">
+
+          <div style="display: flex;">
+            <div class="container albums-container">
+              <div class="row">
+                <div *ngFor="let recommended of recommendedArtists" class="col-md-3">
+                  <div style="flex-direction: column; text-align: center;">
+                    <div style="text-align: center">
+                      <a routerLink="/artist/{{recommended.slug}}">
+                        <img src={{recommended.avatarURL}} width="150" height="150"
+                             onerror="this.src='https://s.discogs.com/images/default-artist.png'">
+                      </a>
+                    </div>
+                    <div class="album-title">
+                      Name: <a routerLink="/artist/{{recommended.slug}}">{{recommended.name}}</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
       </div>
       <div
         style="margin: 0 10px"
-        *ngIf = "isAuthenticated | async"
+        *ngIf="isAuthenticated | async"
       >
         <div class="btn btn-primary" routerLink="/artist/edit/{{artist.slug}}">
           Edit
@@ -59,14 +88,14 @@
       </div>
       <div
         style="margin: 0 10px"
-        *ngIf = "isAuthenticated | async"
+        *ngIf="isAuthenticated | async"
       >
         <div class="btn btn-primary" data-toggle="modal" data-target="#deleteModal">
           Delete
         </div>
       </div>
       <div
-        *ngIf = "isAuthenticated | async"
+        *ngIf="isAuthenticated | async"
       >
         <div class="btn btn-primary" routerLink="/add/artist">
           Add new

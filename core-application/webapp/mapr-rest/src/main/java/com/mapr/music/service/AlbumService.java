@@ -213,4 +213,14 @@ public interface AlbumService {
      * @return list of albums which titles start with name entry.
      */
     List<AlbumDto> searchAlbums(String nameEntry, Long limit);
+
+    /**
+     * Returns list of recommended albums according to the specified album id.
+     *
+     * @param albumId identifier of album, for which recommendations will be returned.
+     * @param limit   specifies number of albums, which will be returned. Can be overridden by actual service
+     *                implementation.
+     * @return list of recommended albums.
+     */
+    List<AlbumDto> getRecommendedById(String albumId, Long limit);
 }

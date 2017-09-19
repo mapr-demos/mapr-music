@@ -36,24 +36,24 @@ function mapToAlbum({_id, name, cover_image_url, slug}): Album {
 }
 
 const mapToAlbumRequest = ({
-                              id
-                            }: Album) => ({
+                             id
+                           }: Album) => ({
   _id: id
 });
 
 const mapToArtistRequest = ({
-                             name,
-                             avatarURL,
-                             gender,
-                             area,
-                             beginDate,
-                             endDate,
-                             slug,
-                             disambiguationComment,
-                             IPI,
-                             ISNI,
-                             albums
-                           }: Artist) => ({
+                              name,
+                              avatarURL,
+                              gender,
+                              area,
+                              beginDate,
+                              endDate,
+                              slug,
+                              disambiguationComment,
+                              IPI,
+                              ISNI,
+                              albums
+                            }: Artist) => ({
   name: name,
   profile_image_url: avatarURL,
   area,
@@ -137,7 +137,8 @@ export class ArtistService {
 
   deleteArtist(artist: Artist): Promise<void> {
     return this.http.delete(`${this.config.apiURL}${ArtistService.SERVICE_URL}/${artist.id}`)
-      .map(() => {})
+      .map(() => {
+      })
       .toPromise()
   }
 
@@ -168,5 +169,14 @@ export class ArtistService {
         return mapToArtist(response);
       })
       .toPromise();
+  }
+
+  getRecommendedForArtist(artist: Artist): Observable<Array<Artist>> {
+    return this.http
+      .get(`${this.config.apiURL}${ArtistService.SERVICE_URL}/${artist.id}/recommended?limit=4`)
+      .map((response: any) => {
+        console.log('Search response: ', response);
+        return response.map(mapToArtist);
+      });
   }
 }

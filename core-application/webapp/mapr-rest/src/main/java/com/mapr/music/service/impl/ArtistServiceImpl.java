@@ -28,6 +28,7 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
     private static final long ARTISTS_PER_PAGE_DEFAULT = 50;
     private static final long FIRST_PAGE_NUM = 1;
     private static final long MAX_SEARCH_LIMIT = 15;
+    private static final long MAX_RECOMMENDED_LIMIT = 5;
 
     private static final String[] ARTIST_SHORT_INFO_FIELDS = {
             "_id",
@@ -394,6 +395,28 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * FIXME
+     * {@inheritDoc}
+     *
+     * @param artistId identifier of artist, for which recommendations will be returned.
+     * @param limit    specifies number of artists, which will be returned. Can be overridden by actual service
+     *                 implementation.
+     * @return list of recommended artists.
+     */
+    @Override
+    public List<ArtistDto> getRecommendedById(String artistId, Long limit) {
+
+        long actualLimit = (limit != null && limit > 0 && limit < MAX_RECOMMENDED_LIMIT) ? limit : MAX_RECOMMENDED_LIMIT;
+        int maxOffset = (int) (artistDao.getTotalNum() - actualLimit);
+        int offset = new Random().nextInt(maxOffset);
+
+        List<Artist> artists = artistDao.getList(offset, actualLimit, ARTIST_SHORT_INFO_FIELDS);
+
+        return artists.stream()
+                .map(this::artistToDto)
+                .collect(Collectors.toList());
+    }
 
     private ArtistDto artistToDto(Artist artist) {
         ArtistDto artistDto = new ArtistDto();

@@ -77,12 +77,22 @@
         <configuration>
           <!-- Java EE 7 doesn't require web.xml, Maven needs to
               catch up! -->
-          <webXml>WEB-INF/web.xml</webXml>
+          <!--<webXml>WEB-INF/web.xml</webXml>-->
           <webResources>
             <resource>
               <!-- this is relative to the pom.xml directory -->
               <directory>target/dist</directory>
             </resource>
+
+            <resource>
+              <directory>${basedir}/WEB-INF</directory>
+              <!--<filtering>true</filtering>-->
+              <targetPath>WEB-INF</targetPath>
+              <!--<includes>-->
+                <!--<include>**/xmlgateway-context.xml</include>-->
+              <!--</includes>-->
+            </resource>
+
           </webResources>
         </configuration>
       </plugin>
