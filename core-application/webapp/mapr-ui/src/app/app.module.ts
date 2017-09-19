@@ -12,7 +12,7 @@ import {LanguageService} from "./services/language.service";
 import {AuthService} from "./services/auth.service";
 import {AuthenticatedGuard} from "./guards/authenticated.guard";
 import {AuthInterceptor} from "./interceptors/auth.interceptor";
-
+import {ReportingService} from "./services/reporting.service";
 
 @NgModule({
   declarations: [
@@ -35,7 +35,8 @@ import {AuthInterceptor} from "./interceptors/auth.interceptor";
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true,
-    }
+    },
+    ReportingService
   ],
   bootstrap: [
     AppComponent
