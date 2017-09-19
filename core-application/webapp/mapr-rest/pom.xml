@@ -27,6 +27,7 @@
         <slf4j.simple.version>1.6.4</slf4j.simple.version>
         <rest.easy.version>3.0.19.Final</rest.easy.version>
         <icu4j.version>59.1</icu4j.version>
+        <kafka.clients.version>0.9.0.0-mapr-1707-beta</kafka.clients.version>
     </properties>
 
     <!-- Required by Arquillian -->
@@ -102,6 +103,18 @@
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
             <version>${icu4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>${kafka.clients.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mapr.db</groupId>
+            <artifactId>maprdb-cdc</artifactId>
+            <version>${mapr.library.version}</version>
         </dependency>
 
         <dependency>
