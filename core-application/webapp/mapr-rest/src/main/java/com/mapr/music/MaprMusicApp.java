@@ -3,6 +3,7 @@ package com.mapr.music;
 import com.mapr.music.api.AlbumEndpoint;
 import com.mapr.music.api.ArtistEndpoint;
 import com.mapr.music.api.LanguageEndpoint;
+import com.mapr.music.api.ReportingEndpoint;
 import com.mapr.music.api.UserEndpoint;
 import com.mapr.music.util.*;
 import io.swagger.jaxrs.config.BeanConfig;
@@ -42,6 +43,7 @@ public class MaprMusicApp extends Application {
         resources.add(ArtistEndpoint.class);
         resources.add(LanguageEndpoint.class);
         resources.add(UserEndpoint.class);
+        resources.add(ReportingEndpoint.class);
         resources.add(CORSFilter.class);
         resources.add(ValidationExceptionMapper.class);
         resources.add(ResourceNotFoundExceptionMapper.class);
