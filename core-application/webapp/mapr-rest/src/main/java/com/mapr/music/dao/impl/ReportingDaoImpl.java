@@ -101,6 +101,7 @@ public class ReportingDaoImpl implements ReportingDao {
       }
       rs.close();
       st.close();
+      connection.close();
 
     } catch (Exception e) {
       e.printStackTrace();
