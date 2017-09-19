@@ -88,4 +88,11 @@ public class ArtistEndpoint {
         return Response.status(Response.Status.CREATED).entity(createdArtist).location(location).build();
     }
 
+    @GET
+    @Path("{id}/recommended/")
+    @ApiOperation(value = "Get list of recommended artists for the specified artist id")
+    public List<ArtistDto> getRecommended(@PathParam("id") String artistId, @QueryParam("limit") Long limit) {
+        return artistService.getRecommendedById(artistId, limit);
+    }
+
 }

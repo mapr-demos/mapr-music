@@ -23,6 +23,7 @@ export class ArtistPage implements OnInit {
   }
 
   artist: Artist;
+  recommendedArtists: Array<Artist> = null;
   sourceURL: string;
 
   ngOnInit(): void {
@@ -37,6 +38,9 @@ export class ArtistPage implements OnInit {
       })
       .subscribe((artist) => {
         this.artist = artist;
+        this.artistService.getRecommendedForArtist(artist).subscribe((recommended) => {
+          this.recommendedArtists = recommended;
+        })
       });
   }
 

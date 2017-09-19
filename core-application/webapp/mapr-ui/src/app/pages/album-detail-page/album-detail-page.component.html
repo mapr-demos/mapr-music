@@ -172,7 +172,45 @@
         >
           Cancel
         </div>
+
+        <div style="padding-top: 35px">
+          <h4>You might also like:</h4>
+        </div>
+        <div id="recommendations" class="container row">
+
+          <div style="display: flex;">
+            <div class="container albums-container">
+              <div class="row">
+                <div *ngFor="let recommended of recommendedAlbums" class="col-md-3">
+                  <div style="flex-direction: column; text-align: center;">
+                    <div style="text-align: center">
+                      <a routerLink="/album/{{recommended.slug}}">
+                        <img src={{recommended.coverImageURL}} width="150" height="150" onerror="this.src='https://s.discogs.com/images/default-release.png'">
+                      </a>
+                    </div>
+                    <div class="album-title">
+                      Title: <a routerLink="/album/{{recommended.slug}}">{{recommended.title}}</a>
+                    </div>
+                    <div class="album-title">
+                      Artist{{album.artists > 1 ? 's' : ''}}:
+                      <a
+                        *ngFor="let artist of recommended.artists"
+                        routerLink="/artist/{{artist.slug}}"
+                      >
+                        {{artist.name}}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
       </div>
+
+
       <div
         style="margin: 0 10px"
         *ngIf = "isAuthenticated | async"

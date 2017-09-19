@@ -21,31 +21,30 @@ function removeAtInd(arr, ind) {
   templateUrl: './album-detail-page.component.html',
   styleUrls: ['./album-detail-page.component.css']
 })
-export class AlbumDetailPage implements OnInit{
+export class AlbumDetailPage implements OnInit {
   isAuthenticated: ReplaySubject<boolean>;
 
-  constructor(
-    private authService: AuthService,
-    private activatedRoute: ActivatedRoute,
-    private albumService: AlbumService,
-    private router: Router
-  ) {
+  constructor(private authService: AuthService,
+              private activatedRoute: ActivatedRoute,
+              private albumService: AlbumService,
+              private router: Router) {
     this.isAuthenticated = this.authService.isAuthenticated$;
   }
 
   album: Album;
+  recommendedAlbums: Array<Album> = null;
   sourceURL: string;
 
   editedTrackId = null;
   nameEditedTrack = '';
-  reorderedTracks:Array<Track> = null;
+  reorderedTracks: Array<Track> = null;
   newTrack = null;
 
-  isFirstTrack(ind: number):boolean {
+  isFirstTrack(ind: number): boolean {
     return ind === 0;
   }
 
-  isLastTrack(ind: number):boolean {
+  isLastTrack(ind: number): boolean {
     return this.reorderedTracks.length === ind + 1;
   }
 
@@ -54,14 +53,14 @@ export class AlbumDetailPage implements OnInit{
       this.reorderedTracks = null;
       return;
     }
-    this.reorderedTracks = this.album.trackList.slice(0,  this.album.trackList.length);
+    this.reorderedTracks = this.album.trackList.slice(0, this.album.trackList.length);
   }
 
-  moveTrackUp(ind:number) {
+  moveTrackUp(ind: number) {
     swap(this.reorderedTracks, ind, ind - 1);
   }
 
-  moveTrackDown(ind:number) {
+  moveTrackDown(ind: number) {
     swap(this.reorderedTracks, ind, ind + 1);
   }
 
@@ -108,6 +107,7 @@ export class AlbumDetailPage implements OnInit{
     }
     this.newTrack = {name: '', duration: '', position: 0};
   }
+
   onCancelAddClick() {
     this.newTrack = null;
   }
@@ -128,6 +128,9 @@ export class AlbumDetailPage implements OnInit{
       })
       .subscribe((album) => {
         this.album = album;
+        this.albumService.getRecommendedForAlbum(album).subscribe((recommended) => {
+          this.recommendedAlbums = recommended;
+        });
       });
   }
 

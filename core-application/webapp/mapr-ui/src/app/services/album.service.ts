@@ -13,15 +13,15 @@ const PAGE_SIZE = 12;
 
 export const SORT_OPTIONS = [
   {
-    label:'No sorting',
+    label: 'No sorting',
     value: 'NO_SORTING'
   },
   {
-    label:'Title A-z',
+    label: 'Title A-z',
     value: 'TITLE_ASC'
   },
   {
-    label:'Title z-A',
+    label: 'Title z-A',
     value: 'TITLE_DESC'
   },
   {
@@ -69,21 +69,21 @@ interface PageRequest {
 }
 
 const mapToArtist = ({
-  _id,
-  name,
-  slug
-}): Artist => ({
+                       _id,
+                       name,
+                       slug
+                     }): Artist => ({
   id: _id,
   name,
   slug
 });
 
 const mapToTrack = ({
-  id,
-  name,
-  length,
-  position
-}): Track  => ({
+                      id,
+                      name,
+                      length,
+                      position
+                    }): Track => ({
   id,
   duration: length ? `${length}` + '' : '0',
   name,
@@ -91,20 +91,20 @@ const mapToTrack = ({
 });
 
 const mapToAlbum = ({
-  _id,
-  name,
-  cover_image_url,
-  country,
-  artists,
-  style,
-  format,
-  tracks,
-  slug,
-  //this property is injected on ui
-  // TODO add to document
-  language,
-  released_date
-}): Album => ({
+                      _id,
+                      name,
+                      cover_image_url,
+                      country,
+                      artists,
+                      style,
+                      format,
+                      tracks,
+                      slug,
+                      //this property is injected on ui
+                      // TODO add to document
+                      language,
+                      released_date
+                    }): Album => ({
   id: _id,
   title: name,
   coverImageURL: cover_image_url,
@@ -123,11 +123,11 @@ const mapToAlbum = ({
 });
 
 const mapToTrackRequest = ({
-  id,
-  name,
-  duration,
-  position
-}: Track) => ({
+                             id,
+                             name,
+                             duration,
+                             position
+                           }: Track) => ({
   id,
   length: duration,
   name,
@@ -135,25 +135,25 @@ const mapToTrackRequest = ({
 });
 
 const mapToArtistRequest = ({
-  id,
-  name
-}: Artist) => ({
+                              id,
+                              name
+                            }: Artist) => ({
   _id: id,
   name
 });
 
 const mapToAlbumRequest = ({
-  title,
-  coverImageURL,
-  country,
-  style,
-  format,
-  slug,
-  trackList,
-  artists,
-  language,
-  releasedDate
-}: Album) => ({
+                             title,
+                             coverImageURL,
+                             country,
+                             style,
+                             format,
+                             slug,
+                             trackList,
+                             artists,
+                             language,
+                             releasedDate
+                           }: Album) => ({
   name: title,
   cover_image_url: coverImageURL,
   country,
@@ -171,16 +171,14 @@ export class AlbumService {
 
   private static SERVICE_URL = '/api/1.0/albums';
 
-  constructor(
-    private http: HttpClient,
-    private config: AppConfig,
-    private languageService: LanguageService
-  ) {
+  constructor(private http: HttpClient,
+              private config: AppConfig,
+              private languageService: LanguageService) {
   }
 
-/**
- * @desc returns URL for albums page request
- * */
+  /**
+   * @desc returns URL for albums page request
+   * */
   getAlbumsPageURL({pageNumber, sortType, lang}: PageRequest): string {
     let url = `${this.config.apiURL}${AlbumService.SERVICE_URL}?page=${pageNumber}&per_page=${PAGE_SIZE}`;
     if (lang !== null) {
@@ -189,9 +187,9 @@ export class AlbumService {
     return SORT_HASH[sortType](url);
   }
 
-/**
- * @desc get albums page from server side
- * */
+  /**
+   * @desc get albums page from server side
+   * */
   getAlbumsPage(request: PageRequest): Promise<AlbumsPage> {
     return this.http.get(this.getAlbumsPageURL(request))
       .flatMap((response: any) => {
@@ -213,17 +211,17 @@ export class AlbumService {
       .toPromise();
   }
 
-/**
- * @desc get album by slug URL
- * */
+  /**
+   * @desc get album by slug URL
+   * */
   getAlbumBySlugURL(albumSlug: string): string {
     return `${this.config.apiURL}${AlbumService.SERVICE_URL}/slug/${albumSlug}`;
   }
 
-/**
- * @desc get album by slug from server side
- * */
-  getAlbumBySlug(albumSlug: string):Promise<Album> {
+  /**
+   * @desc get album by slug from server side
+   * */
+  getAlbumBySlug(albumSlug: string): Promise<Album> {
     return this.http.get(this.getAlbumBySlugURL(albumSlug))
       .flatMap((response: any) => {
         return this.languageService.getAllLanguages().then((languages) => ({languages, response}))
@@ -288,9 +286,20 @@ export class AlbumService {
       })
       .toPromise();
   }
+
   deleteAlbum(album: Album): Promise<void> {
     return this.http.delete(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${album.id}`)
-      .map(() => {})
+      .map(() => {
+      })
       .toPromise()
+  }
+
+  getRecommendedForAlbum(album: Album): Observable<Array<Album>> {
+    return this.http
+      .get(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${album.id}/recommended?limit=4`)
+      .map((response: any) => {
+        console.log('Search response: ', response);
+        return response.map(mapToAlbum);
+      });
   }
 }

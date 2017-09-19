@@ -21,10 +21,7 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -37,6 +34,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     private static final long ALBUMS_PER_PAGE_DEFAULT = 50;
     private static final long FIRST_PAGE_NUM = 1;
     private static final long MAX_SEARCH_LIMIT = 15;
+    private static final long MAX_RECOMMENDED_LIMIT = 5;
 
     /**
      * Array of album's fields that will be used for projection.
@@ -581,7 +579,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
      * {@inheritDoc}
      *
      * @param nameEntry specifies search criteria.
-     * @param limit     specifies number of artists, which will be returned. Can be overridden by actual service
+     * @param limit     specifies number of albums, which will be returned. Can be overridden by actual service
      *                  implementation.
      * @return list of albums which titles start with name entry.
      */
@@ -595,6 +593,30 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
                 .map(this::albumToDto)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * FIXME
+     * {@inheritDoc}
+     *
+     * @param albumId identifier of album, for which recommendations will be returned.
+     * @param limit   specifies number of albums, which will be returned. Can be overridden by actual service
+     *                implementation.
+     * @return list of recommended albums.
+     */
+    @Override
+    public List<AlbumDto> getRecommendedById(String albumId, Long limit) {
+
+        long actualLimit = (limit != null && limit > 0 && limit < MAX_RECOMMENDED_LIMIT) ? limit : MAX_RECOMMENDED_LIMIT;
+        int maxOffset = (int) (albumDao.getTotalNum() - actualLimit);
+        int offset = new Random().nextInt(maxOffset);
+
+        List<Album> albums = albumDao.getList(offset, actualLimit, ALBUM_SHORT_INFO_FIELDS);
+
+        return albums.stream()
+                .map(this::albumToDto)
+                .collect(Collectors.toList());
+    }
+
 
     private AlbumDto albumToDto(Album album) {
 

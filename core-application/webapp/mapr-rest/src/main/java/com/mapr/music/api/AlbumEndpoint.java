@@ -142,4 +142,11 @@ public class AlbumEndpoint {
 
         return albumService.searchAlbums(nameEntry, limit);
     }
+
+    @GET
+    @Path("{id}/recommended/")
+    @ApiOperation(value = "Get list of recommended albums for the specified album id")
+    public List<AlbumDto> getRecommended(@PathParam("id") String albumId, @QueryParam("limit") Long limit) {
+        return albumService.getRecommendedById(albumId, limit);
+    }
 }
