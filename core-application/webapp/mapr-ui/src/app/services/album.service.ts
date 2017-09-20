@@ -71,11 +71,13 @@ interface PageRequest {
 const mapToArtist = ({
                        _id,
                        name,
-                       slug
+                       slug,
+                       profile_image_url
                      }): Artist => ({
   id: _id,
   name,
-  slug
+  slug,
+  avatarURL: profile_image_url
 });
 
 const mapToTrack = ({
@@ -96,7 +98,6 @@ const mapToAlbum = ({
                       cover_image_url,
                       country,
                       artists,
-                      style,
                       format,
                       tracks,
                       slug,
@@ -109,10 +110,9 @@ const mapToAlbum = ({
   title: name,
   coverImageURL: cover_image_url,
   country,
-  style,
   format,
   slug,
-  releasedDate: new Date(released_date),
+  releasedDate: (released_date) ? new Date(released_date) : null,
   language,
   trackList: tracks
     ? tracks.map(mapToTrack)
@@ -136,17 +136,20 @@ const mapToTrackRequest = ({
 
 const mapToArtistRequest = ({
                               id,
-                              name
+                              name,
+                              slug,
+                              avatarURL
                             }: Artist) => ({
   _id: id,
-  name
+  name,
+  slug,
+  profile_image_url: avatarURL
 });
 
 const mapToAlbumRequest = ({
                              title,
                              coverImageURL,
                              country,
-                             style,
                              format,
                              slug,
                              trackList,
@@ -157,11 +160,10 @@ const mapToAlbumRequest = ({
   name: title,
   cover_image_url: coverImageURL,
   country,
-  style,
   format,
   slug,
-  released_date: releasedDate.getTime(),
-  language: language.code,
+  released_date: (releasedDate) ? releasedDate.getTime() : null,
+  language: (language) ? language.code : null,
   artists: artists.map(mapToArtistRequest),
   tracks: trackList.map(mapToTrackRequest)
 });

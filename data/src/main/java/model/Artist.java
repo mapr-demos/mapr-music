@@ -23,14 +23,9 @@ public class Artist {
             return Artist.this.getName();
         }
 
-        @JsonGetter("slug_name")
-        public String getSlugName() {
-            return Artist.this.getSlugName();
-        }
-
-        @JsonGetter("slug_postfix")
-        public JsonNumberLong getSlugPostfix() {
-            return Artist.this.getSlugPostfix();
+        @JsonGetter("slug")
+        public String getSlug() {
+            return String.format("%s-%s", Artist.this.getSlugName(), Artist.this.getSlugPostfix().get$numberLong());
         }
 
         @JsonGetter("profile_image_url")
@@ -77,7 +72,7 @@ public class Artist {
     private String disambiguationComment;
 
     @JsonProperty("albums")
-    private List<String> albumsIds = new LinkedList<>();
+    private List<Album.ShortInfo> albums = new LinkedList<>();
 
     @JsonProperty("profile_image_url")
     private String profileImageUrl;
@@ -189,12 +184,12 @@ public class Artist {
         return this;
     }
 
-    public List<String> getAlbumsIds() {
-        return albumsIds;
+    public List<Album.ShortInfo> getAlbums() {
+        return albums;
     }
 
-    public Artist setAlbumsIds(List<String> albumsIds) {
-        this.albumsIds = albumsIds;
+    public Artist setAlbums(List<Album.ShortInfo> albums) {
+        this.albums = albums;
         return this;
     }
 
@@ -280,7 +275,7 @@ public class Artist {
                 .append("isni", isni)
                 .append("MBID", MBID)
                 .append("disambiguationComment", disambiguationComment)
-                .append("albumsIds", albumsIds)
+                .append("albums", albums)
                 .append("profileImageUrl", profileImageUrl)
                 .append("imagesUrls", imagesUrls)
                 .append("beginDate", beginDate)

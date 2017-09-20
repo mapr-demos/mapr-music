@@ -8,7 +8,6 @@ const createNewAlbum = (): Album => ({
   title: '',
   coverImageURL: '',
   format: '',
-  style: '',
   slug: '',
   trackList: [],
   country: '',

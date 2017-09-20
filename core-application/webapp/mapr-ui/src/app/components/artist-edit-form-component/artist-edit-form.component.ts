@@ -43,7 +43,7 @@ export class ArtistEditForm implements OnInit {
       });
   }
 
-  removeAlbumsById(albumId: string) {
+  removeAlbumById(albumId: string) {
     this.artist.albums = this.artist.albums.filter((album) => album.id !== albumId)
   }
 

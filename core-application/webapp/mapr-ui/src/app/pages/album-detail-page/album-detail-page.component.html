@@ -7,11 +7,12 @@
       <div style="width: 100%">
         <div class="album-container">
           <div>
-            <img src="{{album.coverImageURL}}" width="150" height="150" onerror="this.src='https://s.discogs.com/images/default-release.png'">
+            <img src="{{album.coverImageURL}}" width="150" height="150"
+                 onerror="this.src='https://s.discogs.com/images/default-release.png'">
           </div>
           <div style="padding: 5px">
             <div>{{album.title}}</div>
-            <div>
+            <div *ngIf="album?.artists.length > 0">
               Artist{{album.artists > 1 ? 's' : ''}}:
               <a
                 *ngFor="let artist of album.artists"
@@ -20,16 +21,13 @@
                 {{artist.name}}
               </a>
             </div>
-            <div>
+            <div *ngIf="album.country">
               Country: {{album.country}}
             </div>
-            <div>
-              Style: {{album.style}}
-            </div>
-            <div>
+            <div *ngIf="album?.language?.name">
               Language: <a routerLink="/" [queryParams]="{lang: album.language.code}">{{album.language.name}}</a>
             </div>
-            <div>
+            <div *ngIf="album.releasedDate">
               Date: {{album.releasedDate | date }}
             </div>
           </div>
@@ -68,7 +66,7 @@
               <td
                 style="padding: 0px 10px"
                 (click)="setEditTrackId(track.id)"
-                *ngIf = "isAuthenticated | async"
+                *ngIf="isAuthenticated | async"
               >
                 <div
                   *ngIf="editedTrackId === track.id; then saveTrackIcon else editTrackIcon"
@@ -92,7 +90,7 @@
                     {{track.name}}
                   </ng-template>
                   <ng-template #editedTrackName>
-                    <input [(ngModel)] = "nameEditedTrack">
+                    <input [(ngModel)]="nameEditedTrack">
                   </ng-template>
                   <div>Duration: {{track.duration | date:'mm:ss' }}</div>
                 </div>
@@ -101,13 +99,13 @@
                 *ngIf="reorderedTracks"
               >
                 <div
-                  *ngIf = "!isFirstTrack(i)"
+                  *ngIf="!isFirstTrack(i)"
                   (click)="moveTrackUp(i)"
                 >
                   <i class="fa fa-arrow-up" aria-hidden="true"></i>
                 </div>
                 <div
-                  *ngIf = "!isLastTrack(i)"
+                  *ngIf="!isLastTrack(i)"
                   (click)="moveTrackDown(i)"
                 >
                   <i class="fa fa-arrow-down" aria-hidden="true"></i>
@@ -127,14 +125,14 @@
           </table>
         </div>
         <div
-          *ngIf = "newTrack"
+          *ngIf="newTrack"
           style="padding: 5px;"
         >
           <div
             style="padding: 5px 0;"
           >
             <input
-              [(ngModel)] = "newTrack.name"
+              [(ngModel)]="newTrack.name"
               placeholder="New Track Name"
             >
           </div>
@@ -142,7 +140,7 @@
             style="padding: 5px 0;"
           >
             <input
-              [(ngModel)] = "newTrack.duration"
+              [(ngModel)]="newTrack.duration"
               placeholder="New Track Duration(ms)"
             >
           </div>
@@ -150,7 +148,7 @@
         <div
           class="btn btn-primary"
           style="margin: 0 5px"
-          *ngIf = "isAuthenticated | async"
+          *ngIf="isAuthenticated | async"
           (click)="onAddNewTrackClick()"
         >
           <span
@@ -185,7 +183,8 @@
                   <div style="flex-direction: column; text-align: center;">
                     <div style="text-align: center">
                       <a routerLink="/album/{{recommended.slug}}">
-                        <img src={{recommended.coverImageURL}} width="150" height="150" onerror="this.src='https://s.discogs.com/images/default-release.png'">
+                        <img src={{recommended.coverImageURL}} width="150" height="150"
+                             onerror="this.src='https://s.discogs.com/images/default-release.png'">
                       </a>
                     </div>
                     <div class="album-title">
@@ -213,7 +212,7 @@
 
       <div
         style="margin: 0 10px"
-        *ngIf = "isAuthenticated | async"
+        *ngIf="isAuthenticated | async"
       >
         <div class="btn btn-primary" routerLink="/album/edit/{{album.slug}}">
           Edit
@@ -221,14 +220,14 @@
       </div>
       <div
         style="margin: 0 10px"
-        *ngIf = "isAuthenticated | async"
+        *ngIf="isAuthenticated | async"
       >
         <div class="btn btn-primary" data-toggle="modal" data-target="#deleteModal">
           Delete
         </div>
       </div>
       <div
-        *ngIf = "isAuthenticated | async"
+        *ngIf="isAuthenticated | async"
       >
         <div class="btn btn-primary" routerLink="/add/album">
           Add new

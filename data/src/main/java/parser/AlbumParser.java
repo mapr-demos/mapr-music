@@ -308,7 +308,7 @@ public class AlbumParser {
             return null;
         }
 
-        artist.getAlbumsIds().add(album.getId());
+        artist.getAlbums().add(album.getShortInfo());
         return album;
     }
 

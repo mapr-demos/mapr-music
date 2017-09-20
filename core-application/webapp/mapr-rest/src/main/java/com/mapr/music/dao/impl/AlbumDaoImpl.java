@@ -147,7 +147,7 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
                     .setLanguage(album.getLanguage())
                     .setPackaging(album.getPackaging())
                     .setTrackList(album.getTrackList())
-                    .setArtists(album.getArtistList())
+                    .setArtists(album.getArtists())
                     .setFormat(album.getFormat())
                     .setReleasedDate(album.getReleasedDate());
 

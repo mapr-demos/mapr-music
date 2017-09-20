@@ -36,9 +36,15 @@ function mapToAlbum({_id, name, cover_image_url, slug}): Album {
 }
 
 const mapToAlbumRequest = ({
-                             id
+                             id,
+                             title,
+                             coverImageURL,
+                             slug
                            }: Album) => ({
-  _id: id
+  _id: id,
+  name: title,
+  slug,
+  cover_image_url: coverImageURL
 });
 
 const mapToArtistRequest = ({
