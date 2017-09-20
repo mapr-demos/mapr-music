@@ -118,18 +118,94 @@ child of the `<managed-thread-factories>` element:
   private ManagedThreadFactory threadFactory;
   
   ...
-  
   Thread thread = threadFactory.newThread(() -> {
              // Your runnable
           });
   thread.start();
-  
   ...
+  
 ```
 
 Note: the example above expects that `$WILDFLY_HOME` environment variable is set correctly and points to the Wildfly 
 directory (For instance: `~/wildfly-10.1.0.Final/`).
  
-## MapR Music Artists Changelog Listener Service
+## Consuming change data records
 
-MapR Music Application uses 
+1. Declare Kafka Consumer
+```
+    // Consumer configuration
+    Properties consumerProperties = new Properties();
+    consumerProperties.setProperty("enable.auto.commit", "true");
+    consumerProperties.setProperty("key.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
+    consumerProperties.setProperty("value.deserializer", "com.mapr.db.cdc.ChangeDataRecordDeserializer");
+```
+
+Where:
+* `key.deserializer` an array of bytes created by the CDC gateway
+* `value.deserializer` the value deserializer, MapR CDC uses a optimized serialization format for all the events, 
+so you must specify the `com.mapr.db.cdc.ChangeDataRecordDeserializer` deserializer.
+
+2. Create the consumer and subscribe to the Changelog
+
+```
+    // Consumer used to consume MapR-DB CDC events
+    KafkaConsumer<byte[], ChangeDataRecord> consumer = new KafkaConsumer<byte[], ChangeDataRecord>(consumerProperties);
+    consumer.subscribe(Collections.singletonList("/mapr_music_artists_changelog:artists"));
+```
+
+3. Consume the events
+
+You can now listen to the event and process each ChangeDataRecord.
+```
+  while (true) {
+    ConsumerRecords<byte[], ChangeDataRecord> changeRecords = consumer.poll(KAFKA_CONSUMER_POLL_TIMEOUT);
+      for (ConsumerRecord<byte[], ChangeDataRecord> consumerRecord : changeRecords) {
+        
+        // The ChangeDataRecord contains all the changes made to a document
+        ChangeDataRecord changeDataRecord = consumerRecord.value();
+        
+        // Get identifier of changed document
+        String documentId = changeDataRecord.getId().getString();
+       
+        // process events
+        ...
+        ...
+    }
+  }
+```
+
+4. Process Change Data Records
+
+You can obtain the type of event (insert, update, delete), using the `changeDataRecord.getType()` method.  You can use 
+the `ChangeDataRecordType` enum to check the type.
+
+* Processing Deletes
+
+Processing a delete is a simple operation since the operation is based a single change data record, so you can directly 
+get the document id using `changeDataRecord.getId()` and then process the document deletion.
+
+* Processing Inserts and Updates
+
+Document mutations are stored into a list of ChangeNodes, that you can retrieve int the following way:
+```
+    // Use the ChangeNode Iterator to capture all the individual changes
+    Iterator<KeyValue<FieldPath, ChangeNode>> cdrItr = changeDataRecord.iterator();
+    while (cdrItr.hasNext()) {
+      Map.Entry<FieldPath, ChangeNode> changeNodeEntry = cdrItr.next();
+      String fieldPathAsString = changeNodeEntry.getKey().asPathString();
+      ChangeNode changeNode = changeNodeEntry.getValue();
+      ...
+      ...
+    }
+```
+
+Note: `fieldPathAsString` in the example above indicates path of changed field. Empty string or `null` value of 
+`fieldPathAsString` indicates that document was inserted, otherwise - updated. Thus, to process the document update you 
+have to check the field path using following code snippet: 
+```
+  if("field_name".equalsIgnoreCase(fieldPathAsString)) {
+    // get the value using the proper method, depending of the expected type of the value
+    // For exmaple: changeNode.getString() or changeNode.getMap()
+  }
+
+```

@@ -54,6 +54,7 @@ public class Artist {
     private String name;
     private String gender;
     private String area;
+    private Boolean deleted;
 
     @JsonGetter("_id")
     public String getId() {
@@ -191,5 +192,13 @@ public class Artist {
 
     public void setEndDate(Long endDate) {
         this.endDate = endDate;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }

@@ -1,12 +1,13 @@
 package com.mapr.music.service.impl;
 
 import com.mapr.music.dao.AlbumDao;
+import com.mapr.music.dao.ArtistDao;
+import com.mapr.music.model.Artist;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.ojai.FieldPath;
-import org.ojai.KeyValue;
 import org.ojai.store.cdc.ChangeDataRecord;
 import org.ojai.store.cdc.ChangeDataRecordType;
 import org.ojai.store.cdc.ChangeNode;
@@ -20,18 +21,24 @@ import javax.ejb.Startup;
 import javax.enterprise.concurrent.ManagedThreadFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Startup
 @Singleton
 public class ArtistsChangelogListenerService {
 
-    private static String CHANGE_LOG = "/mapr_music_artists_changelog:artists";
+    private static String ARTISTS_CHANGE_LOG = "/mapr_music_artists_changelog:artists";
+    private static long KAFKA_CONSUMER_POLL_TIMEOUT = 500L;
+    private static final String TEST_USER_NAME = "mapr";
+    private static final String TEST_USER_GROUP = "mapr";
 
     private static final Logger log = LoggerFactory.getLogger(ArtistsChangelogListenerService.class);
+
+    /**
+     * Consumer used to consume MapR-DB CDC events.
+     */
+    private KafkaConsumer<byte[], ChangeDataRecord> consumer;
 
     @Resource(lookup = "java:jboss/ee/concurrency/factory/MaprMusicThreadFactory")
     private ManagedThreadFactory threadFactory;
@@ -40,75 +47,97 @@ public class ArtistsChangelogListenerService {
     @Named("albumDao")
     private AlbumDao albumDao;
 
-    /**
-     * Consumer used to consume MapR-DB CDC events.
-     */
-    private KafkaConsumer<byte[], ChangeDataRecord> consumer;
+    @Inject
+    @Named("artistDao")
+    private ArtistDao artistDao;
 
-    public ArtistsChangelogListenerService() {
+    @PostConstruct
+    public void init() {
 
         Properties consumerProperties = new Properties();
-        consumerProperties.setProperty("group.id", "cdc.consumer.demo_table.fts_geo");
         consumerProperties.setProperty("enable.auto.commit", "true");
         consumerProperties.setProperty("auto.offset.reset", "latest");
         consumerProperties.setProperty("key.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
         consumerProperties.setProperty("value.deserializer", "com.mapr.db.cdc.ChangeDataRecordDeserializer");
 
-        loginTestUser("mapr", "mapr");
+        loginTestUser(TEST_USER_NAME, TEST_USER_GROUP);
         consumer = new KafkaConsumer<>(consumerProperties);
-    }
+        consumer.subscribe(Collections.singletonList(ARTISTS_CHANGE_LOG));
 
-    @PostConstruct
-    public void init() {
-
-        log.info("Subscribing to the artists Changelog '{}'", CHANGE_LOG);
-        consumer.subscribe(Collections.singletonList(CHANGE_LOG));
-
-        // TODO RUN
-        Thread thread = threadFactory.newThread(() -> {
-            log.error("RUN IN ANOTHER THREAD");
-
+        threadFactory.newThread(() -> {
             while (true) {
-                ConsumerRecords<byte[], ChangeDataRecord> changeRecords = consumer.poll(500);
-                Iterator<ConsumerRecord<byte[], ChangeDataRecord>> iter = changeRecords.iterator();
 
-                while (iter.hasNext()) {
-                    ConsumerRecord<byte[], ChangeDataRecord> crec = iter.next();
+                ConsumerRecords<byte[], ChangeDataRecord> changeRecords = consumer.poll(KAFKA_CONSUMER_POLL_TIMEOUT);
+                for (ConsumerRecord<byte[], ChangeDataRecord> consumerRecord : changeRecords) {
+
                     // The ChangeDataRecord contains all the changes made to a document
-                    ChangeDataRecord changeDataRecord = crec.value();
-                    String documentId = changeDataRecord.getId().getString();
+                    ChangeDataRecord changeDataRecord = consumerRecord.value();
 
-                    if (changeDataRecord.getType() == ChangeDataRecordType.RECORD_INSERT) {
-                        log.error("\n\t Document Inserted '{}'", documentId);
-
-
-                    } else if (changeDataRecord.getType() == ChangeDataRecordType.RECORD_UPDATE) {
-                        log.error("\n\t Document Updated '{}'", documentId);
-
-
-                    } else if (changeDataRecord.getType() == ChangeDataRecordType.RECORD_DELETE) {
-                        log.error("\n\t Document Deleted '{}'", documentId);
-//                        changeDataRecord.iterator()
-
-                        Iterator<KeyValue<FieldPath, ChangeNode>> cdrItr = changeDataRecord.iterator();
-                        log.error("\n\t ITERATOR HAS NEXT: '{}'", cdrItr.hasNext());
-
-                        Map.Entry<FieldPath, ChangeNode> changeNodeEntry = cdrItr.next();
-                        String fieldPathAsString = changeNodeEntry.getKey().asPathString();
-                        log.error("\n\t fieldPathAsString: '{}'", fieldPathAsString);
-
-                        ChangeNode changeNode = changeNodeEntry.getValue();
-                        log.error("\n\t changeNode: '{}'", changeNode);
-
-//                        Map<String, Object> documentInserted = changeNode.getMap();
-                        log.error("\n\t VALUE: '{}'", changeNode.getValue());
-
+                    // Ignore all the records that is not 'RECORD_UPDATE'
+                    if (changeDataRecord.getType() != ChangeDataRecordType.RECORD_UPDATE) {
+                        continue;
                     }
 
+                    String artistId = changeDataRecord.getId().getString();
+                    // Use the ChangeNode to capture all the individual changes
+                    for (Map.Entry<FieldPath, ChangeNode> changeNodeEntry : changeDataRecord) {
+
+                        String fieldPathAsString = changeNodeEntry.getKey().asPathString();
+                        ChangeNode changeNode = changeNodeEntry.getValue();
+
+                        // When "INSERTING" a document the field path is empty (new document)
+                        // and all the changes are made in a single object represented as a Map
+                        if (fieldPathAsString == null || fieldPathAsString.isEmpty()) {
+                            // Ignore artist inserting
+                            continue;
+                        }
+
+                        // Ignore all the fields except of artist's 'deleted' flag
+                        if (!"deleted".equalsIgnoreCase(fieldPathAsString)) {
+                            continue;
+                        }
+
+                        // Ignore change record for this Artist if 'deleted' flag changed to 'false'
+                        if (!changeNode.getBoolean()) {
+                            break;
+                        }
+
+                        Artist artistToDelete = artistDao.getById(artistId);
+
+                        // Artist does not exist
+                        if (artistToDelete == null) {
+                            break;
+                        }
+
+                        List<String> albumsIds = artistToDelete.getAlbumsIds();
+                        if (albumsIds != null) {
+                            albumsIds.stream()
+                                    .map(albumDao::getById)
+                                    .filter(Objects::nonNull)
+                                    .filter(album -> album.getArtistList() != null)
+                                    .peek(album -> { // Remove artist from album's list of artists
+                                        List<Artist> toRemove = album.getArtistList().stream()
+                                                .filter(artist -> artistId.equals(artist.getId()))
+                                                .collect(Collectors.toList());
+
+                                        album.getArtistList().removeAll(toRemove);
+                                    })
+                                    .forEach(album -> {
+                                        if (album.getArtistList().isEmpty()) { // Remove albums that had only one artist
+                                            albumDao.deleteById(album.getId());
+                                        } else {
+                                            albumDao.update(album.getId(), album);
+                                        }
+                                    });
+                        }
+
+                        artistDao.deleteById(artistId);
+                        log.info("Artist with id = '{}' is deleted", artistId);
+                    }
                 }
             }
-        });
-        thread.start();
+
+        }).start();
     }
 
     private static void loginTestUser(String username, String group) {
