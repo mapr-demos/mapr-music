@@ -272,8 +272,21 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             throw new IllegalArgumentException("Album's identifier can not be empty");
         }
 
-        if (!albumDao.exists(id)) {
+        Album album = albumDao.getById(id);
+        if (album == null) {
             throw new ResourceNotFoundException("Album with id '" + id + "' not found");
+        }
+
+        // Remove album from Artists' list of albums
+        List<Artist> artistList = album.getArtistList();
+        if (artistList != null) {
+            artistList.stream()
+                    .map(Artist::getId)
+                    .filter(Objects::nonNull)
+                    .map(artistDao::getById) // Map from artist short info to actual artist
+                    .filter(artist -> artist.getAlbumsIds() != null)
+                    .peek(artist -> artist.getAlbumsIds().remove(id))
+                    .forEach(artist -> artistDao.update(artist.getId(), artist));
         }
 
         albumDao.deleteById(id);

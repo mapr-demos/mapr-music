@@ -42,6 +42,9 @@ public class ArtistServiceIntegrationTest {
     @Inject
     ArtistService artistService;
 
+    @Inject
+    ArtistDao artistDao;
+
     ArtistDto firstSample;
     ArtistDto secondSample;
     ArtistDto thirdSample;
@@ -66,9 +69,9 @@ public class ArtistServiceIntegrationTest {
 
     @After
     public void cleanup() {
-        artistService.deleteArtistById(firstSample.getId());
-        artistService.deleteArtistById(secondSample.getId());
-        artistService.deleteArtistById(thirdSample.getId());
+        artistDao.deleteById(firstSample.getId());
+        artistDao.deleteById(secondSample.getId());
+        artistDao.deleteById(thirdSample.getId());
     }
 
     @Test
@@ -152,7 +155,7 @@ public class ArtistServiceIntegrationTest {
     }
 
     @Test(expected = Exception.class)
-    public void should_delete() {
+    public void should_not_get_deleted() {
 
         ArtistDto sample = new ArtistDto();
         sample.setName("Sample");
@@ -160,7 +163,7 @@ public class ArtistServiceIntegrationTest {
         ArtistDto created = artistService.createArtist(sample);
         assertNotNull(created);
 
-        artistService.deleteArtistById(sample.getId());
+        artistDao.deleteById(sample.getId());
         artistService.getArtistById(sample.getId());
     }
 

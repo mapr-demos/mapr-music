@@ -38,10 +38,10 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
     public Artist update(String id, Artist artist) {
         return processStore((connection, store) -> {
 
-            // Create a DocumentMutation to update the zipCode field
+            // Create a DocumentMutation to update non-null fields
             DocumentMutation mutation = connection.newMutation();
 
-            // Update only basic fields
+            // Update only non-null fields
             if (artist.getName() != null) {
                 mutation.set("name", artist.getName());
             }
@@ -76,6 +76,10 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
 
             if (artist.getProfileImageUrl() != null) {
                 mutation.set("profile_image_url", artist.getProfileImageUrl());
+            }
+
+            if (artist.getDeleted() != null) {
+                mutation.set("deleted", artist.getDeleted());
             }
 
             // Update the OJAI Document with specified identifier
@@ -170,4 +174,5 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
             return artists;
         });
     }
+
 }

@@ -7,6 +7,7 @@ import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.dto.TrackDto;
 import com.mapr.music.model.Album;
 import com.mapr.music.service.AlbumService;
+import com.mapr.music.service.impl.ArtistsChangelogListenerService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,6 +31,9 @@ public class AlbumEndpoint {
 
     @Inject
     private AlbumService albumService;
+
+//    @Inject
+//    ArtistsChangelogListenerService artistsChangelogListenerService;
 
     @GET
     @Path("{id}")

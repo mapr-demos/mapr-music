@@ -220,7 +220,7 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
     }
 
     /**
-     * {@inheritDoc}
+     * Sets album's 'deleted' flag to be <code>true</code>. Actual deletion is performed using CDC.
      *
      * @param id identifier of artist which will be deleted.
      */
@@ -231,11 +231,13 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
             throw new IllegalArgumentException("Artist's identifier can not be empty");
         }
 
-        if (!artistDao.exists(id)) {
+        Artist artist = artistDao.getById(id);
+        if (artist == null) {
             throw new ResourceNotFoundException("Artist with id '" + id + "' not found");
         }
 
-        artistDao.deleteById(id);
+        artist.setDeleted(true);
+        artistDao.update(id, artist);
     }
 
     /**
