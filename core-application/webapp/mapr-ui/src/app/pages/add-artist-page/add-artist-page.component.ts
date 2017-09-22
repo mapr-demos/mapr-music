@@ -37,7 +37,7 @@ export class AddArtistPage implements OnInit {
     console.log(this.artist);
     this.artistService.createNewArtist(this.artist)
       .then((created) => {
-        this.router.navigateByUrl(`album/${created.slug}`);
+        this.router.navigateByUrl(`artist/${created.slug}`);
       });
   }
 }
