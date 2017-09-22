@@ -1,4 +1,4 @@
-package com.mapr.elasticsearch.service;
+package com.mapr.elasticsearch.service.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -260,6 +260,7 @@ public class MaprElasticSearchServiceBuilder {
             listener.onDelete((id) -> client.prepareDelete(indexName, typeName, id).get());
 
             listener.listen();
+
         };
     }
 

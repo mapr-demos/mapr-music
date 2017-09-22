@@ -158,6 +158,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!--FIXME CAUSES A LOT OF ISSUES-->
+        <dependency>
+            <groupId>com.mapr.elasticsearch.service</groupId>
+            <artifactId>elasticsearch-service</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
     <repositories>

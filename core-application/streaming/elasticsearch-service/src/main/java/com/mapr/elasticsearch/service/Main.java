@@ -1,9 +1,11 @@
 package com.mapr.elasticsearch.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mapr.elasticsearch.service.service.MaprElasticSearchServiceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.UnknownHostException;
+import java.io.IOException;
 
 public class Main {
 
@@ -18,9 +20,10 @@ public class Main {
     private static final String HOSTNAME = "localhost";
     private static final int PORT = 9300;
 
+    private static final ObjectMapper mapper = new ObjectMapper();
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) throws UnknownHostException {
+    public static void main(String[] args) throws IOException {
 
         // Build and start service for the Artists table
         new MaprElasticSearchServiceBuilder()
@@ -41,6 +44,7 @@ public class Main {
                 .withChangelog(ALBUMS_CHANGELOG)
                 .withField("name") // only Album's name will be sent to the ElasticSearch
                 .build().start();
+
 
     }
 
