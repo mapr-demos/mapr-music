@@ -4,11 +4,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.mapr.elasticsearch.service.service.ESSearchServiceBuilder;
 import com.mapr.music.model.Album;
 import com.mapr.music.model.Artist;
 import com.mapr.music.model.ESSearchResult;
 import com.mapr.music.service.ESSearchService;
+import org.apache.http.HttpHost;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class ESSearchServiceImpl implements ESSearchService {
 
@@ -22,7 +32,7 @@ public class ESSearchServiceImpl implements ESSearchService {
     /**
      * ElasticSearch port number.
      */
-    public static final int PORT = 9300;
+    public static final int REST_PORT = 9200;
 
     private static final String ARTISTS_INDEX_NAME = "artists";
     private static final String ARTISTS_TYPE_NAME = "artist";
@@ -32,18 +42,15 @@ public class ESSearchServiceImpl implements ESSearchService {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    private ESSearchServiceBuilder.SearchService actualService;
+    private RestHighLevelClient client;
+
+    private static final Logger log = LoggerFactory.getLogger(ESSearchServiceImpl.class);
+
 
     public ESSearchServiceImpl() {
 
-        actualService = new ESSearchServiceBuilder()
-                .withHostname(HOSTNAME)
-                .withPort(PORT)
-                .withIndexName(ARTISTS_INDEX_NAME) // Search Artists
-                .withIndexName(ALBUMS_INDEX_NAME) // and Albums
-                .withTypeName(ARTISTS_TYPE_NAME)
-                .withTypeName(ALBUMS_TYPE_NAME)
-                .build();
+        RestClient lowLevelRestClient = RestClient.builder(new HttpHost(HOSTNAME, REST_PORT, "http")).build();
+        this.client = new RestHighLevelClient(lowLevelRestClient);
     }
 
     @Override
@@ -53,8 +60,19 @@ public class ESSearchServiceImpl implements ESSearchService {
             throw new IllegalArgumentException("Name entry can not be null");
         }
 
-        JsonNode query = matchQueryByName(nameEntry);
-        JsonNode result = actualService.search(query);
+        JsonNode jsonQuery = matchQueryByName(nameEntry);
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.query(QueryBuilders.wrapperQuery(jsonQuery.toString()));
+        SearchRequest searchRequest = new SearchRequest();
+        searchRequest.source(sourceBuilder);
+        JsonNode result = null;
+        try {
+            SearchResponse response = client.search(searchRequest);
+            result = mapper.readTree(response.toString());
+        } catch (IOException e) {
+            log.warn("Can not get ES search response. Exception: {}", e);
+        }
+
 
         return mapToResult(result);
     }
@@ -70,6 +88,10 @@ public class ESSearchServiceImpl implements ESSearchService {
     }
 
     private ESSearchResult mapToResult(JsonNode result) {
+
+        if (result == null) {
+            return new ESSearchResult();
+        }
 
         JsonNode hits = result.get("hits");
 
