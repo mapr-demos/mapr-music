@@ -13,6 +13,7 @@ import {AuthService} from "./services/auth.service";
 import {AuthenticatedGuard} from "./guards/authenticated.guard";
 import {AuthInterceptor} from "./interceptors/auth.interceptor";
 import {ReportingService} from "./services/reporting.service";
+import {SearchService} from "./services/search.service";
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import {ReportingService} from "./services/reporting.service";
   providers: [
     ArtistService,
     AlbumService,
+    SearchService,
     AppConfig,
     LanguageService,
     AuthService,

@@ -20,6 +20,7 @@ import {AddArtistPage} from "./pages/add-artist-page/add-artist-page.component";
 import {ArtistEditForm} from "./components/artist-edit-form-component/artist-edit-form.component";
 import {EditArtistPage} from "./pages/edit-artist-page/edit-artist-page.component";
 import {ApiReferencePage} from "./pages/api-reference-page/api-reference-page.component";
+import {SearchResultsPage} from "./pages/search-results-page/search-results-page.component";
 
 
 const appRoutes: Routes = [
@@ -80,6 +81,10 @@ const appRoutes: Routes = [
     component: ApiReferencePage
   },
   {
+    path: 'search',
+    component: SearchResultsPage
+  },
+  {
     path: '**',
     component: NotFoundPage
   }
@@ -101,7 +106,8 @@ const appRoutes: Routes = [
     EditAlbumPage,
     EditArtistPage,
     LoginPage,
-    ApiReferencePage
+    ApiReferencePage,
+    SearchResultsPage
   ],
   imports: [
     FormsModule,
