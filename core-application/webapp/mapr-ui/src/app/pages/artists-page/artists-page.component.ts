@@ -3,9 +3,11 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {Artist, ArtistsPage} from "../../models/artist";
 import {ArtistService} from "../../services/artist.service";
 import "rxjs/add/operator/switchMap";
+import {ReplaySubject} from "rxjs/ReplaySubject";
+import {AuthService} from "../../services/auth.service";
 
 interface QueryParams {
-  page:number,
+  page: number,
   sort: string,
   lang: string
 }
@@ -15,12 +17,15 @@ interface QueryParams {
   templateUrl: './artists-page.component.html',
   styleUrls: ['./artists-page.component.css'],
 })
-export class ArtistsPageComponent implements OnInit{
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private artistService: ArtistService
-  ) {
+export class ArtistsPageComponent implements OnInit {
+
+  isAuthenticated: ReplaySubject<boolean>;
+
+  constructor(private route: ActivatedRoute,
+              private router: Router,
+              private artistService: ArtistService,
+              private authService: AuthService) {
+    this.isAuthenticated = this.authService.isAuthenticated$;
   }
 
   artists: Array<Artist> = [];

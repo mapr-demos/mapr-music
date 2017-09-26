@@ -5,9 +5,11 @@ import {Album, AlbumsPage, Language} from "../../models/album";
 import {AlbumService, SORT_OPTIONS} from "../../services/album.service";
 import {SelectOption} from "../../models/select-option";
 import {LanguageService} from "../../services/language.service";
+import {AuthService} from "../../services/auth.service";
+import {ReplaySubject} from "rxjs/ReplaySubject";
 
 interface QueryParams {
-  page:number,
+  page: number,
   sort: string,
   lang: string
 }
@@ -17,13 +19,16 @@ interface QueryParams {
   templateUrl: './home-page.component.html',
   styleUrls: ['./home-page.component.css'],
 })
-export class HomePage implements OnInit{
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private albumService: AlbumService,
-    private languageService: LanguageService
-  ) {
+export class HomePage implements OnInit {
+
+  isAuthenticated: ReplaySubject<boolean>;
+
+  constructor(private route: ActivatedRoute,
+              private router: Router,
+              private albumService: AlbumService,
+              private languageService: LanguageService,
+              private authService: AuthService) {
+    this.isAuthenticated = this.authService.isAuthenticated$;
   }
 
   albums: Array<Album> = [];
