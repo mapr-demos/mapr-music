@@ -1,5 +1,6 @@
 package com.mapr.music.api;
 
+import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.model.ESSearchResult;
 import com.mapr.music.service.ESSearchService;
 import io.swagger.annotations.Api;
@@ -13,7 +14,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 /**
- * TODO maybe we should delete this separate endpoint. Added just for testing.
  * Endpoint for performing various searching.
  */
 @Api(value = SearchEndpoint.ENDPOINT_PATH, description = "Search endpoint, which allows to perform various searching")
@@ -21,7 +21,6 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 public class SearchEndpoint {
 
-    // TODO change it to correspond to REST
     public static final String ENDPOINT_PATH = "/search";
 
     @Inject
@@ -30,7 +29,30 @@ public class SearchEndpoint {
     @GET
     @Path("/name")
     @ApiOperation(value = "Search by name entry")
-    public ESSearchResult byNameEntry(@QueryParam("entry") String nameEntry) {
-        return searchService.findByNameEntry(nameEntry);
+    public ResourceDto<ESSearchResult> byNameEntry(@QueryParam("per_page") Integer perPage,
+                                                   @QueryParam("page") Integer page,
+                                                   @QueryParam("entry") String nameEntry) {
+
+        return searchService.findByNameEntry(nameEntry, perPage, page);
+    }
+
+    @GET
+    @Path("/artists/name")
+    @ApiOperation(value = "Search artists by name entry")
+    public ResourceDto<ESSearchResult> artistsByNameEntry(@QueryParam("per_page") Integer perPage,
+                                                          @QueryParam("page") Integer page,
+                                                          @QueryParam("entry") String nameEntry) {
+
+        return searchService.findArtistsByNameEntry(nameEntry, perPage, page);
+    }
+
+    @GET
+    @Path("/albums/name")
+    @ApiOperation(value = "Search albums by name entry")
+    public ResourceDto<ESSearchResult> albumsByNameEntry(@QueryParam("per_page") Integer perPage,
+                                                         @QueryParam("page") Integer page,
+                                                         @QueryParam("entry") String nameEntry) {
+
+        return searchService.findAlbumsByNameEntry(nameEntry, perPage, page);
     }
 }

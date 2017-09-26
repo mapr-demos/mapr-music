@@ -2,55 +2,65 @@ package com.mapr.music.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import java.util.HashSet;
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ESSearchResult {
 
-    private int total;
-    private Set<Album> albums;
-    private Set<Artist> artists;
+    @JsonProperty("type")
+    private String type;
 
-    public int getTotal() {
-        return total;
+    @JsonProperty("_id")
+    private String id;
+
+    @JsonProperty("name")
+    private String name;
+
+    @JsonProperty("image_url")
+    private String imageURL;
+
+    @JsonProperty("slug")
+    private String slug;
+
+    public String getType() {
+        return type;
     }
 
-    public void setTotal(int total) {
-        this.total = total;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public Set<Album> getAlbums() {
-        return albums;
+    public String getId() {
+        return id;
     }
 
-    public void setAlbums(Set<Album> albums) {
-        this.albums = albums;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void addAlbum(Album album) {
-        if (this.albums == null) {
-            this.albums = new HashSet<>();
-        }
-
-        this.albums.add(album);
+    public String getName() {
+        return name;
     }
 
-    public Set<Artist> getArtists() {
-        return artists;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setArtists(Set<Artist> artists) {
-        this.artists = artists;
+    public String getImageURL() {
+        return imageURL;
     }
 
-    public void addArtist(Artist artist) {
-        if (this.artists == null) {
-            this.artists = new HashSet<>();
-        }
-
-        this.artists.add(artist);
+    public void setImageURL(String imageURL) {
+        this.imageURL = imageURL;
     }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
 }
