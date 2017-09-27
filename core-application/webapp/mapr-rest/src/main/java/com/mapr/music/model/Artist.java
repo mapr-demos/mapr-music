@@ -1,10 +1,14 @@
 package com.mapr.music.model;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mapr.music.annotation.MaprDbTable;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -15,7 +19,94 @@ import java.util.List;
 @MaprDbTable("/apps/artists")
 public class Artist {
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ShortInfo {
+
+        @JsonProperty("id")
+        private String id;
+
+        @JsonProperty("name")
+        private String name;
+
+        @JsonProperty("slug")
+        private String slug;
+
+        @JsonProperty("profile_image_url")
+        private String profileImageUrl;
+
+        public static ShortInfo valueOf(Artist artist) {
+
+            if (artist == null) {
+                throw new IllegalArgumentException("Artist can not be null");
+            }
+
+            ShortInfo shortInfo = new ShortInfo();
+            shortInfo.setId(artist.getId());
+            shortInfo.setName(artist.getName());
+            shortInfo.setProfileImageUrl(artist.getProfileImageUrl());
+
+            String slug = String.format("%s-%s", artist.getSlugName(), artist.getSlugPostfix());
+            shortInfo.setSlug(slug);
+
+            return shortInfo;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getSlug() {
+            return slug;
+        }
+
+        public void setSlug(String slug) {
+            this.slug = slug;
+        }
+
+        public String getProfileImageUrl() {
+            return profileImageUrl;
+        }
+
+        public void setProfileImageUrl(String profileImageUrl) {
+            this.profileImageUrl = profileImageUrl;
+        }
+
+        @Override
+        public String toString() {
+            return "Artist ShortInfo{" +
+                    "id='" + id + '\'' +
+                    ", name='" + name + '\'' +
+                    ", slug='" + slug + '\'' +
+                    ", profileImageUrl='" + profileImageUrl + '\'' +
+                    '}';
+        }
+    }
+
+    @JsonProperty("_id")
     private String id;
+
+    @NotNull
+    @JsonProperty("name")
+    private String name;
+
+    @JsonProperty("gender")
+    private String gender;
+
+    @JsonProperty("area")
+    private String area;
 
     @JsonProperty("slug_name")
     private String slugName;
@@ -36,7 +127,7 @@ public class Artist {
     private String disambiguationComment;
 
     @JsonProperty("albums")
-    private List<String> albumsIds;
+    private List<Album.ShortInfo> albums;
 
     @JsonProperty("profile_image_url")
     private String profileImageUrl;
@@ -50,27 +141,18 @@ public class Artist {
     @JsonProperty("end_date")
     private Long endDate;
 
-    @NotNull
-    private String name;
-    private String gender;
-    private String area;
+    @JsonProperty("deleted")
     private Boolean deleted;
 
-    @JsonGetter("_id")
+    @JsonIgnore
+    private ShortInfo shortInfo;
+
     public String getId() {
         return id;
     }
 
-    @JsonSetter("_id")
-    public Artist setId(String id) {
+    public void setId(String id) {
         this.id = id;
-        return this;
-    }
-
-    @JsonSetter("id")
-    public Artist setIdWithoutUnderscore(String id) {
-        this.id = id;
-        return this;
     }
 
     public String getName() {
@@ -141,25 +223,24 @@ public class Artist {
         return disambiguationComment;
     }
 
-    public Artist setDisambiguationComment(String disambiguationComment) {
+    public void setDisambiguationComment(String disambiguationComment) {
         this.disambiguationComment = disambiguationComment;
-        return this;
     }
 
-    public List<String> getAlbumsIds() {
-        return albumsIds;
+    public List<Album.ShortInfo> getAlbums() {
+        return (albums != null) ? albums : Collections.emptyList();
     }
 
-    public void setAlbumsIds(List<String> albumsIds) {
-        this.albumsIds = albumsIds;
+    public void setAlbums(List<Album.ShortInfo> albums) {
+        this.albums = albums;
     }
 
-    public void addAlbumId(String albumsId) {
+    public void addAlbum(Album.ShortInfo albumShortInfo) {
 
-        if (this.albumsIds == null) {
-            this.albumsIds = new ArrayList<>();
+        if (this.albums == null) {
+            this.albums = new ArrayList<>();
         }
-        this.albumsIds.add(albumsId);
+        this.albums.add(albumShortInfo);
     }
 
     public String getProfileImageUrl() {
@@ -192,6 +273,20 @@ public class Artist {
 
     public void setEndDate(Long endDate) {
         this.endDate = endDate;
+    }
+
+    public ShortInfo getShortInfo() {
+
+        if (this.shortInfo == null) {
+            this.shortInfo = ShortInfo.valueOf(this);
+        }
+
+        return this.shortInfo;
+    }
+
+    @Override
+    public String toString() {
+        return getShortInfo().toString();
     }
 
     public Boolean getDeleted() {

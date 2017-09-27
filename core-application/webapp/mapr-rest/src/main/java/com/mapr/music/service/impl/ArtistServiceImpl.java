@@ -191,8 +191,13 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
         }
 
         ArtistDto artistDto = artistToDto(artist);
-        List<AlbumDto> albumsDtoList = albumsIdsToDtoList(artist.getAlbumsIds());
-        artistDto.setAlbums(albumsDtoList);
+        if (artist.getAlbums() != null) {
+            List<AlbumDto> albumsDtoList = artist.getAlbums().stream()
+                    .map(this::shortInfoToAlbumDto)
+                    .collect(Collectors.toList());
+
+            artistDto.setAlbums(albumsDtoList);
+        }
 
         return artistDto;
     }
@@ -216,8 +221,13 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
         }
 
         ArtistDto artistDto = artistToDto(artist);
-        List<AlbumDto> albumsDtoList = albumsIdsToDtoList(artist.getAlbumsIds());
-        artistDto.setAlbums(albumsDtoList);
+        if (artist.getAlbums() != null) {
+            List<AlbumDto> albumsDtoList = artist.getAlbums().stream()
+                    .map(this::shortInfoToAlbumDto)
+                    .collect(Collectors.toList());
+
+            artistDto.setAlbums(albumsDtoList);
+        }
 
         return artistDto;
     }
@@ -268,13 +278,15 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
         slugService.setSlugForArtist(artist);
         Artist createdArtist = artistDao.create(artist);
 
-        if (createdArtist.getAlbumsIds() != null) {
-            createdArtist.getAlbumsIds().stream()
-                    .filter(albumId -> albumId != null && !albumId.isEmpty())
+        if (createdArtist.getAlbums() != null) {
+            createdArtist.getAlbums().stream()
+                    .filter(Objects::nonNull)
+                    .map(Album.ShortInfo::getId)
+                    .filter(Objects::nonNull)
                     .map(albumDao::getById)
                     .filter(Objects::nonNull)
                     .forEach(album -> {
-                        album.addArtist(createdArtist);
+                        album.addArtist(createdArtist.getShortInfo());
                         albumDao.update(album.getId(), album);
                     });
         }
@@ -318,7 +330,10 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
             throw new ResourceNotFoundException("Artist with id '" + id + "' not found");
         }
 
-        List<String> artistAlbumsIds = artist.getAlbumsIds();
+        List<String> artistAlbumsIds = artist.getAlbums().stream()
+                .filter(Objects::nonNull)
+                .map(Album.ShortInfo::getId)
+                .collect(Collectors.toList());
 
         if (artistAlbumsIds != null) {
             artistAlbumsIds.forEach(albumId -> {
@@ -328,7 +343,10 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
             });
         }
 
-        List<String> existingArtistAlbumsIds = existingArtist.getAlbumsIds();
+        List<String> existingArtistAlbumsIds = existingArtist.getAlbums().stream()
+                .filter(Objects::nonNull)
+                .map(Album.ShortInfo::getId)
+                .collect(Collectors.toList());
 
         List<String> addedAlbumsIds = null;
         List<String> removedAlbumsIds = null;
@@ -350,7 +368,7 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
             addedAlbumsIds.stream()
                     .map(albumDao::getById)
                     .filter(Objects::nonNull)
-                    .peek(album -> album.addArtist(existingArtist))
+                    .peek(album -> album.addArtist(existingArtist.getShortInfo()))
                     .forEach(album -> albumDao.update(album.getId(), album));
         }
 
@@ -359,24 +377,29 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
             removedAlbumsIds.stream()
                     .map(albumDao::getById)
                     .filter(Objects::nonNull)
-                    .filter(album -> album.getArtistList() != null)
+                    .filter(album -> album.getArtists() != null)
                     .peek(album -> { // remove artist from albums
-                        Artist artistToRemove = null;
-                        for (Artist albumArtist : album.getArtistList()) {
+                        Artist.ShortInfo artistToRemove = null;
+                        for (Artist.ShortInfo albumArtist : album.getArtists()) {
                             if (existingArtist.getId().equals(albumArtist.getId())) {
                                 artistToRemove = albumArtist;
                                 break;
                             }
                         }
-                        album.getArtistList().remove(artistToRemove);
+                        album.getArtists().remove(artistToRemove);
                     })
                     .forEach(album -> albumDao.update(album.getId(), album));
         }
 
         Artist updatedArtist = artistDao.update(id, artist);
         ArtistDto updatedArtistDto = artistToDto(updatedArtist);
-        List<AlbumDto> albumsDtoList = albumsIdsToDtoList(updatedArtist.getAlbumsIds());
-        updatedArtistDto.setAlbums(albumsDtoList);
+        if (updatedArtist.getAlbums() != null) {
+            List<AlbumDto> albumsDtoList = updatedArtist.getAlbums().stream()
+                    .map(this::shortInfoToAlbumDto)
+                    .collect(Collectors.toList());
+
+            updatedArtistDto.setAlbums(albumsDtoList);
+        }
 
         return updatedArtistDto;
     }
@@ -448,8 +471,10 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
         }
 
         if (artistDto.getAlbums() != null) {
-            List<String> albumsIds = artistDto.getAlbums().stream().map(AlbumDto::getId).collect(Collectors.toList());
-            artist.setAlbumsIds(albumsIds);
+            List<Album.ShortInfo> albums = artistDto.getAlbums().stream()
+                    .map(this::albumDtoToShortInfo)
+                    .collect(Collectors.toList());
+            artist.setAlbums(albums);
         }
 
         return artist;
@@ -470,16 +495,30 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
         return albumDto;
     }
 
-    private List<AlbumDto> albumsIdsToDtoList(List<String> albumsIds) {
+    private AlbumDto shortInfoToAlbumDto(Album.ShortInfo albumShortInfo) {
 
-        if (albumsIds == null) {
-            return Collections.emptyList();
+        AlbumDto albumDto = new AlbumDto();
+        PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
+        try {
+            propertyUtilsBean.copyProperties(albumDto, albumShortInfo);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException("Can not create album Data Transfer Object", e);
         }
 
-        return albumsIds.stream()
-                .map(albumId -> albumDao.getById(albumId, "_id", "name", "slug_name", "slug_postfix", "cover_image_url", "released_date"))
-                .map(this::albumToDto)
-                .collect(Collectors.toList());
+        return albumDto;
+    }
+
+    private Album.ShortInfo albumDtoToShortInfo(AlbumDto albumDto) {
+
+        Album.ShortInfo albumShortInfo = new Album.ShortInfo();
+        PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
+        try {
+            propertyUtilsBean.copyProperties(albumShortInfo, albumDto);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException("Can not create album Data Transfer Object", e);
+        }
+
+        return albumShortInfo;
     }
 
 }

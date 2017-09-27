@@ -2,6 +2,7 @@ package com.mapr.music.service.impl;
 
 import com.mapr.music.dao.AlbumDao;
 import com.mapr.music.dao.ArtistDao;
+import com.mapr.music.model.Album;
 import com.mapr.music.model.Artist;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -109,21 +110,23 @@ public class ArtistsChangelogListenerService {
                             break;
                         }
 
-                        List<String> albumsIds = artistToDelete.getAlbumsIds();
-                        if (albumsIds != null) {
-                            albumsIds.stream()
+                        if (artistToDelete.getAlbums() != null) {
+                            artistToDelete.getAlbums().stream()
+                                    .filter(Objects::nonNull)
+                                    .map(Album.ShortInfo::getId)
                                     .map(albumDao::getById)
                                     .filter(Objects::nonNull)
-                                    .filter(album -> album.getArtistList() != null)
+                                    .filter(album -> album.getArtists() != null)
                                     .peek(album -> { // Remove artist from album's list of artists
-                                        List<Artist> toRemove = album.getArtistList().stream()
+                                        List<Artist.ShortInfo> toRemove = album.getArtists().stream()
+                                                .filter(Objects::nonNull)
                                                 .filter(artist -> artistId.equals(artist.getId()))
                                                 .collect(Collectors.toList());
 
-                                        album.getArtistList().removeAll(toRemove);
+                                        album.getArtists().removeAll(toRemove);
                                     })
                                     .forEach(album -> {
-                                        if (album.getArtistList().isEmpty()) { // Remove albums that had only one artist
+                                        if (album.getArtists().isEmpty()) { // Remove albums that had only one artist
                                             albumDao.deleteById(album.getId());
                                         } else {
                                             albumDao.update(album.getId(), album);

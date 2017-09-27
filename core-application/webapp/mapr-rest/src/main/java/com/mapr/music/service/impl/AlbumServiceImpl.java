@@ -281,14 +281,21 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         }
 
         // Remove album from Artists' list of albums
-        List<Artist> artistList = album.getArtistList();
+        List<Artist.ShortInfo> artistList = album.getArtists();
         if (artistList != null) {
             artistList.stream()
-                    .map(Artist::getId)
+                    .map(Artist.ShortInfo::getId)
                     .filter(Objects::nonNull)
                     .map(artistDao::getById) // Map from artist short info to actual artist
-                    .filter(artist -> artist.getAlbumsIds() != null)
-                    .peek(artist -> artist.getAlbumsIds().remove(id))
+                    .filter(artist -> artist.getAlbums() != null)
+                    .peek(artist -> {
+                        List<Album.ShortInfo> toDelete = artist.getAlbums().stream()
+                                .filter(Objects::nonNull)
+                                .filter(a -> id.equals(a.getId()))
+                                .collect(toList());
+
+                        artist.getAlbums().removeAll(toDelete);
+                    })
                     .forEach(artist -> artistDao.update(artist.getId(), artist));
         }
 
@@ -298,36 +305,44 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     /**
      * {@inheritDoc}
      *
-     * @param album contains album info.
+     * @param albumDto contains album info.
      * @return created album.
      */
     @Override
-    public AlbumDto createAlbum(Album album) {
+    public AlbumDto createAlbum(AlbumDto albumDto) {
 
-        if (album == null) {
+        if (albumDto == null) {
             throw new ValidationException("Album can not be null");
         }
 
-        if (album.getName() == null) {
+        if (albumDto.getName() == null) {
             throw new ValidationException("Album's name can not be null");
         }
 
-        if (album.getArtistList() != null) {
-            List<Artist> actualArtists = album.getArtistList().stream()
+        Album album = dtoToAlbum(albumDto);
+
+
+        if (album.getArtists() != null) {
+            List<Artist.ShortInfo> actualArtistsInfo = album.getArtists().stream()
+                    .filter(Objects::nonNull)
                     .filter(artist -> artist.getId() != null)
                     .map(artist -> artistDao.getById(artist.getId())) // fetch actual Artist
                     .filter(Objects::nonNull)
+                    .map(Artist::getShortInfo)
                     .collect(toList());
 
-            album.setArtistList(actualArtists);
+            album.setArtists(actualArtistsInfo);
         }
 
         slugService.setSlugForAlbum(album);
         Album createdAlbum = albumDao.create(album);
 
-        if (album.getArtistList() != null) {
-            album.getArtistList().stream()
-                    .peek(artist -> artist.addAlbumId(createdAlbum.getId()))
+        if (album.getArtists() != null) {
+            album.getArtists().stream()
+                    .filter(Objects::nonNull)
+                    .map(Artist.ShortInfo::getId)
+                    .map(artistDao::getById)
+                    .peek(artist -> artist.addAlbum(createdAlbum.getShortInfo()))
                     .forEach(artist -> artistDao.update(artist.getId(), artist));
         }
 
@@ -337,42 +352,43 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     /**
      * {@inheritDoc}
      *
-     * @param album album which will be updated. Note, that album's id must be set, otherwise
-     *              {@link IllegalArgumentException} will be thrown.
+     * @param albumDto album which will be updated. Note, that album's id must be set, otherwise
+     *                 {@link IllegalArgumentException} will be thrown.
      * @return updated album.
      */
     @Override
-    public AlbumDto updateAlbum(Album album) {
-        return updateAlbum(album.getId(), album);
+    public AlbumDto updateAlbum(AlbumDto albumDto) {
+        return updateAlbum(albumDto.getId(), albumDto);
     }
 
     /**
      * {@inheritDoc}
      *
-     * @param id    identifier of album which will be updated.
-     * @param album album which will be updated.
+     * @param id       identifier of album which will be updated.
+     * @param albumDto album which will be updated.
      * @return updated album.
      */
     @Override
     @SuppressWarnings("unchecked")
-    public AlbumDto updateAlbum(String id, Album album) {
+    public AlbumDto updateAlbum(String id, AlbumDto albumDto) {
 
         if (id == null || id.isEmpty()) {
             throw new IllegalArgumentException("Album's identifier can not be empty");
         }
 
+        Album album = dtoToAlbum(albumDto);
         if (album == null) {
             throw new IllegalArgumentException("Album can not be null");
         }
 
-        Album existingAlbum = albumDao.getById(id, "artists");
+        Album existingAlbum = albumDao.getById(id);
         if (existingAlbum == null) {
             throw new ResourceNotFoundException("Album with id '" + id + "' not found");
         }
 
-        List<String> albumArtistsIds = (album.getArtistList() == null)
+        List<String> albumArtistsIds = (album.getArtists() == null)
                 ? null
-                : album.getArtistList().stream()
+                : album.getArtists().stream()
                 .peek(artist -> {
                     if (artist.getId() == null) {
                         throw new ValidationException("Album's artist must have 'id' field set",
@@ -386,16 +402,15 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
                         throw new ResourceNotFoundException("Artist with id ='" + artist.getId() + "' not found");
                     }
 
-                    artist.setSlugName(storedArtist.getSlugName());
-                    artist.setSlugPostfix(storedArtist.getSlugPostfix());
+                    artist.setSlug(storedArtist.getShortInfo().getSlug());
                 })
-                .map(Artist::getId)
+                .map(Artist.ShortInfo::getId)
                 .collect(toList());
 
-        List<String> existingAlbumArtistsIds = (existingAlbum.getArtistList() == null)
+        List<String> existingAlbumArtistsIds = (existingAlbum.getArtists() == null)
                 ? null
-                : existingAlbum.getArtistList().stream()
-                .map(Artist::getId)
+                : existingAlbum.getArtists().stream()
+                .map(Artist.ShortInfo::getId)
                 .collect(toList());
 
 
@@ -419,7 +434,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             addedArtistsIds.stream()
                     .map(artistDao::getById)
                     .filter(Objects::nonNull)
-                    .peek(artist -> artist.addAlbumId(id))
+                    .peek(artist -> artist.addAlbum(existingAlbum.getShortInfo()))
                     .forEach(artist -> artistDao.update(artist.getId(), artist));
         }
 
@@ -428,8 +443,14 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             removedArtistsIds.stream()
                     .map(artistDao::getById)
                     .filter(Objects::nonNull)
-                    .filter(artist -> artist.getAlbumsIds() != null)
-                    .peek(artist -> artist.getAlbumsIds().remove(id))
+                    .filter(artist -> artist.getAlbums() != null)
+                    .peek(artist -> {
+                        List<Album.ShortInfo> toDelete = artist.getAlbums().stream()
+                                .filter(a -> id.equals(a.getId()))
+                                .collect(toList());
+
+                        artist.getAlbums().removeAll(toDelete);
+                    })
                     .forEach(artist -> artistDao.update(artist.getId(), artist));
         }
 
@@ -663,10 +684,10 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             albumDto.setTrackList(trackDtoList);
         }
 
-        if (album.getArtistList() != null && !album.getArtistList().isEmpty()) {
+        if (album.getArtists() != null && !album.getArtists().isEmpty()) {
 
-            List<ArtistDto> artistDtoList = album.getArtistList().stream()
-                    .map(this::artistToDto)
+            List<ArtistDto> artistDtoList = album.getArtists().stream()
+                    .map(this::artistShortInfoToDto)
                     .collect(toList());
 
             albumDto.setArtistList(artistDtoList);
@@ -701,19 +722,61 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         return track;
     }
 
-    private ArtistDto artistToDto(Artist artist) {
+    private Album dtoToAlbum(AlbumDto albumDto) {
+
+        Album album = new Album();
+        PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
+        try {
+            propertyUtilsBean.copyProperties(album, albumDto);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException("Can not create album Data Transfer Object", e);
+        }
+
+        if (albumDto.getTrackList() != null && !albumDto.getTrackList().isEmpty()) {
+
+            List<Track> trackList = albumDto.getTrackList().stream()
+                    .map(this::dtoToTrack)
+                    .collect(toList());
+
+            album.setTrackList(trackList);
+        }
+
+        if (albumDto.getArtistList() != null && !albumDto.getArtistList().isEmpty()) {
+
+            List<Artist.ShortInfo> artistShortInfoList = albumDto.getArtistList().stream()
+                    .map(this::artistDtoToShortInfo)
+                    .collect(toList());
+
+            album.setArtists(artistShortInfoList);
+        }
+
+        return album;
+    }
+
+    private ArtistDto artistShortInfoToDto(Artist.ShortInfo artistShortInfo) {
+
         ArtistDto artistDto = new ArtistDto();
         PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
         try {
-            propertyUtilsBean.copyProperties(artistDto, artist);
+            propertyUtilsBean.copyProperties(artistDto, artistShortInfo);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException("Can not create artist Data Transfer Object", e);
         }
 
-        String slug = slugService.getSlugForArtist(artist);
-        artistDto.setSlug(slug);
-
         return artistDto;
+    }
+
+    private Artist.ShortInfo artistDtoToShortInfo(ArtistDto artistDto) {
+
+        Artist.ShortInfo artistShortInfo = new Artist.ShortInfo();
+        PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
+        try {
+            propertyUtilsBean.copyProperties(artistShortInfo, artistDto);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException("Can not create album Data Transfer Object", e);
+        }
+
+        return artistShortInfo;
     }
 
 }

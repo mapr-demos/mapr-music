@@ -1,5 +1,6 @@
 package com.mapr.music.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -7,6 +8,7 @@ import com.mapr.music.annotation.MaprDbTable;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -16,6 +18,82 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @MaprDbTable("/apps/albums")
 public class Album {
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ShortInfo {
+
+        @JsonProperty("id")
+        private String id;
+
+        @JsonProperty("name")
+        private String name;
+
+        @JsonProperty("slug")
+        private String slug;
+
+        @JsonProperty("cover_image_url")
+        private String coverImageUrl;
+
+        public static ShortInfo valueOf(Album album) {
+
+            if (album == null) {
+                throw new IllegalArgumentException("Album can not be null");
+            }
+
+            ShortInfo shortInfo = new ShortInfo();
+            shortInfo.setId(album.getId());
+            shortInfo.setName(album.getName());
+            shortInfo.setCoverImageUrl(album.getCoverImageUrl());
+
+            String slug = String.format("%s-%s", album.getSlugName(), album.getSlugPostfix());
+            shortInfo.setSlug(slug);
+
+            return shortInfo;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getSlug() {
+            return slug;
+        }
+
+        public void setSlug(String slug) {
+            this.slug = slug;
+        }
+
+        public String getCoverImageUrl() {
+            return coverImageUrl;
+        }
+
+        public void setCoverImageUrl(String coverImageUrl) {
+            this.coverImageUrl = coverImageUrl;
+        }
+
+        @Override
+        public String toString() {
+            return "Album ShortInfo{" +
+                    "id='" + id + '\'' +
+                    ", name='" + name + '\'' +
+                    ", slug='" + slug + '\'' +
+                    ", coverImageUrl='" + coverImageUrl + '\'' +
+                    '}';
+        }
+    }
 
     @JsonProperty("_id")
     private String id;
@@ -27,7 +105,7 @@ public class Album {
     private Long slugPostfix;
 
     @JsonProperty("artists")
-    private List<Artist> artistList;
+    private List<Artist.ShortInfo> artists;
 
     @JsonProperty("catalog_numbers")
     private List catalogNumbers;
@@ -45,206 +123,211 @@ public class Album {
     private Long releasedDate;
 
     @NotNull
+    @JsonProperty("name")
     private String name;
-    private String style;
+
+    @JsonProperty("barcode")
     private String barcode;
+
+    @JsonProperty("status")
     private String status;
+
+    @JsonProperty("packaging")
     private String packaging;
+
+    @JsonProperty("language")
     private String language;
+
+    @JsonProperty("script")
     private String script;
+
+    @JsonProperty("MBID")
     private String MBID;
+
+    @JsonProperty("format")
     private String format;
+
+    @JsonProperty("country")
     private String country;
+
+    @JsonProperty("reviews")
     private List reviews;
+
+    @JsonIgnore
+    private ShortInfo shortInfo;
 
     public String getId() {
         return id;
     }
 
-    public Album setId(String id) {
+    public void setId(String id) {
         this.id = id;
-        return this;
     }
 
     public String getName() {
         return name;
     }
 
-    public Album setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     public String getSlugName() {
         return slugName;
     }
 
-    public Album setSlugName(String slugName) {
+    public void setSlugName(String slugName) {
         this.slugName = slugName;
-        return this;
     }
 
     public Long getSlugPostfix() {
         return slugPostfix;
     }
 
-    public Album setSlugPostfix(Long slugPostfix) {
+    public void setSlugPostfix(Long slugPostfix) {
         this.slugPostfix = slugPostfix;
-        return this;
     }
 
-    public List<Artist> getArtistList() {
-        return artistList;
+    public List<Artist.ShortInfo> getArtists() {
+        return (artists != null) ? artists : Collections.emptyList();
     }
 
-    public Album setArtistList(List<Artist> artistList) {
-        this.artistList = artistList;
-        return this;
+    public void setArtists(List<Artist.ShortInfo> artists) {
+        this.artists = artists;
     }
 
-    public Album addArtist(Artist artist) {
+    public void addArtist(Artist.ShortInfo artist) {
 
-        if (this.artistList == null) {
-            this.artistList = new ArrayList<>();
+        if (this.artists == null) {
+            this.artists = new ArrayList<>();
         }
 
-        this.artistList.add(artist);
-        return this;
+        this.artists.add(artist);
     }
 
     public List getCatalogNumbers() {
         return catalogNumbers;
     }
 
-    public Album setCatalogNumbers(List catalogNumbers) {
+    public void setCatalogNumbers(List catalogNumbers) {
         this.catalogNumbers = catalogNumbers;
-        return this;
     }
 
     public List<Track> getTrackList() {
         return trackList;
     }
 
-    public Album setTrackList(List<Track> trackList) {
+    public void setTrackList(List<Track> trackList) {
         this.trackList = trackList;
-        return this;
     }
 
     public List getReviews() {
         return reviews;
     }
 
-    public Album setReviews(List reviews) {
+    public void setReviews(List reviews) {
         this.reviews = reviews;
-        return this;
     }
 
     public String getCoverImageUrl() {
         return coverImageUrl;
     }
 
-    public Album setCoverImageUrl(String coverImageUrl) {
+    public void setCoverImageUrl(String coverImageUrl) {
         this.coverImageUrl = coverImageUrl;
-        return this;
     }
 
     public List<String> getImagesUrls() {
         return imagesUrls;
     }
 
-    public Album setImagesUrls(List<String> imagesUrls) {
+    public void setImagesUrls(List<String> imagesUrls) {
         this.imagesUrls = imagesUrls;
-        return this;
     }
 
     public String getFormat() {
         return format;
     }
 
-    public Album setFormat(String format) {
+    public void setFormat(String format) {
         this.format = format;
-        return this;
     }
 
     public String getCountry() {
         return country;
     }
 
-    public Album setCountry(String country) {
+    public void setCountry(String country) {
         this.country = country;
-        return this;
     }
 
     public Long getReleasedDate() {
         return releasedDate;
     }
 
-    public Album setReleasedDate(Long releasedDate) {
+    public void setReleasedDate(Long releasedDate) {
         this.releasedDate = releasedDate;
-        return this;
-    }
-
-    public String getStyle() {
-        return style;
-    }
-
-    public Album setStyle(String style) {
-        this.style = style;
-        return this;
     }
 
     public String getBarcode() {
         return barcode;
     }
 
-    public Album setBarcode(String barcode) {
+    public void setBarcode(String barcode) {
         this.barcode = barcode;
-        return this;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public Album setStatus(String status) {
+    public void setStatus(String status) {
         this.status = status;
-        return this;
     }
 
     public String getPackaging() {
         return packaging;
     }
 
-    public Album setPackaging(String packaging) {
+    public void setPackaging(String packaging) {
         this.packaging = packaging;
-        return this;
     }
 
     public String getLanguage() {
         return language;
     }
 
-    public Album setLanguage(String language) {
+    public void setLanguage(String language) {
         this.language = language;
-        return this;
     }
 
     public String getScript() {
         return script;
     }
 
-    public Album setScript(String script) {
+    public void setScript(String script) {
         this.script = script;
-        return this;
     }
 
     public String getMBID() {
         return MBID;
     }
 
-    public Album setMBID(String MBID) {
+    public void setMBID(String MBID) {
         this.MBID = MBID;
-        return this;
     }
 
+    public ShortInfo getShortInfo() {
+
+        if (this.shortInfo == null) {
+            this.shortInfo = ShortInfo.valueOf(this);
+        }
+
+        return shortInfo;
+    }
+
+    @Override
+    public String toString() {
+        return getShortInfo().toString();
+    }
 }

@@ -8,7 +8,6 @@ import com.mapr.music.dao.impl.*;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.exception.ValidationException;
-import com.mapr.music.model.Album;
 import com.mapr.music.service.impl.AlbumServiceImpl;
 import com.mapr.music.service.impl.SlugService;
 import com.mapr.music.service.impl.StatisticServiceImpl;
@@ -45,21 +44,29 @@ public class AlbumServiceIntegrationTest {
     @Inject
     AlbumService albumService;
 
-    Album firstSample;
-    Album secondSample;
-    Album thirdSample;
+    AlbumDto firstSample;
+    AlbumDto secondSample;
+    AlbumDto thirdSample;
 
     @Before
     public void create_sample_albums() {
 
         // Create several albums to be sure that second page may exist
-        firstSample = new Album().setName("Test1").setLanguage("Test1").setStyle("Test1");
-        secondSample = new Album().setName("Test2").setLanguage("Test2").setStyle("Test2");
-        thirdSample = new Album().setName("Test3").setLanguage("Test3").setStyle("Test3");
+        firstSample = new AlbumDto();
+        firstSample.setName("Test1");
+        firstSample.setLanguage("Test1");
 
-        albumService.createAlbum(firstSample);
-        albumService.createAlbum(secondSample);
-        albumService.createAlbum(thirdSample);
+        secondSample = new AlbumDto();
+        secondSample.setName("Test2");
+        secondSample.setLanguage("Test2");
+
+        thirdSample = new AlbumDto();
+        thirdSample.setName("Test3");
+        thirdSample.setLanguage("Test3");
+
+        firstSample = albumService.createAlbum(firstSample);
+        secondSample = albumService.createAlbum(secondSample);
+        thirdSample = albumService.createAlbum(thirdSample);
     }
 
     @After
@@ -77,7 +84,6 @@ public class AlbumServiceIntegrationTest {
         assertEquals(firstSample.getId(), albumDto.getId());
         assertEquals(firstSample.getName(), albumDto.getName());
         assertEquals(firstSample.getLanguage(), albumDto.getLanguage());
-        assertEquals(firstSample.getStyle(), albumDto.getStyle());
     }
 
     @Test
@@ -154,7 +160,9 @@ public class AlbumServiceIntegrationTest {
     @Test(expected = Exception.class)
     public void should_delete() {
 
-        Album sample = new Album().setName("Sample").setLanguage("Sample").setStyle("Sample");
+        AlbumDto sample = new AlbumDto();
+        sample.setName("Sample");
+        sample.setLanguage("Sample");
         AlbumDto created = albumService.createAlbum(sample);
 
         assertNotNull(created);
@@ -182,7 +190,7 @@ public class AlbumServiceIntegrationTest {
 
     @Test(expected = ValidationException.class)
     public void should_not_create_with_null_name() {
-        albumService.createAlbum(new Album());
+        albumService.createAlbum(new AlbumDto());
     }
 
 }

@@ -4,7 +4,6 @@ import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.dto.TrackDto;
-import com.mapr.music.model.Album;
 import com.mapr.music.model.Language;
 
 import java.util.List;
@@ -108,31 +107,31 @@ public interface AlbumService {
     void deleteAlbumById(String id);
 
     /**
-     * Creates album according to the specified instance of {@link Album} class.
+     * Creates album according to the specified instance of {@link AlbumDto} class.
      *
-     * @param album contains album info.
+     * @param albumDto contains album info.
      * @return created album.
      */
-    AlbumDto createAlbum(Album album);
+    AlbumDto createAlbum(AlbumDto albumDto);
 
     /**
-     * Updates single album according to the specified instance of {@link Album} class.
+     * Updates single album according to the specified instance of {@link AlbumDto} class.
      *
-     * @param album album which will be updated. Note, that album's id must be set, otherwise
-     *              {@link IllegalArgumentException} will be thrown.
+     * @param albumDto album which will be updated. Note, that album's id must be set, otherwise
+     *                 {@link IllegalArgumentException} will be thrown.
      * @return updated album.
      * @throws IllegalArgumentException in case when specified album is <code>null</code> or it does not contain id.
      */
-    AlbumDto updateAlbum(Album album);
+    AlbumDto updateAlbum(AlbumDto albumDto);
 
     /**
-     * Updates single album according to the specified instance of {@link Album} class.
+     * Updates single album according to the specified instance of {@link AlbumDto} class.
      *
-     * @param id    identifier of album which will be updated.
-     * @param album album which will be updated.
+     * @param id       identifier of album which will be updated.
+     * @param albumDto album which will be updated.
      * @return updated album.
      */
-    AlbumDto updateAlbum(String id, Album album);
+    AlbumDto updateAlbum(String id, AlbumDto albumDto);
 
     /**
      * Returns single track according to the specified track identifier and album identifier.

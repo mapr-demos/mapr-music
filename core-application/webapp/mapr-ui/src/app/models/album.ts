@@ -1,7 +1,8 @@
 export interface Artist {
   id: string,
   slug: string,
-  name: string
+  name: string,
+  avatarURL: string
 }
 
 export interface Track {
@@ -21,7 +22,6 @@ export interface Album {
   title: string,
   coverImageURL: string,
   format: string,
-  style: string,
   slug: string,
   language: Language,
   trackList: Array<Track>,

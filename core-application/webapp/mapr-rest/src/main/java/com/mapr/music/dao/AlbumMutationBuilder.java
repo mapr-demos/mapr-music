@@ -173,11 +173,11 @@ public class AlbumMutationBuilder {
         return this;
     }
 
-    public AlbumMutationBuilder setArtists(List<Artist> artists) {
+    public AlbumMutationBuilder setArtists(List<Artist.ShortInfo> artists) {
         return setArtists(artists, SET_NULL_VALUE_DEFAULT);
     }
 
-    public AlbumMutationBuilder setArtists(List<Artist> artists, boolean setNullValue) {
+    public AlbumMutationBuilder setArtists(List<Artist.ShortInfo> artists, boolean setNullValue) {
 
         if (artists == null && !setNullValue) {
             return this;
@@ -186,8 +186,6 @@ public class AlbumMutationBuilder {
         List<Map> artistMapList = (artists == null) ? null
                 : artists.stream()
                 .map(artist -> objectMapper.convertValue(artist, Map.class))
-                .peek(artistMap -> artistMap.put("id", artistMap.get("_id"))) // nested Artist document must have 'id'
-                .peek(artistMap -> artistMap.remove("_id")) // field instead of '_id'
                 .collect(Collectors.toList());
 
         this.mutation.set(ARTISTS_FIELD, artistMapList);

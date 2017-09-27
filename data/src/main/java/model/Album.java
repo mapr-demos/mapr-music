@@ -1,9 +1,6 @@
 package model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.ArrayList;
@@ -12,6 +9,31 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Album {
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public class ShortInfo {
+
+        @JsonGetter("id")
+        public String getId() {
+            return Album.this.getId();
+        }
+
+        @JsonGetter("name")
+        public String getName() {
+            return Album.this.getName();
+        }
+
+        @JsonGetter("slug")
+        public String getSlug() {
+            return String.format("%s-%s", Album.this.getSlugName(), Album.this.getSlugPostfix().get$numberLong());
+        }
+
+        @JsonGetter("cover_image_url")
+        public String getCoverImageUrl() {
+            return Album.this.getCoverImageUrl();
+        }
+    }
 
     @JsonIgnore
     private String pk;
@@ -63,6 +85,9 @@ public class Album {
 
     @JsonProperty("released_date")
     private JsonNumberLong releasedDate;
+
+    @JsonIgnore
+    private ShortInfo shortInfo;
 
     public String getReleaseGroupId() {
         return releaseGroupId;
@@ -272,6 +297,17 @@ public class Album {
     public void setMediumId(String mediumId) {
         this.mediumId = mediumId;
     }
+
+    public ShortInfo getShortInfo() {
+
+        if (shortInfo == null) {
+            shortInfo = new ShortInfo();
+        }
+
+        return shortInfo;
+    }
+
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)

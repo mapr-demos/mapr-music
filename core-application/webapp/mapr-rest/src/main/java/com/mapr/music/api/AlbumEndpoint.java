@@ -71,16 +71,16 @@ public class AlbumEndpoint {
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update single album")
-    public AlbumDto updateAlbum(@PathParam("id") String id, @Valid Album album) {
-        return albumService.updateAlbum(id, album);
+    public AlbumDto updateAlbum(@PathParam("id") String id, @Valid AlbumDto albumDto) {
+        return albumService.updateAlbum(id, albumDto);
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Create album")
-    public Response createAlbum(@Valid Album album, @Context UriInfo uriInfo) {
+    public Response createAlbum(@Valid AlbumDto albumDto, @Context UriInfo uriInfo) {
 
-        AlbumDto createdAlbum = albumService.createAlbum(album);
+        AlbumDto createdAlbum = albumService.createAlbum(albumDto);
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
         builder.path(createdAlbum.getId());
         URI location = builder.build();

@@ -14,6 +14,7 @@ import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Actual implementation of {@link com.mapr.music.dao.MaprDbDao} to manage {@link Artist} model.
@@ -70,8 +71,13 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
                 mutation.set("area", artist.getArea());
             }
 
-            if (artist.getAlbumsIds() != null) {
-                mutation.set("albums", artist.getAlbumsIds());
+            if (artist.getAlbums() != null) {
+
+                List<Map> albumsMapList = artist.getAlbums().stream()
+                        .map(album -> mapper.convertValue(album, Map.class))
+                        .collect(Collectors.toList());
+
+                mutation.set("albums", albumsMapList);
             }
 
             if (artist.getProfileImageUrl() != null) {
