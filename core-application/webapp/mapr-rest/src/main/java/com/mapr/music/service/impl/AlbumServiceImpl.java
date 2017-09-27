@@ -16,6 +16,7 @@ import com.mapr.music.model.Language;
 import com.mapr.music.model.Track;
 import com.mapr.music.service.AlbumService;
 import com.mapr.music.service.PaginatedService;
+import com.mapr.music.service.StatisticService;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 
 import javax.inject.Inject;
@@ -60,20 +61,22 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     private final MaprDbDao<Artist> artistDao;
     private final LanguageDao languageDao;
     private final SlugService slugService;
+    private final StatisticService statisticService;
 
     @Inject
     public AlbumServiceImpl(@Named("albumDao") AlbumDao albumDao, @Named("artistDao") MaprDbDao<Artist> artistDao,
-                            LanguageDao languageDao, SlugService slugService) {
+                            LanguageDao languageDao, SlugService slugService, StatisticService statisticService) {
 
         this.albumDao = albumDao;
         this.artistDao = artistDao;
         this.languageDao = languageDao;
         this.slugService = slugService;
+        this.statisticService = statisticService;
     }
 
     @Override
     public long getTotalNum() {
-        return albumDao.getTotalNum();
+        return statisticService.getTotalAlbums();
     }
 
     /**
@@ -330,7 +333,6 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
 
         return albumToDto(createdAlbum);
     }
-
 
     /**
      * {@inheritDoc}
@@ -628,7 +630,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     public List<AlbumDto> getRecommendedById(String albumId, Long limit) {
 
         long actualLimit = (limit != null && limit > 0 && limit < MAX_RECOMMENDED_LIMIT) ? limit : MAX_RECOMMENDED_LIMIT;
-        int maxOffset = (int) (albumDao.getTotalNum() - actualLimit);
+        int maxOffset = (int) (statisticService.getTotalAlbums() - actualLimit);
         int offset = new Random().nextInt(maxOffset);
 
         List<Album> albums = albumDao.getList(offset, actualLimit, ALBUM_SHORT_INFO_FIELDS);

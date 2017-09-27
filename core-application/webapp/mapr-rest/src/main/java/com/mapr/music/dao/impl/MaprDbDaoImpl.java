@@ -168,25 +168,6 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
     /**
      * {@inheritDoc}
      *
-     * @return total number of documents.
-     */
-    @Override
-    public long getTotalNum() {
-        return processStore((connection, store) -> {
-
-            DocumentStream documentStream = store.find();
-            long totalNum = 0;
-            for (Document ignored : documentStream) {
-                totalNum++;
-            }
-
-            return totalNum;
-        });
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @param storeAction specifies action which will be performed on store.
      * @param <R>         type of {@link OjaiStoreAction} return value.
      * @return process result.
