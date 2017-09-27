@@ -47,6 +47,11 @@
         </select>
       </div>
     </div>
+    <div  class="sort-selector-container" *ngIf = "isAuthenticated | async">
+      <div class="btn btn-primary" routerLink="/add/album">
+        Add new
+      </div>
+    </div>
   </div>
   <div style="display: flex">
     <div class="container albums-container">
