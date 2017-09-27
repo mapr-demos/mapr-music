@@ -309,13 +309,21 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             throw new ValidationException("Album's name can not be null");
         }
 
+        if (album.getArtistList() != null) {
+            List<Artist> actualArtists = album.getArtistList().stream()
+                    .filter(artist -> artist.getId() != null)
+                    .map(artist -> artistDao.getById(artist.getId())) // fetch actual Artist
+                    .filter(Objects::nonNull)
+                    .collect(toList());
+
+            album.setArtistList(actualArtists);
+        }
+
         slugService.setSlugForAlbum(album);
         Album createdAlbum = albumDao.create(album);
 
         if (album.getArtistList() != null) {
             album.getArtistList().stream()
-                    .filter(artist -> artist.getId() != null)
-                    .map(artist -> artistDao.getById(artist.getId())) // fetch actual Artist
                     .peek(artist -> artist.addAlbumId(createdAlbum.getId()))
                     .forEach(artist -> artistDao.update(artist.getId(), artist));
         }
