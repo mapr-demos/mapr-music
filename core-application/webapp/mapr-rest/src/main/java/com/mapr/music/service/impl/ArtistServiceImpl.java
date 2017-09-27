@@ -12,6 +12,7 @@ import com.mapr.music.model.Album;
 import com.mapr.music.model.Artist;
 import com.mapr.music.service.ArtistService;
 import com.mapr.music.service.PaginatedService;
+import com.mapr.music.service.StatisticService;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 
 import javax.inject.Inject;
@@ -52,14 +53,16 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
     private final ArtistDao artistDao;
     private final MaprDbDao<Album> albumDao;
     private final SlugService slugService;
+    private final StatisticService statisticService;
 
     @Inject
-    public ArtistServiceImpl(@Named("artistDao") ArtistDao artistDao,
-                             @Named("albumDao") MaprDbDao<Album> albumDao, SlugService slugService) {
+    public ArtistServiceImpl(@Named("artistDao") ArtistDao artistDao, @Named("albumDao") MaprDbDao<Album> albumDao,
+                             SlugService slugService, StatisticService statisticService) {
 
         this.artistDao = artistDao;
         this.albumDao = albumDao;
         this.slugService = slugService;
+        this.statisticService = statisticService;
     }
 
     /**
@@ -69,7 +72,7 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
      */
     @Override
     public long getTotalNum() {
-        return artistDao.getTotalNum();
+        return statisticService.getTotalArtists();
     }
 
     /**
@@ -410,7 +413,7 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
     public List<ArtistDto> getRecommendedById(String artistId, Long limit) {
 
         long actualLimit = (limit != null && limit > 0 && limit < MAX_RECOMMENDED_LIMIT) ? limit : MAX_RECOMMENDED_LIMIT;
-        int maxOffset = (int) (artistDao.getTotalNum() - actualLimit);
+        int maxOffset = (int) (statisticService.getTotalArtists() - actualLimit);
         int offset = new Random().nextInt(maxOffset);
 
         List<Artist> artists = artistDao.getList(offset, actualLimit, ARTIST_SHORT_INFO_FIELDS);

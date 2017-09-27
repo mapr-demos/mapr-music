@@ -3,9 +3,11 @@ package com.mapr.music.service;
 import com.mapr.music.dao.AlbumDao;
 import com.mapr.music.dao.ArtistDao;
 import com.mapr.music.dao.MaprDbDao;
+import com.mapr.music.dao.StatisticDao;
 import com.mapr.music.dao.impl.AlbumDaoImpl;
 import com.mapr.music.dao.impl.ArtistDaoImpl;
 import com.mapr.music.dao.impl.MaprDbDaoImpl;
+import com.mapr.music.dao.impl.StatisticDaoImpl;
 import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.exception.ValidationException;
@@ -35,7 +37,8 @@ public class ArtistServiceIntegrationTest {
         return ShrinkWrap.create(WebArchive.class)
                 .addClasses(
                         ArtistService.class, ArtistServiceImpl.class, ArtistDao.class, ArtistDaoImpl.class,
-                        AlbumDao.class, AlbumDaoImpl.class, MaprDbDao.class, MaprDbDaoImpl.class, SlugService.class)
+                        AlbumDao.class, AlbumDaoImpl.class, MaprDbDao.class, MaprDbDaoImpl.class, SlugService.class,
+                        StatisticServiceMock.class, StatisticDao.class, StatisticDaoImpl.class)
                 .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
