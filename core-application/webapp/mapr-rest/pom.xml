@@ -28,6 +28,8 @@
         <rest.easy.version>3.0.19.Final</rest.easy.version>
         <icu4j.version>59.1</icu4j.version>
         <kafka.clients.version>0.9.0.0-mapr-1707-beta</kafka.clients.version>
+        <elasticsearch.rest.client.version>5.6.1</elasticsearch.rest.client.version>
+        <apache.httpclient.version>4.5</apache.httpclient.version>
     </properties>
 
     <!-- Required by Arquillian -->
@@ -156,6 +158,18 @@
             <artifactId>slf4j-simple</artifactId>
             <version>${slf4j.simple.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <version>${elasticsearch.rest.client.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${apache.httpclient.version}</version>
         </dependency>
 
     </dependencies>
