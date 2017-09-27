@@ -28,16 +28,40 @@ export class AddArtistPage implements OnInit {
   }
 
   artist: Artist = null;
+  errors: Array<string> = [];
 
   ngOnInit(): void {
     this.artist = createNewArtist();
   }
 
   onArtistSave() {
+
+    this.clearErrors();
+    if (!this.artistValid()) {
+      return;
+    }
+
     console.log(this.artist);
     this.artistService.createNewArtist(this.artist)
       .then((created) => {
         this.router.navigateByUrl(`artist/${created.slug}`);
       });
+  }
+
+  artistValid(): boolean {
+
+    if (!this.artist.name) {
+      this.errors.push("Name is required");
+    }
+
+    if (this.errors && this.errors.length > 0) {
+      return false;
+    }
+
+    return true;
+  }
+
+  clearErrors() {
+    this.errors = [];
   }
 }

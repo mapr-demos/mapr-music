@@ -27,4 +27,12 @@ export class AppBar {
     this.authService.logout();
     this.router.navigateByUrl('login');
   }
+
+  onSearchClick(event, searchEntry) {
+    event.preventDefault();
+    const queryParams = {
+      entry: searchEntry
+    };
+    this.router.navigate(['search'], {queryParams});
+  }
 }

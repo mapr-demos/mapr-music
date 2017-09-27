@@ -184,7 +184,7 @@ public class SlugService {
         return constructSlugString(artist.getSlugName(), artist.getSlugPostfix());
     }
 
-    private String constructSlugString(String slugName, Long slugPostfix) {
+    public static String constructSlugString(String slugName, Long slugPostfix) {
 
         if (slugName != null && slugPostfix != null) {
             return slugName + SLUG_POSTFIX_DELIMITER + slugPostfix;

@@ -16,6 +16,7 @@ import com.mapr.music.model.Language;
 import com.mapr.music.model.Track;
 import com.mapr.music.service.AlbumService;
 import com.mapr.music.service.PaginatedService;
+import com.mapr.music.service.StatisticService;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 
 import javax.inject.Inject;
@@ -60,20 +61,22 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     private final MaprDbDao<Artist> artistDao;
     private final LanguageDao languageDao;
     private final SlugService slugService;
+    private final StatisticService statisticService;
 
     @Inject
     public AlbumServiceImpl(@Named("albumDao") AlbumDao albumDao, @Named("artistDao") MaprDbDao<Artist> artistDao,
-                            LanguageDao languageDao, SlugService slugService) {
+                            LanguageDao languageDao, SlugService slugService, StatisticService statisticService) {
 
         this.albumDao = albumDao;
         this.artistDao = artistDao;
         this.languageDao = languageDao;
         this.slugService = slugService;
+        this.statisticService = statisticService;
     }
 
     @Override
     public long getTotalNum() {
-        return albumDao.getTotalNum();
+        return statisticService.getTotalAlbums();
     }
 
     /**
@@ -272,8 +275,28 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             throw new IllegalArgumentException("Album's identifier can not be empty");
         }
 
-        if (!albumDao.exists(id)) {
+        Album album = albumDao.getById(id);
+        if (album == null) {
             throw new ResourceNotFoundException("Album with id '" + id + "' not found");
+        }
+
+        // Remove album from Artists' list of albums
+        List<Artist.ShortInfo> artistList = album.getArtists();
+        if (artistList != null) {
+            artistList.stream()
+                    .map(Artist.ShortInfo::getId)
+                    .filter(Objects::nonNull)
+                    .map(artistDao::getById) // Map from artist short info to actual artist
+                    .filter(artist -> artist.getAlbums() != null)
+                    .peek(artist -> {
+                        List<Album.ShortInfo> toDelete = artist.getAlbums().stream()
+                                .filter(Objects::nonNull)
+                                .filter(a -> id.equals(a.getId()))
+                                .collect(toList());
+
+                        artist.getAlbums().removeAll(toDelete);
+                    })
+                    .forEach(artist -> artistDao.update(artist.getId(), artist));
         }
 
         albumDao.deleteById(id);
@@ -297,20 +320,34 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         }
 
         Album album = dtoToAlbum(albumDto);
+
+
+        if (album.getArtists() != null) {
+            List<Artist.ShortInfo> actualArtistsInfo = album.getArtists().stream()
+                    .filter(Objects::nonNull)
+                    .filter(artist -> artist.getId() != null)
+                    .map(artist -> artistDao.getById(artist.getId())) // fetch actual Artist
+                    .filter(Objects::nonNull)
+                    .map(Artist::getShortInfo)
+                    .collect(toList());
+
+            album.setArtists(actualArtistsInfo);
+        }
+
         slugService.setSlugForAlbum(album);
         Album createdAlbum = albumDao.create(album);
 
         if (album.getArtists() != null) {
             album.getArtists().stream()
-                    .filter(artist -> artist.getId() != null)
-                    .map(artist -> artistDao.getById(artist.getId())) // fetch actual Artist
+                    .filter(Objects::nonNull)
+                    .map(Artist.ShortInfo::getId)
+                    .map(artistDao::getById)
                     .peek(artist -> artist.addAlbum(createdAlbum.getShortInfo()))
                     .forEach(artist -> artistDao.update(artist.getId(), artist));
         }
 
         return albumToDto(createdAlbum);
     }
-
 
     /**
      * {@inheritDoc}
@@ -614,7 +651,7 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     public List<AlbumDto> getRecommendedById(String albumId, Long limit) {
 
         long actualLimit = (limit != null && limit > 0 && limit < MAX_RECOMMENDED_LIMIT) ? limit : MAX_RECOMMENDED_LIMIT;
-        int maxOffset = (int) (albumDao.getTotalNum() - actualLimit);
+        int maxOffset = (int) (statisticService.getTotalAlbums() - actualLimit);
         int offset = new Random().nextInt(maxOffset);
 
         List<Album> albums = albumDao.getList(offset, actualLimit, ALBUM_SHORT_INFO_FIELDS);

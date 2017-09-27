@@ -1,0 +1,71 @@
+<app-bar
+  [sourceURL]="sourceURL"
+>
+</app-bar>
+<div class="container">
+  <div class="col-md-2">
+    <div class="list-group">
+      <a
+        href="#"
+        class="list-group-item"
+        *ngFor="let option of searchOptions"
+        [ngClass]="{'active': option.value === selectedSearchOption}"
+        (click)="onSelectSearchOption($event, option.value)"
+      >
+        {{option.label}}
+      </a>
+    </div>
+  </div>
+
+  <div class="col-md-9" *ngIf="searchResults">
+
+    <div class="container controls-container">
+      <div>
+        <ngb-pagination
+          [collectionSize]="totalNumber"
+          [page]="pageNumber"
+          [maxSize]="5"
+          [pageSize]="9"
+          (pageChange)="onChangePage($event)"
+        ></ngb-pagination>
+      </div>
+    </div>
+    <div style="display: flex">
+      <div class="container albums-container">
+        <div class="row">
+          <div *ngFor="let searchResult of searchResults" class="col-md-4">
+
+            <div *ngIf="searchResult.type == 'artist'" class="album-container" style="padding-top: 15px">
+              <div style="text-align: center">
+                <a routerLink="/artist/{{searchResult.slug}}">
+                  <img src={{searchResult.imageURL}} width="150" height="150"
+                       onerror="this.src='https://s.discogs.com/images/default-artist.png'">
+                </a>
+              </div>
+              <div class="album-title" style="text-align: center">
+                <span>Artist:</span><br/>
+                <a routerLink="/artist/{{searchResult.slug}}">{{searchResult.name}}</a>
+              </div>
+            </div>
+
+            <div *ngIf="searchResult.type == 'album'" class="album-container" style="padding-top: 15px">
+              <div style="text-align: center">
+                <a routerLink="/album/{{searchResult.slug}}">
+                  <img src={{searchResult.imageURL}} width="150" height="150"
+                       onerror="this.src='https://s.discogs.com/images/default-release.png'">
+                </a>
+              </div>
+              <div class="album-title" style="text-align: center">
+                <span>Album:</span><br/>
+                <a routerLink="/album/{{searchResult.slug}}">{{searchResult.name}}</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>

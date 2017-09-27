@@ -86,6 +86,8 @@ public class Artist {
     @JsonProperty("end_date")
     private JsonNumberLong endDate;
 
+    private boolean deleted;
+
     public Set<ArtistUrlLink> getLinks() {
         return links;
     }
@@ -250,6 +252,14 @@ public class Artist {
     public Artist setArtistCreditId(String artistCreditId) {
         this.artistCreditId = artistCreditId;
         return this;
+    }
+
+    public boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public ShortInfo getShortInfo() {

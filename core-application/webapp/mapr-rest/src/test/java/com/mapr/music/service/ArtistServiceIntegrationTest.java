@@ -3,9 +3,11 @@ package com.mapr.music.service;
 import com.mapr.music.dao.AlbumDao;
 import com.mapr.music.dao.ArtistDao;
 import com.mapr.music.dao.MaprDbDao;
+import com.mapr.music.dao.StatisticDao;
 import com.mapr.music.dao.impl.AlbumDaoImpl;
 import com.mapr.music.dao.impl.ArtistDaoImpl;
 import com.mapr.music.dao.impl.MaprDbDaoImpl;
+import com.mapr.music.dao.impl.StatisticDaoImpl;
 import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.exception.ValidationException;
@@ -35,12 +37,16 @@ public class ArtistServiceIntegrationTest {
         return ShrinkWrap.create(WebArchive.class)
                 .addClasses(
                         ArtistService.class, ArtistServiceImpl.class, ArtistDao.class, ArtistDaoImpl.class,
-                        AlbumDao.class, AlbumDaoImpl.class, MaprDbDao.class, MaprDbDaoImpl.class, SlugService.class)
+                        AlbumDao.class, AlbumDaoImpl.class, MaprDbDao.class, MaprDbDaoImpl.class, SlugService.class,
+                        StatisticServiceMock.class, StatisticDao.class, StatisticDaoImpl.class)
                 .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
     @Inject
     ArtistService artistService;
+
+    @Inject
+    ArtistDao artistDao;
 
     ArtistDto firstSample;
     ArtistDto secondSample;
@@ -66,9 +72,9 @@ public class ArtistServiceIntegrationTest {
 
     @After
     public void cleanup() {
-        artistService.deleteArtistById(firstSample.getId());
-        artistService.deleteArtistById(secondSample.getId());
-        artistService.deleteArtistById(thirdSample.getId());
+        artistDao.deleteById(firstSample.getId());
+        artistDao.deleteById(secondSample.getId());
+        artistDao.deleteById(thirdSample.getId());
     }
 
     @Test
@@ -152,7 +158,7 @@ public class ArtistServiceIntegrationTest {
     }
 
     @Test(expected = Exception.class)
-    public void should_delete() {
+    public void should_not_get_deleted() {
 
         ArtistDto sample = new ArtistDto();
         sample.setName("Sample");
@@ -160,7 +166,7 @@ public class ArtistServiceIntegrationTest {
         ArtistDto created = artistService.createArtist(sample);
         assertNotNull(created);
 
-        artistService.deleteArtistById(sample.getId());
+        artistDao.deleteById(sample.getId());
         artistService.getArtistById(sample.getId());
     }
 

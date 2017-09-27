@@ -38,7 +38,8 @@
               class="artist-album-item"
             >
               <div>
-                <img src="{{album.coverImageURL}}" width="50" height="50" onerror="this.src='https://s.discogs.com/images/default-release.png'">
+                <img src="{{album.coverImageURL}}" width="50" height="50"
+                     onerror="this.src='https://s.discogs.com/images/default-release.png'">
               </div>
               <div
                 class="artist-album-item-title"
@@ -92,13 +93,6 @@
       >
         <div class="btn btn-primary" data-toggle="modal" data-target="#deleteModal">
           Delete
-        </div>
-      </div>
-      <div
-        *ngIf="isAuthenticated | async"
-      >
-        <div class="btn btn-primary" routerLink="/add/artist">
-          Add new
         </div>
       </div>
     </div>

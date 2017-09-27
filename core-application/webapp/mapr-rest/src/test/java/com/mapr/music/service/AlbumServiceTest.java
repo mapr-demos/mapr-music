@@ -24,8 +24,9 @@ public class AlbumServiceTest {
         AlbumDao albumDao = mock(AlbumDao.class);
         LanguageDao languageDao = mock(LanguageDao.class);
         SlugService slugService = mock(SlugService.class);
+        StatisticService statisticService = mock(StatisticService.class);
         MaprDbDao<Artist> artistDao = mock(MaprDbDao.class);
-        AlbumService albumService = new AlbumServiceImpl(albumDao, artistDao, languageDao, slugService);
+        AlbumService albumService = new AlbumServiceImpl(albumDao, artistDao, languageDao, slugService, statisticService);
         albumService.getAlbumsPage(-1L);
     }
 
@@ -36,8 +37,9 @@ public class AlbumServiceTest {
         AlbumDao albumDao = mock(AlbumDao.class);
         LanguageDao languageDao = mock(LanguageDao.class);
         SlugService slugService = mock(SlugService.class);
+        StatisticService statisticService = mock(StatisticService.class);
         MaprDbDao<Artist> artistDao = mock(MaprDbDao.class);
-        AlbumService albumService = new AlbumServiceImpl(albumDao, artistDao, languageDao, slugService);
+        AlbumService albumService = new AlbumServiceImpl(albumDao, artistDao, languageDao, slugService, statisticService);
         albumService.getAlbumById("");
     }
 

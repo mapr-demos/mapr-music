@@ -12,6 +12,11 @@
         (pageChange)="onChangePage($event)"
       ></ngb-pagination>
     </div>
+    <div  class="sort-selector-container" *ngIf = "isAuthenticated | async">
+      <div class="btn btn-primary" routerLink="/add/artist">
+        Add new
+      </div>
+    </div>
   </div>
   <div style="display: flex">
     <div class="container albums-container">

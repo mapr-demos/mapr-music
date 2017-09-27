@@ -141,6 +141,9 @@ public class Artist {
     @JsonProperty("end_date")
     private Long endDate;
 
+    @JsonProperty("deleted")
+    private Boolean deleted;
+
     @JsonIgnore
     private ShortInfo shortInfo;
 
@@ -284,5 +287,13 @@ public class Artist {
     @Override
     public String toString() {
         return getShortInfo().toString();
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }

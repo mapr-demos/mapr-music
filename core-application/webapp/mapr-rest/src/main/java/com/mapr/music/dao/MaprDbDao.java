@@ -90,13 +90,6 @@ public interface MaprDbDao<T> {
     T getById(String id, String... fields);
 
     /**
-     * Counts total number of documents.
-     *
-     * @return total number of documents.
-     */
-    long getTotalNum();
-
-    /**
      * Allows to specify action via {@link OjaiStoreAction} to access the OJAI store.
      *
      * @param storeAction specifies action which will be performed on store.
