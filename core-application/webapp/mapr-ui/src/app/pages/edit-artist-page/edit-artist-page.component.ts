@@ -14,6 +14,7 @@ export class EditArtistPage implements OnInit {
   }
 
   artist: Artist = null;
+  errors: Array<string> = [];
 
   ngOnInit(): void {
     this.activatedRoute.paramMap
@@ -27,9 +28,32 @@ export class EditArtistPage implements OnInit {
   }
 
   onArtistSave() {
+
+    this.clearErrors();
+    if (!this.artistValid()) {
+      return;
+    }
+
     this.artistService.updateArtist(this.artist)
       .then((artist) => {
         this.router.navigateByUrl(`artist/${artist.slug}`);
       });
+  }
+
+  artistValid(): boolean {
+
+    if (!this.artist.name) {
+      this.errors.push("Name is required");
+    }
+
+    if (this.errors && this.errors.length > 0) {
+      return false;
+    }
+
+    return true;
+  }
+
+  clearErrors() {
+    this.errors = [];
   }
 }

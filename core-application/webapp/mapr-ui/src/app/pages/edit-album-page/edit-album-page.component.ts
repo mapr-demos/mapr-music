@@ -15,6 +15,7 @@ export class EditAlbumPage implements OnInit{
   ) {}
 
   album: Album = null;
+  errors: Array<string> = [];
 
   ngOnInit(): void {
     this.activatedRoute.paramMap
@@ -28,9 +29,40 @@ export class EditAlbumPage implements OnInit{
   }
 
   onAlbumSave() {
+
+    this.clearErrors();
+    if (!this.albumValid()) {
+      return;
+    }
+
     this.albumService.updateAlbum(this.album)
       .then((album) => {
         this.router.navigateByUrl(`album/${album.slug}`);
       });
+  }
+
+  albumValid(): boolean {
+
+    if (!this.album.title) {
+      this.errors.push("Title is required");
+    }
+
+    if (!this.album.language) {
+      this.errors.push("Language is required");
+    }
+
+    if (!this.album.artists || this.album.artists.length == 0) {
+      this.errors.push("Ar least one artist must be specified");
+    }
+
+    if (this.errors && this.errors.length > 0) {
+      return false;
+    }
+
+    return true;
+  }
+
+  clearErrors() {
+    this.errors = [];
   }
 }
