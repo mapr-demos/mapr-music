@@ -25,27 +25,8 @@ public class StatisticServiceMock implements StatisticService {
     }
 
     @Override
-    public void incrementAlbums() {
-        this.actualService.incrementAlbums();
-    }
-
-    @Override
-    public void decrementAlbums() {
-        this.actualService.decrementAlbums();
-    }
-
-    @Override
     public long getTotalArtists() {
         return this.actualService.getTotalArtists();
     }
 
-    @Override
-    public void incrementArtists() {
-        this.actualService.incrementAlbums();
-    }
-
-    @Override
-    public void decrementArtists() {
-        this.actualService.decrementArtists();
-    }
 }

@@ -130,35 +130,31 @@ public class StatisticServiceImpl implements StatisticService {
     }
 
     @Override
-    public void incrementAlbums() {
-        Statistic albumsStatistic = getStatisticForTable(ALBUMS_TABLE_NAME);
-        albumsStatistic.setDocumentNumber(albumsStatistic.getDocumentNumber() + 1);
-        statisticDao.update(ALBUMS_TABLE_NAME, albumsStatistic);
-    }
-
-    @Override
-    public void decrementAlbums() {
-        Statistic albumsStatistic = getStatisticForTable(ALBUMS_TABLE_NAME);
-        albumsStatistic.setDocumentNumber(albumsStatistic.getDocumentNumber() - 1);
-        statisticDao.update(ALBUMS_TABLE_NAME, albumsStatistic);
-    }
-
-    @Override
     public long getTotalArtists() {
         Statistic artistsStatistic = getStatisticForTable(ARTISTS_TABLE_NAME);
         return artistsStatistic.getDocumentNumber();
     }
 
-    @Override
-    public void incrementArtists() {
+    private void incrementAlbums() {
+        Statistic albumsStatistic = getStatisticForTable(ALBUMS_TABLE_NAME);
+        albumsStatistic.setDocumentNumber(albumsStatistic.getDocumentNumber() + 1);
+        statisticDao.update(ALBUMS_TABLE_NAME, albumsStatistic);
+    }
+
+    private void decrementAlbums() {
+        Statistic albumsStatistic = getStatisticForTable(ALBUMS_TABLE_NAME);
+        albumsStatistic.setDocumentNumber(albumsStatistic.getDocumentNumber() - 1);
+        statisticDao.update(ALBUMS_TABLE_NAME, albumsStatistic);
+    }
+
+    private void incrementArtists() {
 
         Statistic artistsStatistic = getStatisticForTable(ARTISTS_TABLE_NAME);
         artistsStatistic.setDocumentNumber(artistsStatistic.getDocumentNumber() + 1);
         statisticDao.update(ARTISTS_TABLE_NAME, artistsStatistic);
     }
 
-    @Override
-    public void decrementArtists() {
+    private void decrementArtists() {
         Statistic artistsStatistic = getStatisticForTable(ARTISTS_TABLE_NAME);
         artistsStatistic.setDocumentNumber(artistsStatistic.getDocumentNumber() - 1);
         statisticDao.update(ARTISTS_TABLE_NAME, artistsStatistic);
