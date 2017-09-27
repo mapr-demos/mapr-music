@@ -161,7 +161,7 @@ const mapToAlbumRequest = ({
   format,
   slug,
   released_date: releasedDate.getTime(),
-  language: language.code,
+  language: (language) ? language.code : null,
   artists: artists.map(mapToArtistRequest),
   tracks: trackList.map(mapToTrackRequest)
 });

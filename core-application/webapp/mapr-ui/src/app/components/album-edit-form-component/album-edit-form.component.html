@@ -3,8 +3,23 @@
     <div class="row">
       <div class="col-md-4 form-group">
         <label>Album Name:</label>
-        <input class="form-control" [(ngModel)]="album.title" placeholder="Album name">
+        <input class="form-control" [(ngModel)]="album.title" required minlength="4" placeholder="Album name" #name="ngModel">
+
+        <div *ngIf="name.invalid && (name.dirty || name.touched)"
+             style="color: darkred">
+
+          <div *ngIf="name.errors.required">
+            Name is required.
+          </div>
+          <div *ngIf="name.errors.minlength">
+            Name must be at least 4 characters long.
+          </div>
+
+        </div>
+
       </div>
+
+
       <div class="col-md-4 form-group">
         <label>Date:</label>
         <input class="form-control" id="date-selector">
