@@ -22,7 +22,10 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -45,8 +48,6 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             "name",
             "slug_name",
             "slug_postfix",
-            "genre",
-            "style",
             "barcode",
             "format",
             "country",
@@ -637,30 +638,6 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
                 .map(this::albumToDto)
                 .collect(Collectors.toList());
     }
-
-    /**
-     * FIXME
-     * {@inheritDoc}
-     *
-     * @param albumId identifier of album, for which recommendations will be returned.
-     * @param limit   specifies number of albums, which will be returned. Can be overridden by actual service
-     *                implementation.
-     * @return list of recommended albums.
-     */
-    @Override
-    public List<AlbumDto> getRecommendedById(String albumId, Long limit) {
-
-        long actualLimit = (limit != null && limit > 0 && limit < MAX_RECOMMENDED_LIMIT) ? limit : MAX_RECOMMENDED_LIMIT;
-        int maxOffset = (int) (statisticService.getTotalAlbums() - actualLimit);
-        int offset = new Random().nextInt(maxOffset);
-
-        List<Album> albums = albumDao.getList(offset, actualLimit, ALBUM_SHORT_INFO_FIELDS);
-
-        return albums.stream()
-                .map(this::albumToDto)
-                .collect(Collectors.toList());
-    }
-
 
     private AlbumDto albumToDto(Album album) {
 

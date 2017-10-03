@@ -5,8 +5,8 @@ import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.dto.TrackDto;
-import com.mapr.music.model.Album;
 import com.mapr.music.service.AlbumService;
+import com.mapr.music.service.RecommendationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -30,6 +30,9 @@ public class AlbumEndpoint {
 
     @Inject
     private AlbumService albumService;
+
+    @Inject
+    private RecommendationService recommendationService;
 
     @GET
     @Path("{id}")
@@ -146,7 +149,9 @@ public class AlbumEndpoint {
     @GET
     @Path("{id}/recommended/")
     @ApiOperation(value = "Get list of recommended albums for the specified album id")
-    public List<AlbumDto> getRecommended(@PathParam("id") String albumId, @QueryParam("limit") Long limit) {
-        return albumService.getRecommendedById(albumId, limit);
+    public List<AlbumDto> getRecommended(@Context SecurityContext sec, @PathParam("id") String albumId,
+                                         @QueryParam("limit") Integer limit) {
+
+        return recommendationService.getRecommendedAlbums(albumId, sec.getUserPrincipal(), limit);
     }
 }

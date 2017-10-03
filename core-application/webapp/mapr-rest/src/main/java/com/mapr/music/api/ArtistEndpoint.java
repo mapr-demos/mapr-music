@@ -4,6 +4,7 @@ import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.service.ArtistService;
+import com.mapr.music.service.RecommendationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -26,6 +27,9 @@ public class ArtistEndpoint {
 
     @Inject
     private ArtistService artistService;
+
+    @Inject
+    private RecommendationService recommendationService;
 
     @GET
     @Path("{id}")
@@ -91,8 +95,10 @@ public class ArtistEndpoint {
     @GET
     @Path("{id}/recommended/")
     @ApiOperation(value = "Get list of recommended artists for the specified artist id")
-    public List<ArtistDto> getRecommended(@PathParam("id") String artistId, @QueryParam("limit") Long limit) {
-        return artistService.getRecommendedById(artistId, limit);
+    public List<ArtistDto> getRecommended(@Context SecurityContext sec, @PathParam("id") String artistId,
+                                          @QueryParam("limit") Integer limit) {
+
+        return recommendationService.getRecommendedArtists(artistId, sec.getUserPrincipal(), limit);
     }
 
 }
