@@ -14,6 +14,7 @@ public class OptionParser {
         options.addRequiredOption("s", "src", true, "Specifies Music Brainz dump directory.");
         options.addRequiredOption("d", "dst", true, "Specifies Dataset output directory.");
         options.addOption("n", "num", true, "Specifies number of artist files. Default value is " + DumpConverter.DEFAULT_NUMBER_OF_ARTIST_DOCS);
+        options.addOption("u", "users", true, "Specifies number of users, which will be used for rating generation. Default value is " + DumpConverter.DEFAULT_NUMBER_OF_USERS);
         options.addOption("c", "chosen", false, "When specified only data with images will be converted. Execution time will be raised.");
         options.addOption("h", "help", false, "Prints usage information.");
     }
@@ -48,6 +49,23 @@ public class OptionParser {
                 }
 
                 dumpConverter.setNumberOfArtists(numberOfArtistRecords);
+            }
+
+            if (cmd.hasOption("u")) {
+                Long numberOfUsers = null;
+                try {
+                    numberOfUsers = Long.parseLong(cmd.getOptionValue("u"));
+                } catch (NumberFormatException e) {
+                    log.error("Failed to parse option as number");
+                    help();
+                }
+
+                if (numberOfUsers != null && numberOfUsers <= 0) {
+                    log.error("Number of users must be greater than zero");
+                    help();
+                }
+
+                dumpConverter.setNumberOfUsers(numberOfUsers);
             }
 
             dumpConverter.convert();

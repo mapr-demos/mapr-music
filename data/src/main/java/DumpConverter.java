@@ -2,6 +2,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import model.Album;
 import model.Artist;
 import model.Language;
+import model.Rating;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import parser.AlbumParser;
@@ -11,15 +12,21 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 public class DumpConverter {
 
+    public static final long DEFAULT_NUMBER_OF_USERS = 30_000;
     public static final long DEFAULT_NUMBER_OF_ARTIST_DOCS = 10_000;
 
     private static final String ARTISTS_DIRECTORY_NAME = "artists";
     private static final String ALBUMS_DIRECTORY_NAME = "albums";
     private static final String LANGUAGES_DIRECTORY_NAME = "languages";
+    private static final String ARTISTS_RATINGS_DIRECTORY_NAME = "ratings-artists";
+    private static final String ALBUMS_RATINGS_DIRECTORY_NAME = "ratings-albums";
     private static final String JSON_EXTENSION_NAME = ".json";
 
     private static final Logger log = LoggerFactory.getLogger(DumpConverter.class);
@@ -27,6 +34,7 @@ public class DumpConverter {
     private String dumpDirectory;
     private String destinationDirectory;
     private Long numberOfArtists;
+    private Long numberOfUsers;
     private boolean convertOnlyWithImages;
 
     private static ObjectMapper mapper = new ObjectMapper();
@@ -38,7 +46,6 @@ public class DumpConverter {
         this.dumpDirectory = dumpDirectory;
         this.destinationDirectory = destinationDirectory;
     }
-
 
     public DumpConverter(String dumpDirectory, String destinationDirectory, Long numberOfArtists, boolean convertOnlyWithImages) {
         this(dumpDirectory, destinationDirectory);
@@ -58,6 +65,10 @@ public class DumpConverter {
         this.numberOfArtists = numberOfArtists;
     }
 
+    public void setNumberOfUsers(Long numberOfUsers) {
+        this.numberOfUsers = numberOfUsers;
+    }
+
     public void setConvertOnlyWithImages(boolean convertOnlyWithImages) {
         this.convertOnlyWithImages = convertOnlyWithImages;
     }
@@ -73,6 +84,10 @@ public class DumpConverter {
             numberOfArtists = DEFAULT_NUMBER_OF_ARTIST_DOCS;
         }
 
+        if (numberOfUsers == null) {
+            numberOfUsers = DEFAULT_NUMBER_OF_USERS;
+        }
+
         long startTime = System.currentTimeMillis();
         log.info("Started converting Music Brainz dump into Dataset");
 
@@ -84,6 +99,21 @@ public class DumpConverter {
         List<Album> albums = albumParser.parseAlbums(dumpDirectory, artists, convertOnlyWithImages);
         log.info("{} albums parsed.", albums.size());
 
+        // Generate Artists ratings
+        log.info("Generating ratings for the artists. Number of users: {}", numberOfUsers);
+        Set<String> usersIds = LongStream.range(0L, numberOfUsers)
+                .mapToObj(ignored -> UUID.randomUUID().toString())
+                .collect(Collectors.toSet());
+        Set<String> artistsIds = artists.stream().map(Artist::getId).collect(Collectors.toSet());
+        Set<Rating> artistsRatings = RatingGenerator.generateRatings(artistsIds, usersIds);
+        log.info("{} artist ratings generated.", artistsRatings.size());
+
+
+        // Generate Albums ratings
+        log.info("Generating ratings for the albums. Number of users: {}", numberOfUsers);
+        Set<String> albumsIds = albums.stream().map(Album::getId).collect(Collectors.toSet());
+        Set<Rating> albumsRatings = RatingGenerator.generateRatings(albumsIds, usersIds);
+        log.info("{} albums ratings generated.", albumsRatings.size());
 
         // Save artists
         String artistsDirectoryPath = destinationDirectory + File.separator + ARTISTS_DIRECTORY_NAME;
@@ -106,6 +136,20 @@ public class DumpConverter {
 
         log.info("Saving Language JSON files to '{}'", languagesDirectoryPath);
         existingLanguages.forEach(language -> writeJson(language, languagesDirectoryPath, language.getId()));
+
+        // Save artists ratings
+        String artistsRatingsDirectoryPath = destinationDirectory + File.separator + ARTISTS_RATINGS_DIRECTORY_NAME;
+        createDirectoryIfNotExists(artistsRatingsDirectoryPath);
+
+        log.info("Saving Artists ratings JSON files to '{}'", artistsRatingsDirectoryPath);
+        artistsRatings.forEach(rating -> writeJson(rating, artistsRatingsDirectoryPath, rating.getId()));
+
+        // Save artists ratings
+        String albumsRatingsDirectoryPath = destinationDirectory + File.separator + ALBUMS_RATINGS_DIRECTORY_NAME;
+        createDirectoryIfNotExists(albumsRatingsDirectoryPath);
+
+        log.info("Saving Albums ratings JSON files to '{}'", albumsRatingsDirectoryPath);
+        albumsRatings.forEach(rating -> writeJson(rating, albumsRatingsDirectoryPath, rating.getId()));
 
         long conversionTookMillis = System.currentTimeMillis() - startTime;
         long hours = TimeUnit.MILLISECONDS.toHours(conversionTookMillis);
