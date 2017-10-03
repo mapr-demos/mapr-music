@@ -1,7 +1,6 @@
 package com.mapr.recommendation.engine
 
 import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonProperty}
-import com.mapr.db.spark._
 import com.mapr.db.spark.sql._
 import org.apache.spark.ml.feature.StringIndexer
 import org.apache.spark.mllib.recommendation.{ALS, Rating}
@@ -30,21 +29,15 @@ object RecommendationEngine extends java.io.Serializable {
 
     // Get user albums recommendations
     val albumsRecommendationsRDD = computeRecommended(sparkSession, AlbumsRatingsTableName)
-      .map(rec => (rec.id, MaprRecommendation(rec.id, rec.recommended, null)))
 
     // Get user artists recommendations
     val artistsRecommendationsRDD = computeRecommended(sparkSession, ArtistsRatingsTableName)
-      .map(rec => (rec.id, MaprRecommendation(rec.id, null, rec.recommended)))
 
-    // Merge user albums recommendations and artists recommendations into one resulting RDD
-    val resultRDD = albumsRecommendationsRDD.union(artistsRecommendationsRDD).reduceByKey((first, second) => {
-      val albums = if (first.recommendedAlbums != null) first.recommendedAlbums else second.recommendedAlbums
-      val artists = if (first.recommendedArtists != null) first.recommendedArtists else second.recommendedArtists
-      MaprRecommendation(first.id, albums, artists)
-    })
+    val albumsDataFrame = sparkSession.createDataFrame(albumsRecommendationsRDD).toDF("_id", "recommended_albums")
+    val artistsDataFrame = sparkSession.createDataFrame(artistsRecommendationsRDD).toDF("_id", "recommended_artists")
 
-    // Save user recommendations to the MapR-DB JSON table
-    resultRDD.saveToMapRDB(RecommendationsTableName)
+    val resultDataFrame = albumsDataFrame.join(artistsDataFrame, Seq("_id"))
+    resultDataFrame.saveToMapRDB(RecommendationsTableName)
 
     sparkSession.stop()
   }
@@ -89,6 +82,7 @@ object RecommendationEngine extends java.io.Serializable {
           .array
 
         Recommendation(stringUserId, documentIdsArray)
+
       })
 
     recommendationRDD
@@ -161,8 +155,8 @@ case class MaprRatingEnhanced(_id: String, user_id: String, user_id_numeric: Dou
 
 case class Recommendation(id: String, recommended: Array[String])
 
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 case class MaprRecommendation(@JsonProperty("_id") id: String,
-                              @JsonProperty("recommended_albums") recommendedAlbums: Array[String],
-                              @JsonProperty("recommended_artists") recommendedArtists: Array[String])
-
+                              @JsonProperty("recommended_albums") recommended_albums: Array[String],
+                              @JsonProperty("recommended_artists") recommended_artists: Array[String])
