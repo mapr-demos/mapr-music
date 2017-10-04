@@ -35,6 +35,9 @@ public class Album {
         @JsonProperty("cover_image_url")
         private String coverImageUrl;
 
+        @JsonProperty("rating")
+        private Double rating;
+
         public static ShortInfo valueOf(Album album) {
 
             if (album == null) {
@@ -82,6 +85,14 @@ public class Album {
 
         public void setCoverImageUrl(String coverImageUrl) {
             this.coverImageUrl = coverImageUrl;
+        }
+
+        public Double getRating() {
+            return rating;
+        }
+
+        public void setRating(Double rating) {
+            this.rating = rating;
         }
 
         @Override
@@ -152,6 +163,9 @@ public class Album {
 
     @JsonProperty("reviews")
     private List reviews;
+
+    @JsonProperty("rating")
+    private Double rating;
 
     @JsonIgnore
     private ShortInfo shortInfo;
@@ -315,6 +329,14 @@ public class Album {
 
     public void setMBID(String MBID) {
         this.MBID = MBID;
+    }
+
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
     }
 
     public ShortInfo getShortInfo() {

@@ -35,6 +35,7 @@ public class AlbumMutationBuilder {
     private static final String COUNTRY_FIELD = "country";
     private static final String ARTISTS_FIELD = "artists";
     private static final String COVER_FIELD = "cover_image_url";
+    private static final String RATING_FIELD = "rating";
 
     private static final String TRACKS_FIELD = "tracks";
     private static final String TRACK_NAME_FIELD = "name";
@@ -238,6 +239,19 @@ public class AlbumMutationBuilder {
         }
 
         this.mutation.set(fieldName, value);
+        return this;
+    }
+
+    public AlbumMutationBuilder setRating(Double rating) {
+        return setRating(rating, SET_NULL_VALUE_DEFAULT);
+    }
+
+    public AlbumMutationBuilder setRating(Double rating, boolean setNullValue) {
+        if (rating == null && !setNullValue) {
+            return this;
+        }
+
+        this.mutation.set(RATING_FIELD, rating);
         return this;
     }
 

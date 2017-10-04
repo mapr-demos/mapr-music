@@ -5,7 +5,9 @@ import com.mapr.music.dao.SortOption;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.dto.TrackDto;
+import com.mapr.music.model.AlbumRate;
 import com.mapr.music.service.AlbumService;
+import com.mapr.music.service.RateService;
 import com.mapr.music.service.RecommendationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,6 +35,9 @@ public class AlbumEndpoint {
 
     @Inject
     private RecommendationService recommendationService;
+
+    @Inject
+    private RateService rateService;
 
     @GET
     @Path("{id}")
@@ -153,5 +158,31 @@ public class AlbumEndpoint {
                                          @QueryParam("limit") Integer limit) {
 
         return recommendationService.getRecommendedAlbums(albumId, sec.getUserPrincipal(), limit);
+    }
+
+    @GET
+    @Path("{id}/rating")
+    @ApiOperation(value = "Get users rate for this album. Allowed only for authorized users.")
+    public Response getAlbumRating(@ApiParam(value = "Album's identifier", required = true) @PathParam("id") String id,
+                                   @Context SecurityContext sec) {
+
+        if (sec.getUserPrincipal() == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+        return Response.ok(rateService.getAlbumRate(sec.getUserPrincipal(), id)).build();
+    }
+
+    @PUT
+    @Path("{id}/rating")
+    @ApiOperation(value = "Saves users rate for this album. Allowed only for authorized users.")
+    public Response saveAlbumRating(@ApiParam(value = "Album's identifier", required = true) @PathParam("id") String id,
+                                     @Context SecurityContext sec, AlbumRate albumRate) {
+
+        if (sec.getUserPrincipal() == null) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+
+        return Response.ok(rateService.rateAlbum(sec.getUserPrincipal(), id, albumRate)).build();
     }
 }
