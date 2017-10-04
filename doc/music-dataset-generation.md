@@ -81,6 +81,7 @@ $ hadoop fs -copyFromLocal /path/to/output/languages /tmp/languages
 $ maprcli table create -path /apps/albums -tabletype json
 $ maprcli table create -path /apps/artists -tabletype json
 $ maprcli table create -path /apps/languages -tabletype json
+$ maprcli table create -path /apps/statistics -tabletype json
 ```
 
 * Import data into MapR-DB using `importJSON` tool:
@@ -95,6 +96,7 @@ $ mapr importJSON -idField _id -src /tmp/languages/* -dst /apps/languages -mapre
 $ maprcli table cf edit -path /apps/albums -cfname default -readperm p -writeperm p -traverseperm  p
 $ maprcli table cf edit -path /apps/artists -cfname default -readperm p -writeperm p -traverseperm  p
 $ maprcli table cf edit -path /apps/languages -cfname default -readperm p -writeperm p -traverseperm  p
+$ maprcli table cf edit -path /apps/statistics -cfname default -readperm p -writeperm p -traverseperm  p
 ```
 
 After that dataset is ready to be used by MapR-Music application.
