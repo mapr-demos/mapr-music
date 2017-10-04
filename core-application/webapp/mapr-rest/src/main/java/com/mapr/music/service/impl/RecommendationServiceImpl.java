@@ -79,8 +79,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 
         int actualLimit = (limit == null || limit < 0) ? DEFAULT_LIMIT : (limit > MAX_LIMIT) ? MAX_LIMIT : limit;
 
-        // FIXME determine user id according to the User Principal.
-        return recommendationDao.getById(ANONYMOUS_USER_ID).getRecommendedArtistsIds().stream()
+        return getRecommendationForUser(user).getRecommendedArtistsIds().stream()
                 .filter(Objects::nonNull)
                 .filter(recommendedId -> !recommendedId.equals(id))
                 .map(artistId -> artistDao.getById(artistId, ARTIST_SHORT_INFO_FIELDS))
@@ -104,8 +103,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 
         int actualLimit = (limit == null || limit < 0) ? DEFAULT_LIMIT : (limit > MAX_LIMIT) ? MAX_LIMIT : limit;
 
-        // FIXME determine user id according to the User Principal.
-        return recommendationDao.getById(ANONYMOUS_USER_ID).getRecommendedAlbumsIds().stream()
+        return getRecommendationForUser(user).getRecommendedAlbumsIds().stream()
                 .filter(Objects::nonNull)
                 .filter(recommendedId -> !recommendedId.equals(id))
                 .map(albumId -> albumDao.getById(albumId, ALBUM_SHORT_INFO_FIELDS))
@@ -116,6 +114,15 @@ public class RecommendationServiceImpl implements RecommendationService {
                 }))
                 .limit(actualLimit)
                 .collect(Collectors.toList());
+    }
+
+    private Recommendation getRecommendationForUser(Principal user) {
+
+        // There is can be such situation when user has no rates and thus has no recommendation
+        String userId = (user == null) ? ANONYMOUS_USER_ID : user.getName();
+        Recommendation userRecommendation = recommendationDao.getById(userId);
+
+        return (userRecommendation != null) ? userRecommendation : recommendationDao.getById(ANONYMOUS_USER_ID);
     }
 
     private AlbumDto albumToDto(Album album) {

@@ -1,8 +1,5 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
-import model.Album;
-import model.Artist;
-import model.Language;
-import model.Rating;
+import model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import parser.AlbumParser;
@@ -12,19 +9,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 
 public class DumpConverter {
 
-    public static final long DEFAULT_NUMBER_OF_USERS = 30_000;
+    public static final int DEFAULT_NUMBER_OF_USERS = 3_000;
     public static final long DEFAULT_NUMBER_OF_ARTIST_DOCS = 10_000;
 
     private static final String ARTISTS_DIRECTORY_NAME = "artists";
     private static final String ALBUMS_DIRECTORY_NAME = "albums";
     private static final String LANGUAGES_DIRECTORY_NAME = "languages";
+    private static final String USERS_DIRECTORY_NAME = "users";
     private static final String ARTISTS_RATINGS_DIRECTORY_NAME = "ratings-artists";
     private static final String ALBUMS_RATINGS_DIRECTORY_NAME = "ratings-albums";
     private static final String JSON_EXTENSION_NAME = ".json";
@@ -34,7 +30,7 @@ public class DumpConverter {
     private String dumpDirectory;
     private String destinationDirectory;
     private Long numberOfArtists;
-    private Long numberOfUsers;
+    private Integer numberOfUsers;
     private boolean convertOnlyWithImages;
 
     private static ObjectMapper mapper = new ObjectMapper();
@@ -65,7 +61,7 @@ public class DumpConverter {
         this.numberOfArtists = numberOfArtists;
     }
 
-    public void setNumberOfUsers(Long numberOfUsers) {
+    public void setNumberOfUsers(Integer numberOfUsers) {
         this.numberOfUsers = numberOfUsers;
     }
 
@@ -99,15 +95,16 @@ public class DumpConverter {
         List<Album> albums = albumParser.parseAlbums(dumpDirectory, artists, convertOnlyWithImages);
         log.info("{} albums parsed.", albums.size());
 
+        // Generate users
+        log.info("Generating '{}' users ...", numberOfUsers);
+        Set<User> users = UserGenerator.generate(numberOfUsers);
+
         // Generate Artists ratings
         log.info("Generating ratings for the artists. Number of users: {}", numberOfUsers);
-        Set<String> usersIds = LongStream.range(0L, numberOfUsers)
-                .mapToObj(ignored -> UUID.randomUUID().toString())
-                .collect(Collectors.toSet());
+        Set<String> usersIds = users.stream().map(User::getId).collect(Collectors.toSet());
         Set<String> artistsIds = artists.stream().map(Artist::getId).collect(Collectors.toSet());
         Set<Rating> artistsRatings = RatingGenerator.generateRatings(artistsIds, usersIds);
         log.info("{} artist ratings generated.", artistsRatings.size());
-
 
         // Generate Albums ratings
         log.info("Generating ratings for the albums. Number of users: {}", numberOfUsers);
@@ -136,6 +133,12 @@ public class DumpConverter {
 
         log.info("Saving Language JSON files to '{}'", languagesDirectoryPath);
         existingLanguages.forEach(language -> writeJson(language, languagesDirectoryPath, language.getId()));
+
+        // Save users
+        String usersDirectoryPath = destinationDirectory + File.separator + USERS_DIRECTORY_NAME;
+        createDirectoryIfNotExists(usersDirectoryPath);
+        log.info("Saving User JSON files to '{}'", usersDirectoryPath);
+        users.forEach(user -> writeJson(user, usersDirectoryPath, user.getId()));
 
         // Save artists ratings
         String artistsRatingsDirectoryPath = destinationDirectory + File.separator + ARTISTS_RATINGS_DIRECTORY_NAME;

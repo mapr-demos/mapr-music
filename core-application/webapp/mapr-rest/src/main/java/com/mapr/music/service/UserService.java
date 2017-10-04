@@ -1,14 +1,14 @@
 package com.mapr.music.service;
 
-import com.mapr.music.model.User;
+import com.mapr.music.dto.UserDto;
 
 import java.security.Principal;
 
 public interface UserService {
 
-    User register(User user);
+    UserDto register(UserDto user);
 
-    User getUserByUsername(String username);
+    UserDto getUserByUsername(String username);
 
-    User getUserByPrincipal(Principal principal);
+    UserDto getUserByPrincipal(Principal principal);
 }

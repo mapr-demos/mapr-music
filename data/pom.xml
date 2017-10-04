@@ -75,6 +75,12 @@
             <version>59.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.javafaker</groupId>
+            <artifactId>javafaker</artifactId>
+            <version>0.13</version>
+        </dependency>
+
     </dependencies>
 
     <build>
