@@ -6,6 +6,7 @@
 
 NUMBER_REGEX='^[0-9]+$'
 DEFAULT_USER_PASSWORD='music'
+PREDEFINED_USERS=('jdoe', 'sdavis', 'mdupont')
 
 #######################################################################
 # Functions definition
@@ -23,7 +24,7 @@ EOM
 
 function create_wildfly_user () {
 
-    USERNAME=$(jq -r '._id' $1)
+    USERNAME=$1
 
     ${WILDFLY_HOME}/bin/add-user.sh -a -u ${USERNAME} -p ${DEFAULT_USER_PASSWORD} -g 'user,admin' > /dev/null
 
@@ -72,13 +73,21 @@ else
     exit 1
 fi
 
+# Register predefined users
+for i in "${PREDEFINED_USERS[@]}"
+do
+    create_wildfly_user $i
+done
+echo "Predefined users '${PREDEFINED_USERS[*]}' are registered!"
+
 USERS_CREATED=0
 FILES=${USERS_PATH}/*.json
 for file in $FILES
 do
     if [ -f "$file" ]; then
         if [ "$LIMIT" -eq -1 ] || [ "$USERS_CREATED" -lt "$LIMIT" ]; then
-            create_wildfly_user $file
+            USERNAME=$(jq -r '._id' $file)
+            create_wildfly_user $USERNAME
             USERS_CREATED=$((USERS_CREATED + 1))
         fi
     fi
