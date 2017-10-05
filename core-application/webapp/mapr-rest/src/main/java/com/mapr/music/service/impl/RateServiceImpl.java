@@ -46,7 +46,7 @@ public class RateServiceImpl implements RateService {
         }
 
         if (!albumDao.exists(albumId)) {
-            throw new ResourceNotFoundException("Album with id '" + userId + "' not found");
+            throw new ResourceNotFoundException("Album with id '" + albumId + "' not found");
         }
 
         AlbumRate rate = albumRateDao.getRate(userId, albumId);
@@ -100,7 +100,7 @@ public class RateServiceImpl implements RateService {
 
         Album existingAlbum = albumDao.getById(albumId);
         if (existingAlbum == null) {
-            throw new ResourceNotFoundException("Album with id '" + userId + "' not found");
+            throw new ResourceNotFoundException("Album with id '" + albumId + "' not found");
         }
 
         AlbumRate possibleExistingRate = albumRateDao.getRate(userId, albumId);
@@ -164,7 +164,7 @@ public class RateServiceImpl implements RateService {
         }
 
         if (!artistDao.exists(artistId)) {
-            throw new ResourceNotFoundException("Artist with id '" + userId + "' not found");
+            throw new ResourceNotFoundException("Artist with id '" + artistId + "' not found");
         }
 
         ArtistRate rate = artistRateDao.getRate(userId, artistId);
@@ -218,7 +218,7 @@ public class RateServiceImpl implements RateService {
 
         Artist existingArtist = artistDao.getById(artistId);
         if (existingArtist == null) {
-            throw new ResourceNotFoundException("Artist with id '" + userId + "' not found");
+            throw new ResourceNotFoundException("Artist with id '" + artistId + "' not found");
         }
 
         ArtistRate possibleExistingRate = artistRateDao.getRate(userId, artistId);
