@@ -113,6 +113,7 @@ public class DumpConverter {
         log.info("{} albums ratings generated.", albumsRatings.size());
 
         // Save artists
+        computeArtistsRates(artists, artistsRatings);
         String artistsDirectoryPath = destinationDirectory + File.separator + ARTISTS_DIRECTORY_NAME;
         createDirectoryIfNotExists(artistsDirectoryPath);
 
@@ -120,6 +121,7 @@ public class DumpConverter {
         artists.forEach(artist -> writeJson(artist, artistsDirectoryPath, artist.getMBID()));
 
         // Save albums
+        computeAlbumsRates(albums, albumsRatings);
         String albumsDirectoryPath = destinationDirectory + File.separator + ALBUMS_DIRECTORY_NAME;
         createDirectoryIfNotExists(albumsDirectoryPath);
 
@@ -165,6 +167,28 @@ public class DumpConverter {
                         "created. Resulting dataset can be found at '{}'", conversionTookFormatted, artists.size(),
                 albums.size(), existingLanguages.size(), destinationDirectory);
 
+    }
+
+    private static void computeArtistsRates(List<Artist> artists, Set<Rating> ratings) {
+        artists.forEach(artist -> {
+            Set<Rating> artistRates = ratings.stream()
+                    .filter(rating -> artist.getId().equals(rating.getDocumentId()))
+                    .collect(Collectors.toSet());
+
+            double rate = artistRates.stream().mapToDouble(Rating::getRating).sum() / artistRates.size();
+            artist.setRating(rate);
+        });
+    }
+
+    private static void computeAlbumsRates(List<Album> albums, Set<Rating> ratings) {
+        albums.forEach(album -> {
+            Set<Rating> albumRates = ratings.stream()
+                    .filter(rating -> album.getId().equals(rating.getDocumentId()))
+                    .collect(Collectors.toSet());
+
+            double rate = albumRates.stream().mapToDouble(Rating::getRating).sum() / albumRates.size();
+            album.setRating(rate);
+        });
     }
 
     private static void writeJson(Object value, String directoryPath, String id) {

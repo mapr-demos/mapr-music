@@ -32,6 +32,11 @@ public class Artist {
         public String getProfileImageUrl() {
             return Artist.this.getProfileImageUrl();
         }
+
+        @JsonGetter("rating")
+        public Double getRating() {
+            return Artist.this.getRating();
+        }
     }
 
     @JsonIgnore
@@ -85,6 +90,9 @@ public class Artist {
 
     @JsonProperty("end_date")
     private JsonNumberLong endDate;
+
+    @JsonProperty("rating")
+    private Double rating;
 
     private boolean deleted;
 
@@ -260,6 +268,14 @@ public class Artist {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
     }
 
     public ShortInfo getShortInfo() {
