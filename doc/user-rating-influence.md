@@ -1,8 +1,9 @@
 # Users ratings influence
 
-To check how users ratings influence on the recommendations, produced by [Recommendation engine](todo) we will create 
-simple script, which initializes ratings data for Recommendation engine. After that we will train Recommendation engine 
-on generated data and compare the expected result with actual one.
+To check how users ratings influence on the recommendations, produced by 
+[Recommendation engine](https://github.com/mapr-demos/mapr-music/blob/feature/Recommendation_engine/doc/creating-recommendation-engine.md) 
+we will create simple script, which initializes ratings data for Recommendation engine. After that we will train 
+Recommendation engine on generated data and compare the expected result with actual one.
 
 ### Prerequisites
 Script assumes that there is no rating data, so:
@@ -12,11 +13,12 @@ Script assumes that there is no rating data, so:
 
 ### Script purpose
 
-As described in [Creating recommendation engine](todo) document, recommendation engine produces recommendations 
-according to the specified ratings data. It uses Collaborative filtering approach, which is based on similarity; 
-the basic idea is people who liked similar items in the past will like similar items in the future. In the example below, 
-Ted likes albums A, B, and C. Carol also likes albums A, B and C. Bob likes albums A and B. To recommend an album to 
-Bob, we calculate that users who liked B also liked C, so C is a possible recommendation for Bob.
+As described in [Creating recommendation engine](https://github.com/mapr-demos/mapr-music/blob/feature/Recommendation_engine/doc/creating-recommendation-engine.md) 
+document, recommendation engine produces recommendations according to the specified ratings data. It uses Collaborative 
+filtering approach, which is based on similarity; the basic idea is people who liked similar items in the past will like 
+similar items in the future. In the example below, Ted likes albums A, B, and C. Carol also likes albums A, B and C. Bob 
+likes albums A and B. To recommend an album to Bob, we calculate that users who liked B also liked C, so C is a possible 
+recommendation for Bob.
 
 Users Item Rating Matrix:
 
