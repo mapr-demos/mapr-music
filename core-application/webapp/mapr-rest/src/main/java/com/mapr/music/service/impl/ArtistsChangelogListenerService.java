@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class ArtistsChangelogListenerService {
 
-    private static String ARTISTS_CHANGE_LOG = "/mapr_music_artists_changelog:artists";
+    private static String ARTISTS_CHANGE_LOG = "/mapr_music_changelog:artists";
     private static long KAFKA_CONSUMER_POLL_TIMEOUT = 500L;
     private static final String TEST_USER_NAME = "mapr";
     private static final String TEST_USER_GROUP = "mapr";

@@ -27,8 +27,9 @@ public class StatisticServiceImpl implements StatisticService {
     private static final String ALBUMS_TABLE_NAME = "/apps/albums";
     private static final String ARTISTS_TABLE_NAME = "/apps/artists";
 
-    private static final String ARTISTS_CHANGE_LOG = "/mapr_music_artists_changelog:artists";
-    private static final String ALBUMS_CHANGE_LOG = "/mapr_music_albums_changelog:albums";
+    private static final String MAPR_MUSIC_CHANGELOG = "/mapr_music_changelog";
+    private static final String ARTISTS_CHANGE_LOG = MAPR_MUSIC_CHANGELOG + ":artists";
+    private static final String ALBUMS_CHANGE_LOG = MAPR_MUSIC_CHANGELOG + ":albums";
 
     private static final String TEST_USER_NAME = "mapr";
     private static final String TEST_USER_GROUP = "mapr";

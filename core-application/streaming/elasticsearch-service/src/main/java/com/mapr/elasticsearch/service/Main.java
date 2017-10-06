@@ -2,18 +2,17 @@ package com.mapr.elasticsearch.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mapr.elasticsearch.service.service.MaprElasticSearchServiceBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class Main {
 
-    private static final String ARTISTS_CHANGELOG = "/mapr_music_artists_changelog:artists";
+    private static final String MAPR_MUSIC_CHANGELOG = "/mapr_music_changelog";
+    private static final String ARTISTS_CHANGELOG = MAPR_MUSIC_CHANGELOG + ":artists";
     private static final String ARTISTS_INDEX_NAME = "artists";
     private static final String ARTISTS_TYPE_NAME = "artist";
 
-    private static final String ALBUMS_CHANGELOG = "/mapr_music_albums_changelog:albums";
+    private static final String ALBUMS_CHANGELOG = MAPR_MUSIC_CHANGELOG + ":albums";
     private static final String ALBUMS_INDEX_NAME = "albums";
     private static final String ALBUMS_TYPE_NAME = "album";
 
@@ -21,7 +20,6 @@ public class Main {
     private static final int PORT = 9300;
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws IOException {
 
