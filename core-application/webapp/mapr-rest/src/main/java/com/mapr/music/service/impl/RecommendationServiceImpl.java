@@ -83,6 +83,7 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .filter(Objects::nonNull)
                 .filter(recommendedId -> !recommendedId.equals(id))
                 .map(artistId -> artistDao.getById(artistId, ARTIST_SHORT_INFO_FIELDS))
+                .filter(Objects::nonNull)
                 .map(this::artistToDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
                     Collections.shuffle(collected);
@@ -107,6 +108,7 @@ public class RecommendationServiceImpl implements RecommendationService {
                 .filter(Objects::nonNull)
                 .filter(recommendedId -> !recommendedId.equals(id))
                 .map(albumId -> albumDao.getById(albumId, ALBUM_SHORT_INFO_FIELDS))
+                .filter(Objects::nonNull)
                 .map(this::albumToDto)
                 .collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
                     Collections.shuffle(collected);

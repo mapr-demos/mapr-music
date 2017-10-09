@@ -1,34 +1,25 @@
 package com.mapr.music.service;
 
-import com.mapr.music.model.AlbumRate;
-import com.mapr.music.model.ArtistRate;
+import com.mapr.music.dto.RateDto;
 
 import java.security.Principal;
 
 public interface RateService {
 
-    AlbumRate getAlbumRate(Principal user, String albumId);
+    RateDto getAlbumRate(Principal user, String albumId);
 
-    AlbumRate rateAlbum(AlbumRate albumRate);
+    RateDto rateAlbum(String userId, String albumId, RateDto albumRate);
 
-    AlbumRate rateAlbum(String albumId, AlbumRate albumRate);
+    RateDto rateAlbum(String userId, String albumId, double rate);
 
-    AlbumRate rateAlbum(String userId, String albumId, AlbumRate albumRate);
+    RateDto rateAlbum(Principal user, String albumId, RateDto albumRate);
 
-    AlbumRate rateAlbum(String userId, String albumId, double rate);
+    RateDto getArtistRate(Principal user, String artistId);
 
-    AlbumRate rateAlbum(Principal user, String albumId, AlbumRate albumRate);
+    RateDto rateArtist(String userId, String artistId, RateDto artistRate);
 
-    ArtistRate getArtistRate(Principal user, String artistId);
+    RateDto rateArtist(String userId, String artistId, double rate);
 
-    ArtistRate rateArtist(ArtistRate artistRate);
-
-    ArtistRate rateArtist(String artistId, ArtistRate artistRate);
-
-    ArtistRate rateArtist(String userId, String artistId, ArtistRate artistRate);
-
-    ArtistRate rateArtist(String userId, String artistId, double rate);
-
-    ArtistRate rateArtist(Principal user, String artistId, ArtistRate artistRate);
+    RateDto rateArtist(Principal user, String artistId, RateDto artistRate);
 
 }

@@ -1,12 +1,15 @@
 package com.mapr.music.service.impl;
 
 import com.mapr.music.dao.*;
+import com.mapr.music.dto.RateDto;
 import com.mapr.music.exception.ResourceNotFoundException;
 import com.mapr.music.model.*;
 import com.mapr.music.service.RateService;
+import org.apache.commons.beanutils.PropertyUtilsBean;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
@@ -34,10 +37,10 @@ public class RateServiceImpl implements RateService {
     }
 
     @Override
-    public AlbumRate getAlbumRate(Principal user, String albumId) {
+    public RateDto getAlbumRate(Principal user, String albumId) {
 
         if (user == null || user.getName() == null || user.getName().isEmpty()) {
-            return new AlbumRate();
+            return new RateDto();
         }
 
         String userId = user.getName();
@@ -50,31 +53,12 @@ public class RateServiceImpl implements RateService {
         }
 
         AlbumRate rate = albumRateDao.getRate(userId, albumId);
-        return (rate != null) ? rate : new AlbumRate();
+        return (rate != null) ? albumRateToDto(rate) : new RateDto();
     }
 
-    @Override
-    public AlbumRate rateAlbum(AlbumRate albumRate) {
-
-        if (albumRate == null) {
-            throw new IllegalArgumentException("Album rate can not be null");
-        }
-
-        return rateAlbum(albumRate.getUserId(), albumRate.getDocumentId(), albumRate.getRating());
-    }
 
     @Override
-    public AlbumRate rateAlbum(String albumId, AlbumRate albumRate) {
-
-        if (albumRate == null) {
-            throw new IllegalArgumentException("Album rate can not be null");
-        }
-
-        return rateAlbum(albumRate.getUserId(), albumId, albumRate.getRating());
-    }
-
-    @Override
-    public AlbumRate rateAlbum(String userId, String albumId, AlbumRate albumRate) {
+    public RateDto rateAlbum(String userId, String albumId, RateDto albumRate) {
 
         if (albumRate == null) {
             throw new IllegalArgumentException("Album rate can not be null");
@@ -84,7 +68,7 @@ public class RateServiceImpl implements RateService {
     }
 
     @Override
-    public AlbumRate rateAlbum(String userId, String albumId, double rate) {
+    public RateDto rateAlbum(String userId, String albumId, double rate) {
 
         if (userId == null || userId.isEmpty()) {
             throw new IllegalArgumentException("User id can not be empty");
@@ -108,7 +92,7 @@ public class RateServiceImpl implements RateService {
             possibleExistingRate.setRating(rate);
             AlbumRate newAlbumRate = albumRateDao.update(possibleExistingRate.getId(), possibleExistingRate);
             recomputeAlbumRate(newAlbumRate, existingAlbum);
-            return newAlbumRate;
+            return albumRateToDto(newAlbumRate);
         }
 
         AlbumRate albumRate = new AlbumRate();
@@ -119,7 +103,7 @@ public class RateServiceImpl implements RateService {
         AlbumRate newAlbumRate = albumRateDao.create(albumRate);
         recomputeAlbumRate(newAlbumRate, existingAlbum);
 
-        return newAlbumRate;
+        return albumRateToDto(newAlbumRate);
     }
 
     private void recomputeAlbumRate(AlbumRate newAlbumRate, Album existingAlbum) {
@@ -137,7 +121,7 @@ public class RateServiceImpl implements RateService {
     }
 
     @Override
-    public AlbumRate rateAlbum(Principal user, String albumId, AlbumRate albumRate) {
+    public RateDto rateAlbum(Principal user, String albumId, RateDto albumRate) {
 
         if (user == null) {
             throw new IllegalArgumentException("User principal can not be null");
@@ -152,10 +136,10 @@ public class RateServiceImpl implements RateService {
 
 
     @Override
-    public ArtistRate getArtistRate(Principal user, String artistId) {
+    public RateDto getArtistRate(Principal user, String artistId) {
 
         if (user == null || user.getName() == null || user.getName().isEmpty()) {
-            return new ArtistRate();
+            return new RateDto();
         }
 
         String userId = user.getName();
@@ -168,31 +152,11 @@ public class RateServiceImpl implements RateService {
         }
 
         ArtistRate rate = artistRateDao.getRate(userId, artistId);
-        return (rate != null) ? rate : new ArtistRate();
+        return (rate != null) ? artistRateToDto(rate) : new RateDto();
     }
 
     @Override
-    public ArtistRate rateArtist(ArtistRate artistRate) {
-
-        if (artistRate == null) {
-            throw new IllegalArgumentException("Artist rate can not be null");
-        }
-
-        return rateArtist(artistRate.getUserId(), artistRate.getDocumentId(), artistRate.getRating());
-    }
-
-    @Override
-    public ArtistRate rateArtist(String artistId, ArtistRate artistRate) {
-
-        if (artistRate == null) {
-            throw new IllegalArgumentException("Artist rate can not be null");
-        }
-
-        return rateArtist(artistRate.getUserId(), artistId, artistRate.getRating());
-    }
-
-    @Override
-    public ArtistRate rateArtist(String userId, String artistId, ArtistRate artistRate) {
+    public RateDto rateArtist(String userId, String artistId, RateDto artistRate) {
 
         if (artistRate == null) {
             throw new IllegalArgumentException("Artist rate can not be null");
@@ -202,7 +166,7 @@ public class RateServiceImpl implements RateService {
     }
 
     @Override
-    public ArtistRate rateArtist(String userId, String artistId, double rate) {
+    public RateDto rateArtist(String userId, String artistId, double rate) {
 
         if (userId == null || userId.isEmpty()) {
             throw new IllegalArgumentException("User id can not be empty");
@@ -227,7 +191,7 @@ public class RateServiceImpl implements RateService {
             ArtistRate newArtistRate = artistRateDao.update(possibleExistingRate.getId(), possibleExistingRate);
             recomputeArtistRate(newArtistRate, existingArtist);
 
-            return newArtistRate;
+            return artistRateToDto(newArtistRate);
         }
 
         ArtistRate artistRate = new ArtistRate();
@@ -239,11 +203,11 @@ public class RateServiceImpl implements RateService {
         ArtistRate newArtistRate = artistRateDao.create(artistRate);
         recomputeArtistRate(newArtistRate, existingArtist);
 
-        return newArtistRate;
+        return artistRateToDto(newArtistRate);
     }
 
     @Override
-    public ArtistRate rateArtist(Principal user, String artistId, ArtistRate artistRate) {
+    public RateDto rateArtist(Principal user, String artistId, RateDto artistRate) {
 
         if (user == null) {
             throw new IllegalArgumentException("User principal can not be null");
@@ -255,4 +219,31 @@ public class RateServiceImpl implements RateService {
 
         return rateArtist(user.getName(), artistId, artistRate.getRating());
     }
+
+    private RateDto artistRateToDto(ArtistRate artistRate) {
+
+        RateDto rateDto = new RateDto();
+        PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
+        try {
+            propertyUtilsBean.copyProperties(rateDto, artistRate);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException("Can not create artist rate Data Transfer Object", e);
+        }
+
+        return rateDto;
+    }
+
+    private RateDto albumRateToDto(AlbumRate albumRate) {
+
+        RateDto rateDto = new RateDto();
+        PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
+        try {
+            propertyUtilsBean.copyProperties(rateDto, albumRate);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException("Can not create album rate Data Transfer Object", e);
+        }
+
+        return rateDto;
+    }
+
 }
