@@ -1,7 +1,9 @@
 package com.mapr.music.service.impl;
 
 import com.mapr.music.dao.AlbumDao;
+import com.mapr.music.dao.AlbumRateDao;
 import com.mapr.music.dao.ArtistDao;
+import com.mapr.music.dao.ArtistRateDao;
 import com.mapr.music.model.Album;
 import com.mapr.music.model.Artist;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -51,6 +53,12 @@ public class ArtistsChangelogListenerService {
     @Inject
     @Named("artistDao")
     private ArtistDao artistDao;
+
+    @Inject
+    private AlbumRateDao albumRateDao;
+
+    @Inject
+    private ArtistRateDao artistRateDao;
 
     @PostConstruct
     public void init() {
@@ -127,12 +135,18 @@ public class ArtistsChangelogListenerService {
                                     })
                                     .forEach(album -> {
                                         if (album.getArtists().isEmpty()) { // Remove albums that had only one artist
+                                            // Remove Album's rates
+                                            albumRateDao.getByAlbumId(album.getId())
+                                                    .forEach(rate -> albumRateDao.deleteById(rate.getId()));
                                             albumDao.deleteById(album.getId());
                                         } else {
                                             albumDao.update(album.getId(), album);
                                         }
                                     });
                         }
+
+                        // Remove Artist's rates
+                        artistRateDao.getByArtistId(artistId).forEach(rate -> artistRateDao.deleteById(rate.getId()));
 
                         artistDao.deleteById(artistId);
                         log.info("Artist with id = '{}' is deleted", artistId);

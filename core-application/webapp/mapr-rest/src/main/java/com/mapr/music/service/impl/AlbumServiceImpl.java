@@ -1,9 +1,6 @@
 package com.mapr.music.service.impl;
 
-import com.mapr.music.dao.AlbumDao;
-import com.mapr.music.dao.LanguageDao;
-import com.mapr.music.dao.MaprDbDao;
-import com.mapr.music.dao.SortOption;
+import com.mapr.music.dao.*;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.ResourceDto;
@@ -63,16 +60,19 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     private final LanguageDao languageDao;
     private final SlugService slugService;
     private final StatisticService statisticService;
+    private final AlbumRateDao albumRateDao;
 
     @Inject
     public AlbumServiceImpl(@Named("albumDao") AlbumDao albumDao, @Named("artistDao") MaprDbDao<Artist> artistDao,
-                            LanguageDao languageDao, SlugService slugService, StatisticService statisticService) {
+                            LanguageDao languageDao, SlugService slugService, StatisticService statisticService,
+                            AlbumRateDao albumRateDao) {
 
         this.albumDao = albumDao;
         this.artistDao = artistDao;
         this.languageDao = languageDao;
         this.slugService = slugService;
         this.statisticService = statisticService;
+        this.albumRateDao = albumRateDao;
     }
 
     @Override
@@ -280,6 +280,9 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         if (album == null) {
             throw new ResourceNotFoundException("Album with id '" + id + "' not found");
         }
+
+        // Remove Album's rates
+        albumRateDao.getByAlbumId(id).forEach(albumRate -> albumRateDao.deleteById(albumRate.getId()));
 
         // Remove album from Artists' list of albums
         List<Artist.ShortInfo> artistList = album.getArtists();
