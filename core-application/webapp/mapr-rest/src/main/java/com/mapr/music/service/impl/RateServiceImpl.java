@@ -91,8 +91,8 @@ public class RateServiceImpl implements RateService {
         if (possibleExistingRate != null) {
             possibleExistingRate.setRating(rate);
             AlbumRate newAlbumRate = albumRateDao.update(possibleExistingRate.getId(), possibleExistingRate);
-            recomputeAlbumRate(newAlbumRate, existingAlbum);
-            return albumRateToDto(newAlbumRate);
+
+            return recomputeAlbumRate(newAlbumRate, existingAlbum);
         }
 
         AlbumRate albumRate = new AlbumRate();
@@ -101,23 +101,26 @@ public class RateServiceImpl implements RateService {
         albumRate.setDocumentId(albumId);
         albumRate.setRating(rate);
         AlbumRate newAlbumRate = albumRateDao.create(albumRate);
-        recomputeAlbumRate(newAlbumRate, existingAlbum);
 
-        return albumRateToDto(newAlbumRate);
+        return recomputeAlbumRate(newAlbumRate, existingAlbum);
     }
 
-    private void recomputeAlbumRate(AlbumRate newAlbumRate, Album existingAlbum) {
+    private RateDto recomputeAlbumRate(AlbumRate newAlbumRate, Album existingAlbum) {
         List<AlbumRate> albumRates = albumRateDao.getByAlbumId(newAlbumRate.getDocumentId());
         double aggregatedRating = albumRates.stream().mapToDouble(AlbumRate::getRating).sum() / albumRates.size();
         existingAlbum.setRating(aggregatedRating);
         albumDao.update(existingAlbum.getId(), existingAlbum);
+
+        return new RateDto(aggregatedRating);
     }
 
-    private void recomputeArtistRate(ArtistRate newArtistRate, Artist existingArtist) {
+    private RateDto recomputeArtistRate(ArtistRate newArtistRate, Artist existingArtist) {
         List<ArtistRate> artistRates = artistRateDao.getByArtistId(newArtistRate.getDocumentId());
         double aggregatedRating = artistRates.stream().mapToDouble(ArtistRate::getRating).sum() / artistRates.size();
         existingArtist.setRating(aggregatedRating);
         artistDao.update(existingArtist.getId(), existingArtist);
+
+        return new RateDto(aggregatedRating);
     }
 
     @Override
@@ -189,9 +192,8 @@ public class RateServiceImpl implements RateService {
         if (possibleExistingRate != null) {
             possibleExistingRate.setRating(rate);
             ArtistRate newArtistRate = artistRateDao.update(possibleExistingRate.getId(), possibleExistingRate);
-            recomputeArtistRate(newArtistRate, existingArtist);
 
-            return artistRateToDto(newArtistRate);
+            return recomputeArtistRate(newArtistRate, existingArtist);
         }
 
         ArtistRate artistRate = new ArtistRate();
@@ -201,9 +203,8 @@ public class RateServiceImpl implements RateService {
         artistRate.setRating(rate);
 
         ArtistRate newArtistRate = artistRateDao.create(artistRate);
-        recomputeArtistRate(newArtistRate, existingArtist);
 
-        return artistRateToDto(newArtistRate);
+        return recomputeArtistRate(newArtistRate, existingArtist);
     }
 
     @Override

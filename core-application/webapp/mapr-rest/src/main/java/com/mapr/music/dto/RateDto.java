@@ -11,6 +11,13 @@ public class RateDto {
     @JsonProperty("rating")
     private Double rating;
 
+    public RateDto() {
+    }
+
+    public RateDto(Double rating) {
+        this.rating = rating;
+    }
+
     public Double getRating() {
         return rating;
     }
