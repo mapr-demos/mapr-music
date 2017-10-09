@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -223,6 +224,28 @@ public class MaprElasticSearchServiceBuilder {
         }
 
         this.fields.add(fieldName);
+        return this;
+    }
+
+    /**
+     * Adds field names to the set of allowed fields. Only changes to the allowed fields will be sent to the
+     * ElasticSearch.
+     *
+     * @param fieldNames MapR-DB document's field names.
+     * @return builder.
+     */
+    public MaprElasticSearchServiceBuilder withFields(String... fieldNames) {
+
+
+        if (fieldNames == null) {
+            throw new IllegalArgumentException("Field names can not be null");
+        }
+
+        if (this.fields == null) {
+            this.fields = new HashSet<>();
+        }
+
+        this.fields.addAll(Arrays.asList(fieldNames));
         return this;
     }
 

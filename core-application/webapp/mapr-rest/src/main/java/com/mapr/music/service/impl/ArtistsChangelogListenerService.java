@@ -64,6 +64,7 @@ public class ArtistsChangelogListenerService {
     public void init() {
 
         Properties consumerProperties = new Properties();
+        consumerProperties.setProperty("group.id", "mapr.music.artists.listener");
         consumerProperties.setProperty("enable.auto.commit", "true");
         consumerProperties.setProperty("auto.offset.reset", "latest");
         consumerProperties.setProperty("key.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
