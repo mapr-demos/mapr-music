@@ -2,8 +2,8 @@
   [sourceURL]="sourceURL"
 ></app-bar>
 <div class="artist-page">
-  <div class="container">
-    <div style="display: flex;" *ngIf="artist">
+  <div *ngIf="artist" class="container">
+    <div style="display: flex;" class="col-xs-10">
       <div style="width: 100%">
         <div class="album-container">
           <div>
@@ -94,8 +94,12 @@
         </div>
 
       </div>
+
+    </div>
+
+    <div class="col-xs-2" style="display: flex; flex-direction: row">
       <div
-        style="margin: 0 10px"
+        style="padding-right: 15px"
         *ngIf="isAuthenticated | async"
       >
         <div class="btn btn-primary" routerLink="/artist/edit/{{artist.slug}}">
@@ -103,7 +107,6 @@
         </div>
       </div>
       <div
-        style="margin: 0 10px"
         *ngIf="isAuthenticated | async"
       >
         <div class="btn btn-primary" data-toggle="modal" data-target="#deleteModal">
@@ -111,6 +114,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </div>
 <div id="deleteModal" class="modal fade" role="dialog">

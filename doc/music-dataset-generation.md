@@ -89,6 +89,7 @@ $ maprcli table create -path /apps/artists_ratings -tabletype json
 $ maprcli table create -path /apps/users -tabletype json
 $ maprcli table create -path /apps/statistics -tabletype json
 $ maprcli table create -path /apps/recommendations -tabletype json
+
 ```
 
 * Import data into MapR-DB using `importJSON` tool:
