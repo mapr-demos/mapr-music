@@ -5,6 +5,7 @@ import com.mapr.music.annotation.MaprDbTable;
 import com.mapr.music.dao.MaprDbDao;
 import com.mapr.music.dao.SortOption;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.ojai.Document;
 import org.ojai.DocumentStream;
 import org.ojai.store.*;
@@ -12,10 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.security.Principal;
+import java.util.*;
 
 /**
  * Implements common methods to access MapR-DB using OJAI driver.
@@ -238,6 +237,9 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
             // Create an OJAI Document form the Java bean (there are other ways too)
             final Document createdOjaiDoc = connection.newDocument(entity);
 
+            // Set update info if available
+            getUpdateInfo().ifPresent(updateInfo -> createdOjaiDoc.set("update_info", updateInfo));
+
             // Insert the document into the OJAI store
             store.insertOrReplace(createdOjaiDoc);
 
@@ -289,6 +291,25 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
         }
 
         return document;
+    }
+
+    /**
+     * Constructs and returns map, which contains document update information.
+     *
+     * @return map, which contains document update information.
+     */
+    protected Optional<Map<String, Object>> getUpdateInfo() {
+
+        Principal principal = ResteasyProviderFactory.getContextData(Principal.class);
+        if (principal == null) {
+            return Optional.empty();
+        }
+
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("user_id", principal.getName());
+        userInfo.put("date_of_operation", System.currentTimeMillis());
+
+        return Optional.of(userInfo);
     }
 
     /**
