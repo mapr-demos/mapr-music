@@ -14,7 +14,7 @@ import javax.ws.rs.core.Response;
 /**
  * Endpoint for updating application statistics.
  */
-@Api(value = LanguageEndpoint.ENDPOINT_PATH, description = "Statistics endpoint, which allows update app statistics")
+@Api(value = StatisticsEndpoint.ENDPOINT_PATH, description = "Statistics endpoint, which allows update app statistics")
 @Path(StatisticsEndpoint.ENDPOINT_PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public class StatisticsEndpoint {
