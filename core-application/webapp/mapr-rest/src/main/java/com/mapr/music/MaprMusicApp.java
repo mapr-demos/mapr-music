@@ -41,6 +41,7 @@ public class MaprMusicApp extends Application {
         resources.add(UserEndpoint.class);
         resources.add(SearchEndpoint.class);
         resources.add(ReportingEndpoint.class);
+        resources.add(StatisticsEndpoint.class);
         resources.add(CORSFilter.class);
         resources.add(ValidationExceptionMapper.class);
         resources.add(ResourceNotFoundExceptionMapper.class);
