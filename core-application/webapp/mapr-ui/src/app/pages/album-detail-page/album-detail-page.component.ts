@@ -30,6 +30,7 @@ export class AlbumDetailPage implements OnInit {
               private router: Router) {
     this.isAuthenticated = this.authService.isAuthenticated$;
   }
+  currentRate = 0;
 
   album: Album;
   recommendedAlbums: Array<Album> = null;
@@ -134,4 +135,10 @@ export class AlbumDetailPage implements OnInit {
       });
   }
 
+  changeRating() {
+    this.albumService.changeRating(this.album, this.currentRate)
+      .then(({rating}) => {
+        this.album.rating = rating;
+      });
+  }
 }

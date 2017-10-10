@@ -21,7 +21,7 @@ export class ArtistPage implements OnInit {
               private artistService: ArtistService) {
     this.isAuthenticated = this.authService.isAuthenticated$;
   }
-
+  currentRate = 0;
   artist: Artist;
   recommendedArtists: Array<Artist> = null;
   sourceURL: string;
@@ -48,6 +48,12 @@ export class ArtistPage implements OnInit {
     this.artistService.deleteArtist(this.artist)
       .then(() => {
         this.router.navigateByUrl('');
+      });
+  }
+  changeRating() {
+    this.artistService.changeRating(this.artist, this.currentRate)
+      .then(({rating}) => {
+        this.artist.rating = rating;
       });
   }
 }

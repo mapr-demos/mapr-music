@@ -23,6 +23,7 @@ export interface Album {
   coverImageURL: string,
   format: string,
   slug: string,
+  rating: number,
   language: Language,
   trackList: Array<Track>,
   country: string,

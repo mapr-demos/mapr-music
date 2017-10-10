@@ -104,6 +104,7 @@ const mapToAlbum = ({
                       //this property is injected on ui
                       // TODO add to document
                       language,
+                      rating,
                       released_date
                     }): Album => ({
   id: _id,
@@ -112,6 +113,7 @@ const mapToAlbum = ({
   country,
   format,
   slug,
+  rating,
   releasedDate: (released_date) ? new Date(released_date) : null,
   language,
   trackList: tracks
@@ -303,5 +305,11 @@ export class AlbumService {
         console.log('Search response: ', response);
         return response.map(mapToAlbum);
       });
+  }
+
+  changeRating(album: Album, rating: number):Promise<any> {
+    return this.http
+      .put(`${this.config.apiURL}${AlbumService.SERVICE_URL}/${album.id}/rating`, {rating})
+      .toPromise();
   }
 }
