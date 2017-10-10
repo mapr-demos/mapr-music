@@ -9,6 +9,7 @@ const createNewAlbum = (): Album => ({
   coverImageURL: '',
   format: '',
   slug: '',
+  rating: 0,
   trackList: [],
   country: '',
   artists: [],
@@ -63,7 +64,7 @@ export class AddAlbumPage implements OnInit {
     if (this.errors && this.errors.length > 0) {
       return false;
     }
-   
+
     return true;
   }
 

@@ -9,7 +9,7 @@ import {Observable} from "rxjs/Observable";
 
 const PAGE_SIZE = 12;
 
-function mapToArtist({_id, name, profile_image_url, gender, slug, area, disambiguation_comment, begin_date, end_date, IPI, ISNI}): Artist {
+function mapToArtist({_id, name, profile_image_url, gender, slug, area, disambiguation_comment, begin_date, end_date, IPI, ISNI, rating}): Artist {
   return {
     id: _id,
     name,
@@ -22,6 +22,7 @@ function mapToArtist({_id, name, profile_image_url, gender, slug, area, disambig
     endDate: (end_date) ? new Date(end_date).toDateString() : null,
     IPI,
     ISNI,
+    rating,
     albums: []
   }
 }
@@ -184,5 +185,11 @@ export class ArtistService {
         console.log('Search response: ', response);
         return response.map(mapToArtist);
       });
+  }
+
+  changeRating(artist: Artist, rating: number):Promise<any> {
+    return this.http
+      .put(`${this.config.apiURL}${ArtistService.SERVICE_URL}/${artist.id}/rating`, {rating})
+      .toPromise();
   }
 }

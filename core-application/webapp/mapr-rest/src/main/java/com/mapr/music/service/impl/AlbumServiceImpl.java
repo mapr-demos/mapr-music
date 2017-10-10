@@ -1,9 +1,6 @@
 package com.mapr.music.service.impl;
 
-import com.mapr.music.dao.AlbumDao;
-import com.mapr.music.dao.LanguageDao;
-import com.mapr.music.dao.MaprDbDao;
-import com.mapr.music.dao.SortOption;
+import com.mapr.music.dao.*;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.ResourceDto;
@@ -22,7 +19,10 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -45,8 +45,6 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             "name",
             "slug_name",
             "slug_postfix",
-            "genre",
-            "style",
             "barcode",
             "format",
             "country",
@@ -62,16 +60,19 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     private final LanguageDao languageDao;
     private final SlugService slugService;
     private final StatisticService statisticService;
+    private final AlbumRateDao albumRateDao;
 
     @Inject
     public AlbumServiceImpl(@Named("albumDao") AlbumDao albumDao, @Named("artistDao") MaprDbDao<Artist> artistDao,
-                            LanguageDao languageDao, SlugService slugService, StatisticService statisticService) {
+                            LanguageDao languageDao, SlugService slugService, StatisticService statisticService,
+                            AlbumRateDao albumRateDao) {
 
         this.albumDao = albumDao;
         this.artistDao = artistDao;
         this.languageDao = languageDao;
         this.slugService = slugService;
         this.statisticService = statisticService;
+        this.albumRateDao = albumRateDao;
     }
 
     @Override
@@ -279,6 +280,9 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
         if (album == null) {
             throw new ResourceNotFoundException("Album with id '" + id + "' not found");
         }
+
+        // Remove Album's rates
+        albumRateDao.getByAlbumId(id).forEach(albumRate -> albumRateDao.deleteById(albumRate.getId()));
 
         // Remove album from Artists' list of albums
         List<Artist.ShortInfo> artistList = album.getArtists();
@@ -637,30 +641,6 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
                 .map(this::albumToDto)
                 .collect(Collectors.toList());
     }
-
-    /**
-     * FIXME
-     * {@inheritDoc}
-     *
-     * @param albumId identifier of album, for which recommendations will be returned.
-     * @param limit   specifies number of albums, which will be returned. Can be overridden by actual service
-     *                implementation.
-     * @return list of recommended albums.
-     */
-    @Override
-    public List<AlbumDto> getRecommendedById(String albumId, Long limit) {
-
-        long actualLimit = (limit != null && limit > 0 && limit < MAX_RECOMMENDED_LIMIT) ? limit : MAX_RECOMMENDED_LIMIT;
-        int maxOffset = (int) (statisticService.getTotalAlbums() - actualLimit);
-        int offset = new Random().nextInt(maxOffset);
-
-        List<Album> albums = albumDao.getList(offset, actualLimit, ALBUM_SHORT_INFO_FIELDS);
-
-        return albums.stream()
-                .map(this::albumToDto)
-                .collect(Collectors.toList());
-    }
-
 
     private AlbumDto albumToDto(Album album) {
 

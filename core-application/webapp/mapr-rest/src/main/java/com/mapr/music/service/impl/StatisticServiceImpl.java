@@ -1,5 +1,8 @@
 package com.mapr.music.service.impl;
 
+import com.mapr.music.dao.AlbumDao;
+import com.mapr.music.dao.ArtistDao;
+import com.mapr.music.dao.MaprDbDao;
 import com.mapr.music.dao.StatisticDao;
 import com.mapr.music.model.Statistic;
 import com.mapr.music.service.StatisticService;
@@ -7,6 +10,8 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.ojai.Document;
+import org.ojai.DocumentStream;
 import org.ojai.store.cdc.ChangeDataRecord;
 import org.ojai.store.cdc.ChangeDataRecordType;
 
@@ -27,8 +32,9 @@ public class StatisticServiceImpl implements StatisticService {
     private static final String ALBUMS_TABLE_NAME = "/apps/albums";
     private static final String ARTISTS_TABLE_NAME = "/apps/artists";
 
-    private static final String ARTISTS_CHANGE_LOG = "/mapr_music_artists_changelog:artists";
-    private static final String ALBUMS_CHANGE_LOG = "/mapr_music_albums_changelog:albums";
+    private static final String MAPR_MUSIC_CHANGELOG = "/mapr_music_changelog";
+    private static final String ARTISTS_CHANGE_LOG = MAPR_MUSIC_CHANGELOG + ":artists";
+    private static final String ALBUMS_CHANGE_LOG = MAPR_MUSIC_CHANGELOG + ":albums";
 
     private static final String TEST_USER_NAME = "mapr";
     private static final String TEST_USER_GROUP = "mapr";
@@ -37,10 +43,17 @@ public class StatisticServiceImpl implements StatisticService {
     private ManagedThreadFactory threadFactory;
 
     private final StatisticDao statisticDao;
+    private final AlbumDao albumDao;
+    private final ArtistDao artistDao;
 
     @Inject
-    public StatisticServiceImpl(@Named("statisticDao") StatisticDao statisticDao) {
+    public StatisticServiceImpl(@Named("statisticDao") StatisticDao statisticDao,
+                                @Named("albumDao") AlbumDao albumDao,
+                                @Named("artistDao") ArtistDao artistDao) {
+
         this.statisticDao = statisticDao;
+        this.albumDao = albumDao;
+        this.artistDao = artistDao;
     }
 
     static class ChangeDataRecordHandler implements Runnable {
@@ -97,7 +110,10 @@ public class StatisticServiceImpl implements StatisticService {
     @PostConstruct
     public void init() {
 
+        recomputeStatistics();
+
         Properties consumerProperties = new Properties();
+        consumerProperties.setProperty("group.id", "mapr.music.statistics");
         consumerProperties.setProperty("enable.auto.commit", "true");
         consumerProperties.setProperty("auto.offset.reset", "latest");
         consumerProperties.setProperty("key.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
@@ -121,6 +137,34 @@ public class StatisticServiceImpl implements StatisticService {
 
         threadFactory.newThread(albumsHandler).start();
         threadFactory.newThread(artistsHandler).start();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void recomputeStatistics() {
+
+        MaprDbDao.OjaiStoreAction<Long> countAction = ((connection, store) -> {
+
+            long total = 0;
+            DocumentStream documentStream = store.find("_id");
+            for (Document document : documentStream) {
+                total++;
+            }
+
+            return total;
+        });
+
+        long albumsTotal = albumDao.processStore(countAction);
+        Statistic albumsStatistic = getStatisticForTable(ALBUMS_TABLE_NAME);
+        albumsStatistic.setDocumentNumber(albumsTotal);
+        statisticDao.update(ALBUMS_TABLE_NAME, albumsStatistic);
+
+        long artistsTotal = artistDao.processStore(countAction);
+        Statistic artistsStatistic = getStatisticForTable(ARTISTS_TABLE_NAME);
+        artistsStatistic.setDocumentNumber(artistsTotal);
+        statisticDao.update(ARTISTS_TABLE_NAME, artistsStatistic);
     }
 
     @Override
@@ -163,11 +207,7 @@ public class StatisticServiceImpl implements StatisticService {
     private Statistic getStatisticForTable(String tableName) {
 
         Statistic statistic = statisticDao.getById(tableName);
-        if (statistic != null) {
-            return statistic;
-        }
-
-        return statisticDao.create(new Statistic(tableName, 0));
+        return (statistic != null) ? statistic : new Statistic(tableName, 0);
     }
 
     private static void loginTestUser(String username, String group) {

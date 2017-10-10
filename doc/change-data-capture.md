@@ -89,18 +89,19 @@ my.cluster.id       < IP addresses for source cluster gateways >
 
 ## MapR Music CDC setup
 
-1. Create Changelog Stream:
+1. Create Changelog Streams for Artists and Albums:
 ```
-$ maprcli stream create -path /mapr_music_artists_changelog -ischangelog true -consumeperm p
+$ maprcli stream create -path /mapr_music_changelog -ischangelog true -consumeperm p
 ```
 
 Where:
 * `-ischangelog` set to `true` to configure the stream to store change log
 * `-consumeperm p` set the changelog consumer presentation to "public" allowing any application to subscribe to the events.
 
-2. Add Changelog to the `artists` table:
+2. Add Changelog to the `artists` and `albums` tables:
 ```
-$ maprcli table changelog add -path /apps/artists -changelog /mapr_music_artists_changelog:artists
+$ maprcli table changelog add -path /apps/artists -changelog /mapr_music_changelog:artists
+$ maprcli table changelog add -path /apps/albums -changelog /mapr_music_changelog:albums
 ```
 
 3. Define MapR Music Managed Thread Factory within Wildfly
@@ -150,7 +151,7 @@ so you must specify the `com.mapr.db.cdc.ChangeDataRecordDeserializer` deseriali
 ```
     // Consumer used to consume MapR-DB CDC events
     KafkaConsumer<byte[], ChangeDataRecord> consumer = new KafkaConsumer<byte[], ChangeDataRecord>(consumerProperties);
-    consumer.subscribe(Collections.singletonList("/mapr_music_artists_changelog:artists"));
+    consumer.subscribe(Collections.singletonList("/mapr_music_changelog:artists"));
 ```
 
 3. Consume the events

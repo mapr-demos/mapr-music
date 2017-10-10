@@ -1,7 +1,9 @@
 package com.mapr.music.service.impl;
 
 import com.mapr.music.dao.AlbumDao;
+import com.mapr.music.dao.AlbumRateDao;
 import com.mapr.music.dao.ArtistDao;
+import com.mapr.music.dao.ArtistRateDao;
 import com.mapr.music.model.Album;
 import com.mapr.music.model.Artist;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -29,7 +31,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class ArtistsChangelogListenerService {
 
-    private static String ARTISTS_CHANGE_LOG = "/mapr_music_artists_changelog:artists";
+    private static String ARTISTS_CHANGE_LOG = "/mapr_music_changelog:artists";
     private static long KAFKA_CONSUMER_POLL_TIMEOUT = 500L;
     private static final String TEST_USER_NAME = "mapr";
     private static final String TEST_USER_GROUP = "mapr";
@@ -52,10 +54,17 @@ public class ArtistsChangelogListenerService {
     @Named("artistDao")
     private ArtistDao artistDao;
 
+    @Inject
+    private AlbumRateDao albumRateDao;
+
+    @Inject
+    private ArtistRateDao artistRateDao;
+
     @PostConstruct
     public void init() {
 
         Properties consumerProperties = new Properties();
+        consumerProperties.setProperty("group.id", "mapr.music.artists.listener");
         consumerProperties.setProperty("enable.auto.commit", "true");
         consumerProperties.setProperty("auto.offset.reset", "latest");
         consumerProperties.setProperty("key.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
@@ -127,12 +136,18 @@ public class ArtistsChangelogListenerService {
                                     })
                                     .forEach(album -> {
                                         if (album.getArtists().isEmpty()) { // Remove albums that had only one artist
+                                            // Remove Album's rates
+                                            albumRateDao.getByAlbumId(album.getId())
+                                                    .forEach(rate -> albumRateDao.deleteById(rate.getId()));
                                             albumDao.deleteById(album.getId());
                                         } else {
                                             albumDao.update(album.getId(), album);
                                         }
                                     });
                         }
+
+                        // Remove Artist's rates
+                        artistRateDao.getByArtistId(artistId).forEach(rate -> artistRateDao.deleteById(rate.getId()));
 
                         artistDao.deleteById(artistId);
                         log.info("Artist with id = '{}' is deleted", artistId);

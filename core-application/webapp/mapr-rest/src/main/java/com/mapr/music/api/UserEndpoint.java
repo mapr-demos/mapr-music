@@ -1,6 +1,6 @@
 package com.mapr.music.api;
 
-import com.mapr.music.model.User;
+import com.mapr.music.dto.UserDto;
 import com.mapr.music.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,10 +12,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import java.util.HashMap;
-import java.util.Map;
 
 @Api(value = ArtistEndpoint.ENDPOINT_PATH, description = "Artists endpoint, which allows to manage 'Artist' documents")
 @Path(UserEndpoint.ENDPOINT_PATH)
@@ -30,18 +27,14 @@ public class UserEndpoint {
     @GET
     @Path("current")
     @ApiOperation(value = "Get authenticated user info")
-    public Response getCurrentUserInfo(@Context SecurityContext securityContext) {
-
-        Map<String, String> simpleUserInfo = new HashMap<>();
-        simpleUserInfo.put("username", securityContext.getUserPrincipal().getName());
-
-        return Response.ok(simpleUserInfo).build();
+    public UserDto getCurrentUserInfo(@Context SecurityContext securityContext) {
+        return userService.getUserByPrincipal(securityContext.getUserPrincipal());
     }
 
     @POST
     @Path("/")
     @ApiOperation(value = "Creates new user account")
-    public User registerUser(User user) {
+    public UserDto registerUser(UserDto user) {
         return userService.register(user);
     }
 }

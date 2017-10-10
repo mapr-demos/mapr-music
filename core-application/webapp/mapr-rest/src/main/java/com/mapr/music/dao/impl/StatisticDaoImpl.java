@@ -35,4 +35,9 @@ public class StatisticDaoImpl extends MaprDbDaoImpl<Statistic> implements Statis
             return mapOjaiDocument(updatedOjaiDoc);
         });
     }
+
+    @Override
+    public boolean isEmpty() {
+        return getList(0, 1).isEmpty();
+    }
 }

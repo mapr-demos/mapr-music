@@ -1,5 +1,7 @@
 package com.mapr.music.service;
 
+import com.mapr.music.dao.AlbumDao;
+import com.mapr.music.dao.ArtistDao;
 import com.mapr.music.dao.StatisticDao;
 import com.mapr.music.service.impl.StatisticServiceImpl;
 
@@ -15,8 +17,9 @@ public class StatisticServiceMock implements StatisticService {
     private StatisticService actualService;
 
     @Inject
-    public StatisticServiceMock(@Named("statisticDao") StatisticDao statisticDao) {
-        this.actualService = new StatisticServiceImpl(statisticDao);
+    public StatisticServiceMock(@Named("statisticDao") StatisticDao statisticDao, @Named("albumDao") AlbumDao albumDao,
+                                @Named("artistDao") ArtistDao artistDao) {
+        this.actualService = new StatisticServiceImpl(statisticDao, albumDao, artistDao);
     }
 
     @Override
@@ -29,4 +32,8 @@ public class StatisticServiceMock implements StatisticService {
         return this.actualService.getTotalArtists();
     }
 
+    @Override
+    public void recomputeStatistics() {
+        this.actualService.recomputeStatistics();
+    }
 }

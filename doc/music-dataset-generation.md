@@ -57,7 +57,7 @@ $ cd /path/to/output/
 $ ls
 ```
 
-You will be able to see two directories `artists` and `albums` that contain JSON documents with artists and albums data 
+You will be able to see `artists` and `albums` directories that contain JSON documents with artists and albums data 
 respectively.
 
 ### Import data in MapR-DB
@@ -73,15 +73,23 @@ $ scp -r /path/to/output/artists /path/to/output/albums /path/to/output/language
 $ hadoop fs -copyFromLocal /path/to/output/albums /tmp/albums
 $ hadoop fs -copyFromLocal /path/to/output/artists /tmp/artists
 $ hadoop fs -copyFromLocal /path/to/output/languages /tmp/languages
+$ hadoop fs -copyFromLocal /path/to/output/users /tmp/users
+$ hadoop fs -copyFromLocal /path/to/output/ratings-albums /tmp/albums_ratings
+$ hadoop fs -copyFromLocal /path/to/output/ratings-artists /tmp/artists_ratings
 ```
 
-* Create `artists` and `albums` tables:
+* Create tables:
 
 ```
 $ maprcli table create -path /apps/albums -tabletype json
 $ maprcli table create -path /apps/artists -tabletype json
 $ maprcli table create -path /apps/languages -tabletype json
+$ maprcli table create -path /apps/albums_ratings -tabletype json
+$ maprcli table create -path /apps/artists_ratings -tabletype json
+$ maprcli table create -path /apps/users -tabletype json
 $ maprcli table create -path /apps/statistics -tabletype json
+$ maprcli table create -path /apps/recommendations -tabletype json
+
 ```
 
 * Import data into MapR-DB using `importJSON` tool:
@@ -89,14 +97,24 @@ $ maprcli table create -path /apps/statistics -tabletype json
 $ mapr importJSON -idField _id -src /tmp/albums/* -dst /apps/albums -mapreduce false
 $ mapr importJSON -idField _id -src /tmp/artists/* -dst /apps/artists -mapreduce false
 $ mapr importJSON -idField _id -src /tmp/languages/* -dst /apps/languages -mapreduce false
+$ mapr importJSON -idField _id -src /tmp/users/* -dst /apps/users -mapreduce false
+$ mapr importJSON -idField _id -src /tmp/albums_ratings/* -dst /apps/albums_ratings -mapreduce false
+$ mapr importJSON -idField _id -src /tmp/artists_ratings/* -dst /apps/artists_ratings -mapreduce false
 ```
+
+Note: in case of lack of memory while importing ratings documents try to split ratings into multiple sets and import 
+them one by one.
 
 * Change table permissions to allow access for the MapR-Music application:
 ```
 $ maprcli table cf edit -path /apps/albums -cfname default -readperm p -writeperm p -traverseperm  p
 $ maprcli table cf edit -path /apps/artists -cfname default -readperm p -writeperm p -traverseperm  p
 $ maprcli table cf edit -path /apps/languages -cfname default -readperm p -writeperm p -traverseperm  p
+$ maprcli table cf edit -path /apps/albums_ratings -cfname default -readperm p -writeperm p -traverseperm  p
+$ maprcli table cf edit -path /apps/artists_ratings -cfname default -readperm p -writeperm p -traverseperm  p
+$ maprcli table cf edit -path /apps/users -cfname default -readperm p -writeperm p -traverseperm  p
 $ maprcli table cf edit -path /apps/statistics -cfname default -readperm p -writeperm p -traverseperm  p
+$ maprcli table cf edit -path /apps/recommendations -cfname default -readperm p -writeperm p -traverseperm  p
 ```
 
 After that dataset is ready to be used by MapR-Music application.

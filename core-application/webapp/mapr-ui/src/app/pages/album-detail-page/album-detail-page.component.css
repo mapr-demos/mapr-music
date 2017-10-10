@@ -10,3 +10,17 @@
 .album-container {
   display: flex;
 }
+
+.star {
+  font-size: 2rem;
+  color: #b0c4de;
+}
+
+.star-big {
+  font-size: 3rem;
+  color: #b0c4de;
+}
+
+.filled {
+  color: #1e90ff;
+}

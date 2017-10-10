@@ -30,6 +30,21 @@
             <div *ngIf="album.releasedDate">
               Date: {{album.releasedDate | date }}
             </div>
+            <div>
+              <ngb-rating [(rate)]="album.rating" max="5" [readonly]="true" style="outline: none">
+                <ng-template let-fill="fill">
+                  <span class="star" [class.filled]="fill === 100">&#9733;</span>
+                </ng-template>
+              </ngb-rating>
+              <span
+                style="margin: 0 10px"
+                *ngIf="isAuthenticated | async"
+              >
+                <div class="btn btn-primary" data-toggle="modal" data-target="#voteModal">
+                  Vote
+                </div>
+              </span>
+            </div>
           </div>
         </div>
         <div
@@ -249,6 +264,35 @@
           Yes
         </button>
         <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="voteModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Vote</h4>
+      </div>
+      <div class="modal-body">
+        <p>Select your rating</p>
+        <ngb-rating [(rate)]="currentRate" max="5" style="outline: none">
+          <ng-template let-fill="fill">
+            <span class="star star-big" [class.filled]="fill === 100">&#9733;</span>
+          </ng-template>
+        </ngb-rating>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="changeRating()"
+          data-dismiss="modal"
+        >
+          Vote
+        </button>
       </div>
     </div>
   </div>

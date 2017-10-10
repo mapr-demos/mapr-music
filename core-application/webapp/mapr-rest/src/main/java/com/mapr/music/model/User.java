@@ -1,41 +1,45 @@
 package com.mapr.music.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.mapr.music.annotation.MaprDbTable;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@MaprDbTable("/apps/users")
 public class User {
 
-    private String username;
+    @JsonProperty("_id")
+    private String id;
 
-    private String password;
+    @JsonProperty("first_name")
+    private String firstName;
 
-    public User() {
+    @JsonProperty("last_name")
+    private String lastName;
+
+    public String getId() {
+        return id;
     }
 
-    public User(String username, String password) {
-        this.username = username;
-        this.password = password;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    @JsonIgnore
-    public String getPassword() {
-        return password;
+    public String getLastName() {
+        return lastName;
     }
 
-    @JsonSetter("password")
-    public void setPassword(String password) {
-        this.password = password;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }

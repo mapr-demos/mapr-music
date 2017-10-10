@@ -48,6 +48,9 @@ public class AlbumDto {
     @JsonProperty("released_date")
     private Long releasedDate;
 
+    @JsonProperty("rating")
+    private Double rating;
+
     public String getId() {
         return id;
     }
@@ -200,4 +203,11 @@ public class AlbumDto {
         this.MBID = MBID;
     }
 
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
 }

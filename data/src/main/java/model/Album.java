@@ -33,6 +33,11 @@ public class Album {
         public String getCoverImageUrl() {
             return Album.this.getCoverImageUrl();
         }
+
+        @JsonGetter("rating")
+        public Double getRating() {
+            return Album.this.getRating();
+        }
     }
 
     @JsonIgnore
@@ -85,6 +90,9 @@ public class Album {
 
     @JsonProperty("released_date")
     private JsonNumberLong releasedDate;
+
+    @JsonProperty("rating")
+    private Double rating;
 
     @JsonIgnore
     private ShortInfo shortInfo;
@@ -307,6 +315,13 @@ public class Album {
         return shortInfo;
     }
 
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
 
     @Override
     public String toString() {

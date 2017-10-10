@@ -1,6 +1,5 @@
 MapR Cluster Configuaration:
-* Create Artists changelog(Descibed here: https://github.com/mapr-demos/mapr-music/blob/master/doc/change-data-capture.md)
-* Create Albums changelog in the same way. Use '/mapr_music_albums_changelog' as stream name and 'albums' as topic name(Resulting full changelog path: '/mapr_music_albums_changelog:albums')
+* Create Albums/Artists changelogs(Descibed here: https://github.com/mapr-demos/mapr-music/blob/master/doc/change-data-capture.md)
 
 Dev machine configuration:
 1. Install and run the ElasticSearch

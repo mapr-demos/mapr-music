@@ -35,6 +35,9 @@ public class Artist {
         @JsonProperty("profile_image_url")
         private String profileImageUrl;
 
+        @JsonProperty("rating")
+        private Double rating;
+
         public static ShortInfo valueOf(Artist artist) {
 
             if (artist == null) {
@@ -82,6 +85,14 @@ public class Artist {
 
         public void setProfileImageUrl(String profileImageUrl) {
             this.profileImageUrl = profileImageUrl;
+        }
+
+        public Double getRating() {
+            return rating;
+        }
+
+        public void setRating(Double rating) {
+            this.rating = rating;
         }
 
         @Override
@@ -143,6 +154,9 @@ public class Artist {
 
     @JsonProperty("deleted")
     private Boolean deleted;
+
+    @JsonProperty("rating")
+    private Double rating;
 
     @JsonIgnore
     private ShortInfo shortInfo;
@@ -295,5 +309,13 @@ public class Artist {
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
     }
 }

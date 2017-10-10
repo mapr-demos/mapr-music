@@ -88,6 +88,10 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
                 mutation.set("deleted", artist.getDeleted());
             }
 
+            if (artist.getRating() != null) {
+                mutation.set("rating", artist.getRating());
+            }
+
             // Update the OJAI Document with specified identifier
             store.update(id, mutation);
 

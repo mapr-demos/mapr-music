@@ -10,6 +10,7 @@ import com.mapr.music.dao.impl.MaprDbDaoImpl;
 import com.mapr.music.dao.impl.StatisticDaoImpl;
 import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.ResourceDto;
+import com.mapr.music.exception.ResourceNotFoundException;
 import com.mapr.music.exception.ValidationException;
 import com.mapr.music.service.impl.ArtistServiceImpl;
 import com.mapr.music.service.impl.SlugService;
@@ -157,7 +158,7 @@ public class ArtistServiceIntegrationTest {
 
     }
 
-    @Test(expected = Exception.class)
+    @Test(expected = ResourceNotFoundException.class)
     public void should_not_get_deleted() {
 
         ArtistDto sample = new ArtistDto();
@@ -166,8 +167,8 @@ public class ArtistServiceIntegrationTest {
         ArtistDto created = artistService.createArtist(sample);
         assertNotNull(created);
 
-        artistDao.deleteById(sample.getId());
-        artistService.getArtistById(sample.getId());
+        artistDao.deleteById(created.getId());
+        artistService.getArtistById(created.getId());
     }
 
     @Test

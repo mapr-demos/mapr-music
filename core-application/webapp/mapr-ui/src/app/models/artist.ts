@@ -15,6 +15,7 @@ export interface Artist {
   disambiguationComment: string,
   beginDate: string,
   endDate: string,
+  rating: number,
   IPI,
   ISNI
   albums: Array<Album>

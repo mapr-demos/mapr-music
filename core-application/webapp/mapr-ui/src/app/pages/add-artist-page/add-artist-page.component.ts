@@ -15,6 +15,7 @@ const createNewArtist = (): Artist => ({
   albums: [],
   disambiguationComment: '',
   IPI: '',
+  rating: 0,
   ISNI: ''
 });
 

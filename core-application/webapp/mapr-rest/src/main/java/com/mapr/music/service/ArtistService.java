@@ -124,13 +124,4 @@ public interface ArtistService {
      */
     List<ArtistDto> searchArtists(String nameEntry, Long limit);
 
-    /**
-     * Returns list of recommended artists according to the specified artist id.
-     *
-     * @param artistId identifier of artist, for which recommendations will be returned.
-     * @param limit   specifies number of artists, which will be returned. Can be overridden by actual service
-     *                implementation.
-     * @return list of recommended artists.
-     */
-    List<ArtistDto> getRecommendedById(String artistId, Long limit);
 }

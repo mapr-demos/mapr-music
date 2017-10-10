@@ -1,16 +1,13 @@
 package com.mapr.music.service;
 
-import com.mapr.music.dao.AlbumDao;
-import com.mapr.music.dao.LanguageDao;
-import com.mapr.music.dao.MaprDbDao;
-import com.mapr.music.dao.StatisticDao;
+import com.mapr.music.dao.*;
 import com.mapr.music.dao.impl.*;
 import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.ResourceDto;
+import com.mapr.music.exception.ResourceNotFoundException;
 import com.mapr.music.exception.ValidationException;
 import com.mapr.music.service.impl.AlbumServiceImpl;
 import com.mapr.music.service.impl.SlugService;
-import com.mapr.music.service.impl.StatisticServiceImpl;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -37,7 +34,7 @@ public class AlbumServiceIntegrationTest {
                         AlbumService.class, AlbumServiceImpl.class, AlbumDao.class, ArtistDaoImpl.class,
                         LanguageDao.class, LanguageDaoImpl.class, AlbumDaoImpl.class, MaprDbDao.class,
                         MaprDbDaoImpl.class, SlugService.class, StatisticServiceMock.class, StatisticDao.class,
-                        StatisticDaoImpl.class)
+                        StatisticDaoImpl.class, AlbumRateDao.class, AlbumRateDaoImpl.class)
                 .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
@@ -157,7 +154,7 @@ public class AlbumServiceIntegrationTest {
 
     }
 
-    @Test(expected = Exception.class)
+    @Test(expected = ResourceNotFoundException.class)
     public void should_delete() {
 
         AlbumDto sample = new AlbumDto();
@@ -167,8 +164,8 @@ public class AlbumServiceIntegrationTest {
 
         assertNotNull(created);
 
-        albumService.deleteAlbumById(sample.getId());
-        albumService.getAlbumById(sample.getId());
+        albumService.deleteAlbumById(created.getId());
+        albumService.getAlbumById(created.getId());
     }
 
     @Test

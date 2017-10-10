@@ -52,6 +52,9 @@ public class ArtistDto {
     @JsonProperty("end_date")
     private Long endDate;
 
+    @JsonProperty("rating")
+    private Double rating;
+
     public String getId() {
         return id;
     }
@@ -162,5 +165,13 @@ public class ArtistDto {
 
     public void setEndDate(Long endDate) {
         this.endDate = endDate;
+    }
+
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
     }
 }

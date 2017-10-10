@@ -7,13 +7,9 @@ we have to adjust the environment and deploy the app in a proper way:
 * Create MapR-DB tables and change permissions as described 
 [here](https://github.com/mapr-demos/mapr-music/blob/master/doc/music-dataset-generation.md#import-data-in-mapr-db). 
 DO NOT import the data. We will do it later.
-* Since [issue #31](https://github.com/mapr-demos/mapr-music/issues/31) MapR Music app uses `/apps/statistics` table. 
-So we need to create it and change permissions as  with other tables(see previous step).
+
 * Create changelogs and add them to the Artists and Albums tables as described 
 [here](https://github.com/mapr-demos/mapr-music/blob/master/doc/change-data-capture.md). 
-
-Note: Create Albums changelog in the same way. Use `/mapr_music_albums_changelog` as stream name and `albums` as topic 
-name(Resulting full changelog path: `/mapr_music_albums_changelog:albums`)
 
 * Build and run `elasticsearch-service`:
 
@@ -33,6 +29,43 @@ Note: ensure that MapR Music REST app is deployed BEFORE dataset import. Since
 which contains total number of Artists/Albums document. So we have to be sure that `StatisticService` of MapR Music up 
 is run before dataset import.
 
-* Import the dataset as described [here](https://github.com/mapr-demos/mapr-music/blob/master/doc/music-dataset-generation.md#import-data-in-mapr-db)
+### Register users from dataset at Wildfly
 
-Note: new dataset archive with name `27-09-lists-refactored.tar.gz` can be found at Google Drive.
+Data Converter root directory contains 'add-wildfly-users.sh' script, which can be used to register users from dataset 
+at Wildfly. Below you can see script usage information:
+```
+$ ./add-wildfly-users.sh -h
+Usage: add-wildfly-users.sh [-p|--path] [-l|--limit] [-h|--help]
+Options:
+    --path      Specifies path to the 'users' dataset directory. Default value is current directory.
+    --limit     Specifies maximum number of users, which will be registered at Wildfly. Dafault value is '3'.
+    --help      Prints usage information.
+```
+
+Note: script will register 3 predefined users('jdoe, sdavis, mdupont') even without actual dataset. Each of the 
+users has 'music' password.
+
+Note: script assumes that `WILDFLY_HOME` environment variable is set and it points to the Wildfly root directory.
+
+### Check users ratings influence
+
+If you want to check users rating influence than do not import albums and artists rating documents as described in the 
+next section. Instead, import everything except of these documents and left `/apps/albums_ratings` and 
+`/apps/artists_ratings` empty. After that refer 
+[Users ratings influence](https://github.com/mapr-demos/mapr-music/blob/feature/Recommendation_engine/doc/) document.
+
+### Import the dataset
+
+Import the dataset as described [here](https://github.com/mapr-demos/mapr-music/blob/master/doc/music-dataset-generation.md#import-data-in-mapr-db)
+
+Note: the latest dataset archive with name `issue-73-dataset.tar.gz` can be found at Google Drive. It has only 500 
+artist and 346 album documents and can be used for testing. Rating documents contained at multiple directories and 
+should be imported one by one in case of lack of memory.
+
+### Run recommendation engine
+
+Recommendation engine can be run from the Dev machine in the following way:
+```
+$ cd mapr-music/core-application/processing/recommendation-engine/
+$ mvn clean install scala:run
+```
