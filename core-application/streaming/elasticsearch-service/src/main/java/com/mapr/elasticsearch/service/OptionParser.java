@@ -19,16 +19,42 @@ public class OptionParser {
 
         options.addOption("r", "reinit", false, "When specified indices will be reinitialized.");
         options.addOption("h", "help", false, "Prints usage information.");
+        options.addOption(null, "host", true, "Specifies ElasticSearch host name.");
+        options.addOption("p", "port", true, "Specifies ElasticSearch transport port number.");
     }
 
     public void parseOpts() {
 
-        CommandLineParser parser = new BasicParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine cmd;
         try {
             cmd = parser.parse(options, args);
             if (cmd.hasOption("h")) {
                 help();
+            }
+
+            if (cmd.hasOption("host")) {
+                String host = cmd.getOptionValue("host");
+                elasticSearchService.setHost(host);
+            }
+
+            if (cmd.hasOption("p")) {
+                Integer portNumber = null;
+                try {
+                    portNumber = Integer.parseInt(cmd.getOptionValue("p"));
+                } catch (NumberFormatException e) {
+                    log.error("Failed to parse option port number");
+                    help();
+                }
+
+                if (portNumber != null && portNumber <= 0) {
+                    log.error("Port number must be greater than zero");
+                    help();
+                }
+
+                if (portNumber != null) {
+                    elasticSearchService.setPort(portNumber);
+                }
             }
 
             if (cmd.hasOption("r")) {
