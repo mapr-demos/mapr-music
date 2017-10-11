@@ -29,34 +29,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.mapr.music.util.MaprProperties.*;
+
 public class ESSearchServiceImpl implements ESSearchService, PaginatedService {
-
-    /**
-     * FIXME use properties file. Currently assuming that ElasticSearch is installed on the host with Wildfly(which serves the app).
-     * <p>
-     * ElasticSearch hostname.
-     */
-    public static final String HOSTNAME = "localhost";
-
-    /**
-     * ElasticSearch port number.
-     */
-    public static final int REST_PORT = 9200;
 
     private static final int PER_PAGE_DEFAULT = 5;
     private static final int FIRST_PAGE_NUM = 1;
-
-    private static final String ARTISTS_INDEX_NAME = "artists";
-    private static final String ARTISTS_TYPE_NAME = "artist";
-
-    private static final String ALBUMS_INDEX_NAME = "albums";
-    private static final String ALBUMS_TYPE_NAME = "album";
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private RestHighLevelClient client;
 
     private static final Logger log = LoggerFactory.getLogger(ESSearchServiceImpl.class);
-
 
     private final ArtistDao artistDao;
     private final MaprDbDao<Album> albumDao;
@@ -68,7 +51,7 @@ public class ESSearchServiceImpl implements ESSearchService, PaginatedService {
         this.artistDao = artistDao;
         this.albumDao = albumDao;
 
-        RestClient lowLevelRestClient = RestClient.builder(new HttpHost(HOSTNAME, REST_PORT, "http")).build();
+        RestClient lowLevelRestClient = RestClient.builder(new HttpHost(ES_REST_HOST, ES_REST_PORT, "http")).build();
         this.client = new RestHighLevelClient(lowLevelRestClient);
     }
 
@@ -84,7 +67,7 @@ public class ESSearchServiceImpl implements ESSearchService, PaginatedService {
      */
     @Override
     public ResourceDto<ESSearchResult> findByNameEntry(String nameEntry, Integer perPage, Integer page) {
-        return findByNameEntry(nameEntry, perPage, page, ARTISTS_INDEX_NAME, ALBUMS_INDEX_NAME);
+        return findByNameEntry(nameEntry, perPage, page, ES_ARTISTS_INDEX, ES_ALBUMS_INDEX);
     }
 
     /**
@@ -99,7 +82,7 @@ public class ESSearchServiceImpl implements ESSearchService, PaginatedService {
      */
     @Override
     public ResourceDto<ESSearchResult> findAlbumsByNameEntry(String nameEntry, Integer perPage, Integer page) {
-        return findByNameEntry(nameEntry, perPage, page, ALBUMS_INDEX_NAME);
+        return findByNameEntry(nameEntry, perPage, page, ES_ALBUMS_INDEX);
     }
 
     /**
@@ -114,7 +97,7 @@ public class ESSearchServiceImpl implements ESSearchService, PaginatedService {
      */
     @Override
     public ResourceDto<ESSearchResult> findArtistsByNameEntry(String nameEntry, Integer perPage, Integer page) {
-        return findByNameEntry(nameEntry, perPage, page, ARTISTS_INDEX_NAME);
+        return findByNameEntry(nameEntry, perPage, page, ES_ARTISTS_INDEX);
     }
 
     private ResourceDto<ESSearchResult> findByNameEntry(String nameEntry, Integer perPage, Integer page, String... indices) {
@@ -232,11 +215,11 @@ public class ESSearchServiceImpl implements ESSearchService, PaginatedService {
     }
 
     private boolean isArtistHit(JsonNode hit) {
-        return ARTISTS_INDEX_NAME.equals(hit.get("_index").asText()) && ARTISTS_TYPE_NAME.equals(hit.get("_type").asText());
+        return ES_ARTISTS_INDEX.equals(hit.get("_index").asText()) && ES_ARTISTS_TYPE.equals(hit.get("_type").asText());
     }
 
     private boolean isAlbumHit(JsonNode hit) {
-        return ALBUMS_INDEX_NAME.equals(hit.get("_index").asText()) && ALBUMS_TYPE_NAME.equals(hit.get("_type").asText());
+        return ES_ALBUMS_INDEX.equals(hit.get("_index").asText()) && ES_ALBUMS_TYPE.equals(hit.get("_type").asText());
     }
 
     @Override

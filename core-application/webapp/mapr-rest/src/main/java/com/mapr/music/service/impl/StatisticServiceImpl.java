@@ -25,21 +25,13 @@ import javax.inject.Named;
 import java.util.Collections;
 import java.util.Properties;
 
+import static com.mapr.music.util.MaprProperties.*;
+
 @Startup
 @Singleton
 public class StatisticServiceImpl implements StatisticService {
 
-    private static final String ALBUMS_TABLE_NAME = "/apps/albums";
-    private static final String ARTISTS_TABLE_NAME = "/apps/artists";
-
-    private static final String MAPR_MUSIC_CHANGELOG = "/mapr_music_changelog";
-    private static final String ARTISTS_CHANGE_LOG = MAPR_MUSIC_CHANGELOG + ":artists";
-    private static final String ALBUMS_CHANGE_LOG = MAPR_MUSIC_CHANGELOG + ":albums";
-
-    private static final String TEST_USER_NAME = "mapr";
-    private static final String TEST_USER_GROUP = "mapr";
-
-    @Resource(lookup = "java:jboss/ee/concurrency/factory/MaprMusicThreadFactory")
+    @Resource(lookup = THREAD_FACTORY)
     private ManagedThreadFactory threadFactory;
 
     private final StatisticDao statisticDao;
@@ -119,7 +111,7 @@ public class StatisticServiceImpl implements StatisticService {
         consumerProperties.setProperty("key.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
         consumerProperties.setProperty("value.deserializer", "com.mapr.db.cdc.ChangeDataRecordDeserializer");
 
-        loginTestUser(TEST_USER_NAME, TEST_USER_GROUP);
+        loginTestUser(MAPR_USER_NAME, MAPR_USER_GROUP);
 
         // Create and adjust consumer which is used to consume MapR-DB CDC events for Albums table.
         KafkaConsumer<byte[], ChangeDataRecord> albumsChangelogConsumer = new KafkaConsumer<>(consumerProperties);

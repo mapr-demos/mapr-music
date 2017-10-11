@@ -35,7 +35,6 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
     private static final long ALBUMS_PER_PAGE_DEFAULT = 50;
     private static final long FIRST_PAGE_NUM = 1;
     private static final long MAX_SEARCH_LIMIT = 15;
-    private static final long MAX_RECOMMENDED_LIMIT = 5;
 
     /**
      * Array of album's fields that will be used for projection.
@@ -53,7 +52,6 @@ public class AlbumServiceImpl implements AlbumService, PaginatedService {
             "cover_image_url",
             "artists"
     };
-
 
     private final AlbumDao albumDao;
     private final MaprDbDao<Artist> artistDao;

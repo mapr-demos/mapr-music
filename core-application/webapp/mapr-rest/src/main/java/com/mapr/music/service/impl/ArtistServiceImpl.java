@@ -29,7 +29,6 @@ public class ArtistServiceImpl implements ArtistService, PaginatedService {
     private static final long ARTISTS_PER_PAGE_DEFAULT = 50;
     private static final long FIRST_PAGE_NUM = 1;
     private static final long MAX_SEARCH_LIMIT = 15;
-    private static final long MAX_RECOMMENDED_LIMIT = 5;
 
     private static final String[] ARTIST_SHORT_INFO_FIELDS = {
             "_id",
