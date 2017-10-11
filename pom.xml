@@ -10,5 +10,8 @@
     <modules>
         <module>mapr-ui</module>
         <module>mapr-rest</module>
+        <module>data-generator</module>
+        <module>elasticsearch-service</module>
+        <module>recommendation-engine</module>
     </modules>
 </project>
