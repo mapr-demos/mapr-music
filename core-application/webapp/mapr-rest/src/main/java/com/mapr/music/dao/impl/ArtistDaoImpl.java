@@ -2,6 +2,7 @@ package com.mapr.music.dao.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.base.Stopwatch;
 import com.mapr.music.dao.ArtistDao;
 import com.mapr.music.model.Artist;
 import org.ojai.Document;
@@ -12,6 +13,7 @@ import org.ojai.store.QueryCondition;
 
 import javax.inject.Named;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,6 +40,8 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
     @Override
     public Artist update(String id, Artist artist) {
         return processStore((connection, store) -> {
+
+            Stopwatch stopwatch = Stopwatch.createStarted();
 
             // Create a DocumentMutation to update non-null fields
             DocumentMutation mutation = connection.newMutation();
@@ -100,6 +104,8 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
 
             Document updatedOjaiDoc = store.findById(id);
 
+            log.info("Update document from table '{}' with id: '{}'. Elapsed time: {}", tablePath, id, stopwatch);
+
             // Map Ojai document to the actual instance of model class
             return mapOjaiDocument(updatedOjaiDoc);
         });
@@ -122,8 +128,9 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
 
         return processStore((connection, store) -> {
 
-            // Convert artist instance to JSON string
+            Stopwatch stopwatch = Stopwatch.createStarted();
 
+            // Convert artist instance to JSON string
             ObjectNode artistJsonNode = mapper.valueToTree(artist);
 
             // Since we creating artist from JSON string we have to specify tags explicitly.
@@ -142,6 +149,8 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
             // Insert the document into the OJAI store
             store.insertOrReplace(createdOjaiDoc);
 
+            log.info("Create document '{}' at table: '{}'. Elapsed time: {}", createdOjaiDoc, tablePath, stopwatch);
+
             // Map Ojai document to the actual instance of model class
             return mapOjaiDocument(createdOjaiDoc);
         });
@@ -159,6 +168,7 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
     public List<Artist> getByNameStartsWith(String nameEntry, long limit, String... fields) {
         return processStore((connection, store) -> {
 
+            Stopwatch stopwatch = Stopwatch.createStarted();
             Query query = connection.newQuery();
 
             // Select only specified field
@@ -184,6 +194,9 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
             for (Document doc : documentStream) {
                 artists.add(mapOjaiDocument(doc));
             }
+
+            log.info("Get '{}' artists by name entry: '{}' with limit: '{}', fields: '{}'. Elapsed time: {}",
+                    artists.size(), nameEntry, limit, (fields != null) ? Arrays.asList(fields) : "[]", stopwatch);
 
             return artists;
         });

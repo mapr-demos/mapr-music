@@ -1,5 +1,6 @@
 package com.mapr.music.dao.impl;
 
+import com.google.common.base.Stopwatch;
 import com.mapr.music.dao.AlbumDao;
 import com.mapr.music.dao.AlbumMutationBuilder;
 import com.mapr.music.dao.SortOption;
@@ -42,6 +43,8 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
     public List<Album> getByLanguage(long offset, long limit, List<SortOption> options, String lang, String... fields) {
         return processStore((connection, store) -> {
 
+            Stopwatch stopwatch = Stopwatch.createStarted();
+
             Query query = connection.newQuery();
 
             // Select only specified field
@@ -80,6 +83,10 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
                 albums.add(mapOjaiDocument(doc));
             }
 
+            log.info("Get list of '{}' documents from '{}' table by language: '{}' with offset: '{}', limit: '{}', " +
+                            "sortOptions: '{}', fields: '{}'. Elapsed time: {}", albums.size(), tablePath, lang, offset,
+                    limit, options, (fields != null) ? Arrays.asList(fields) : "[]", stopwatch);
+
             return albums;
         });
     }
@@ -93,6 +100,8 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
     @Override
     public long getTotalNumByLanguage(String language) {
         return processStore((connection, store) -> {
+
+            Stopwatch stopwatch = Stopwatch.createStarted();
 
             QueryCondition languageEqualsCondition = connection.newCondition()
                     .is("language", QueryCondition.Op.EQUAL, language)
@@ -108,6 +117,8 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
             for (Document ignored : documentStream) {
                 totalNum++;
             }
+
+            log.info("Counting '{}' albums by language '{}' took {}", totalNum, language, stopwatch);
 
             return totalNum;
         });
@@ -141,6 +152,8 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
 
         return processStore((connection, store) -> {
 
+            Stopwatch stopwatch = Stopwatch.createStarted();
+
             // Update basic fields
             DocumentMutation albumMutation = AlbumMutationBuilder.forConnection(connection)
                     .setName(album.getName())
@@ -162,6 +175,8 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
             store.update(id, albumMutation);
 
             Document updatedOjaiDoc = store.findById(id);
+
+            log.info("Update document from table '{}' with id: '{}'. Elapsed time: {}", tablePath, id, stopwatch);
 
             // Map Ojai document to the actual instance of model class
             return mapOjaiDocument(updatedOjaiDoc);
@@ -219,12 +234,17 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
         track.setId(UUID.randomUUID().toString());
         processStore((connection, store) -> {
 
+            Stopwatch stopwatch = Stopwatch.createStarted();
+
             // Add tracks to the track list
             AlbumMutationBuilder mutationBuilder = AlbumMutationBuilder.forConnection(connection)
                     .addTracks(track);
 
             // Update the OJAI Document with specified identifier
             store.update(albumId, mutationBuilder.build());
+
+            log.info("Add track to album '{}' took {}", albumId, stopwatch);
+
         });
 
         Optional<Track> trackOptional = getTracksList(albumId).stream().filter(t -> track.getId().equals(t.getId())).findAny();
@@ -249,12 +269,17 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
 
         processStore((connection, store) -> {
 
+            Stopwatch stopwatch = Stopwatch.createStarted();
+
             // Add tracks to the track list
             AlbumMutationBuilder mutationBuilder = AlbumMutationBuilder.forConnection(connection)
                     .addTracks(tracks);
 
             // Update the OJAI Document with specified identifier
             store.update(albumId, mutationBuilder.build());
+
+            log.info("Add '{}' tracks to album '{}' took {}", tracks.size(), albumId, stopwatch);
+
         });
 
         Set<String> createdTracksIds = tracks.stream().map(Track::getId).collect(Collectors.toSet());
@@ -284,6 +309,8 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
 
         return processStore((connection, store) -> {
 
+            Stopwatch stopwatch = Stopwatch.createStarted();
+
             // Update single track
             AlbumMutationBuilder mutationBuilder = AlbumMutationBuilder.forConnection(connection)
                     .editTrack(trackIndex, track);
@@ -298,6 +325,8 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
             Optional<Track> trackOptional = updatedAlbum.getTrackList().stream()
                     .filter(t -> trackId.equals(t.getId()))
                     .findAny();
+
+            log.info("Updating album's track with id '{}' for albumId: '{}' took {}", trackId, albumId, stopwatch);
 
             return (trackOptional.isPresent()) ? trackOptional.get() : null;
         });
@@ -327,6 +356,8 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
 
         return processStore((connection, store) -> {
 
+            Stopwatch stopwatch = Stopwatch.createStarted();
+
             // Set new track list for the specified album
             AlbumMutationBuilder mutationBuilder = AlbumMutationBuilder.forConnection(connection)
                     .setTrackList(trackList);
@@ -338,6 +369,9 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
 
             // Map Ojai document to the actual instance of model class
             Album updatedAlbum = mapOjaiDocument(updatedOjaiDoc);
+
+            log.info("Updating album's track list for albumId: '{}' took {}", albumId, stopwatch);
+
             return updatedAlbum.getTrackList();
         });
 
@@ -365,12 +399,20 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
 
         return processStore((connection, store) -> {
 
+            Stopwatch stopwatch = Stopwatch.createStarted();
+
             // Delete single track
-            AlbumMutationBuilder mutationBuilder = AlbumMutationBuilder.forConnection(connection)
-                    .deleteTrack(trackIndex);
+            DocumentMutation mutation = AlbumMutationBuilder.forConnection(connection)
+                    .deleteTrack(trackIndex).build();
+
+            // Set update info if available
+            getUpdateInfo().ifPresent(updateInfo -> mutation.set("update_info", updateInfo));
 
             // Update the OJAI Document with specified identifier
-            store.update(albumId, mutationBuilder.build());
+            store.update(albumId, mutation);
+
+            log.info("Deleting album's track with id: '{}' for albumId: '{}' took {}", trackId, albumId, stopwatch);
+
             return true;
         });
 
@@ -388,6 +430,7 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
     public List<Album> getByNameStartsWith(String nameEntry, long limit, String... fields) {
         return processStore((connection, store) -> {
 
+            Stopwatch stopwatch = Stopwatch.createStarted();
             Query query = connection.newQuery();
 
             // Select only specified field
@@ -413,6 +456,9 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
             for (Document doc : documentStream) {
                 albums.add(mapOjaiDocument(doc));
             }
+
+            log.info("Get '{}' albums by name entry: '{}' with limit: '{}', fields: '{}'. Elapsed time: {}",
+                    albums.size(), nameEntry, limit, (fields != null) ? Arrays.asList(fields) : "[]", stopwatch);
 
             return albums;
         });

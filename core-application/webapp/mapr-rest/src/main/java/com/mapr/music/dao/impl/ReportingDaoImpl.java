@@ -1,7 +1,10 @@
 package com.mapr.music.dao.impl;
 
+import com.google.common.base.Stopwatch;
 import com.mapr.music.dao.ReportingDao;
 import com.mapr.music.model.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import javax.inject.Named;
@@ -12,24 +15,23 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import static com.mapr.music.util.MaprProperties.DRILL_DATA_SOURCE;
 
 @Named("reportingDao")
 public class ReportingDaoImpl implements ReportingDao {
 
-    Logger logger = Logger.getLogger(ReportingDaoImpl.class.toString());
+    private static final Logger log = LoggerFactory.getLogger(ReportingDaoImpl.class);
 
     @Resource(lookup = DRILL_DATA_SOURCE)
     DataSource ds;
 
     Connection connection;
 
-    @Override
     /**
      * Return the most common area with artists.
      */
+    @Override
     public List<Pair> getTopAreaForArtists(int numberOfRows) {
 
         String sql = "SELECT `area` AS `area`, COUNT(1) AS `count` " +
@@ -37,8 +39,6 @@ public class ReportingDaoImpl implements ReportingDao {
                 " GROUP BY `area` ORDER BY 2 DESC LIMIT " + numberOfRows;
 
         List<Pair> pairs = populatePaiFromSQL(sql);
-
-
         return pairs;
     }
 
@@ -85,10 +85,12 @@ public class ReportingDaoImpl implements ReportingDao {
      * @return
      */
     private List<Pair> populatePaiFromSQL(String sql) {
+
+        Stopwatch stopwatch = Stopwatch.createStarted();
         List<Pair> pairs = new ArrayList<Pair>();
         try {
 
-            logger.info("Executing SQL :\n\t" + sql);
+            log.info("Executing SQL :\n\t" + sql);
 
             Statement st = getConnection().createStatement();
             ResultSet rs = st.executeQuery(sql);
@@ -107,6 +109,8 @@ public class ReportingDaoImpl implements ReportingDao {
             e.printStackTrace();
             // TODO: Manage exception
         }
+
+        log.info("Performing query: '{}' took: {}", sql, stopwatch);
         return pairs;
     }
 
