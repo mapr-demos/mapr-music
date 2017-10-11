@@ -11,12 +11,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.mapr.music.util.MaprProperties.ARTISTS_TABLE_NAME;
+
 /**
  * Model class, which represents 'Album' document stored in MapR DB.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@MaprDbTable("/apps/artists")
+@MaprDbTable(ARTISTS_TABLE_NAME)
 public class Artist {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

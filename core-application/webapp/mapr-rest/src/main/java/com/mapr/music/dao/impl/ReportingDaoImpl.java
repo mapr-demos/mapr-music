@@ -16,20 +16,22 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mapr.music.util.MaprProperties.DRILL_DATA_SOURCE;
+
 @Named("reportingDao")
 public class ReportingDaoImpl implements ReportingDao {
 
     private static final Logger log = LoggerFactory.getLogger(ReportingDaoImpl.class);
 
-    @Resource(lookup = "java:/datasources/mapr-music-drill")
+    @Resource(lookup = DRILL_DATA_SOURCE)
     DataSource ds;
 
     Connection connection;
 
-    @Override
     /**
      * Return the most common area with artists.
      */
+    @Override
     public List<Pair> getTopAreaForArtists(int numberOfRows) {
 
         String sql = "SELECT `area` AS `area`, COUNT(1) AS `count` " +

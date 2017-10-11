@@ -7,12 +7,14 @@ import com.mapr.music.annotation.MaprDbTable;
 
 import java.util.List;
 
+import static com.mapr.music.util.MaprProperties.RECOMMENDATIONS_TABLE_NAME;
+
 /**
  * Model class, which represents 'Recommendation' document stored in MapR DB.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@MaprDbTable("/apps/recommendations")
+@MaprDbTable(RECOMMENDATIONS_TABLE_NAME)
 public class Recommendation {
 
     @JsonProperty("_id")

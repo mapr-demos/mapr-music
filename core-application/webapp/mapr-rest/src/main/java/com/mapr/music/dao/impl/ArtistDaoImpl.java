@@ -96,6 +96,9 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
                 mutation.set("rating", artist.getRating());
             }
 
+            // Set update info if available
+            getUpdateInfo().ifPresent(updateInfo -> mutation.set("update_info", updateInfo));
+
             // Update the OJAI Document with specified identifier
             store.update(id, mutation);
 
@@ -137,6 +140,7 @@ public class ArtistDaoImpl extends MaprDbDaoImpl<Artist> implements ArtistDao {
                 slugPostfix.put("$numberLong", artist.getSlugPostfix());
                 artistJsonNode.set("slug_postfix", slugPostfix);
             }
+
             String artistJsonString = artistJsonNode.toString();
 
             // Create an OJAI Document form the JSON string (there are other ways too)

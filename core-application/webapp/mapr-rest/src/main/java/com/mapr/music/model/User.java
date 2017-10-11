@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mapr.music.annotation.MaprDbTable;
 
+import static com.mapr.music.util.MaprProperties.USERS_TABLE_NAME;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@MaprDbTable("/apps/users")
+@MaprDbTable(USERS_TABLE_NAME)
 public class User {
 
     @JsonProperty("_id")

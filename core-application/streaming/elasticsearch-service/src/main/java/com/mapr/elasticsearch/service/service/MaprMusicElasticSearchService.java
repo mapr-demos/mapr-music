@@ -39,23 +39,51 @@ public class MaprMusicElasticSearchService {
     private static final String ALBUMS_TABLE_PATH = "/apps/albums";
     private static final String ARTISTS_TABLE_PATH = "/apps/artists";
 
-    private static final String HOSTNAME = "localhost";
-    private static final int PORT = 9300;
+    private static final String DEFAULT_ES_HOSTNAME = "localhost";
+    private static final int DEFAULT_ES_PORT = 9300;
 
     private static final Logger log = LoggerFactory.getLogger(MaprMusicElasticSearchService.class);
+
+    private String host;
+    private int port;
+
+    public MaprMusicElasticSearchService(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
+
+    public MaprMusicElasticSearchService() {
+        this(DEFAULT_ES_HOSTNAME, DEFAULT_ES_PORT);
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
 
     public void reinit() {
 
         InetAddress inetAddress;
         try {
-            inetAddress = InetAddress.getByName(HOSTNAME);
+            inetAddress = InetAddress.getByName(host);
         } catch (UnknownHostException e) {
             throw new IllegalArgumentException(e);
         }
 
         // Create ES Client
         TransportClient client = new PreBuiltTransportClient(Settings.EMPTY)
-                .addTransportAddress(new InetSocketTransportAddress(inetAddress, PORT));
+                .addTransportAddress(new InetSocketTransportAddress(inetAddress, port));
 
 
         // Delete indices
@@ -109,8 +137,8 @@ public class MaprMusicElasticSearchService {
 
         // Build and start service for the Artists table
         new MaprElasticSearchServiceBuilder()
-                .withHostname(HOSTNAME)
-                .withPort(PORT)
+                .withHostname(host)
+                .withPort(port)
                 .withIndexName(ARTISTS_INDEX_NAME)
                 .withTypeName(ARTISTS_TYPE_NAME)
                 .withChangelog(ARTISTS_CHANGELOG)
@@ -119,8 +147,8 @@ public class MaprMusicElasticSearchService {
 
         // Build and start service for the Albums table
         new MaprElasticSearchServiceBuilder()
-                .withHostname(HOSTNAME)
-                .withPort(PORT)
+                .withHostname(host)
+                .withPort(port)
                 .withIndexName(ALBUMS_INDEX_NAME)
                 .withTypeName(ALBUMS_TYPE_NAME)
                 .withChangelog(ALBUMS_CHANGELOG)

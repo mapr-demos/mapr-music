@@ -8,6 +8,7 @@ import com.mapr.music.model.Album;
 import com.mapr.music.model.Track;
 import org.ojai.Document;
 import org.ojai.DocumentStream;
+import org.ojai.store.DocumentMutation;
 import org.ojai.store.Query;
 import org.ojai.store.QueryCondition;
 import org.ojai.store.SortOrder;
@@ -148,12 +149,13 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
     @Override
     @SuppressWarnings("unchecked")
     public Album update(String id, Album album) {
+
         return processStore((connection, store) -> {
 
             Stopwatch stopwatch = Stopwatch.createStarted();
 
             // Update basic fields
-            AlbumMutationBuilder mutationBuilder = AlbumMutationBuilder.forConnection(connection)
+            DocumentMutation albumMutation = AlbumMutationBuilder.forConnection(connection)
                     .setName(album.getName())
                     .setBarcode(album.getBarcode())
                     .setCountry(album.getCountry())
@@ -163,10 +165,14 @@ public class AlbumDaoImpl extends MaprDbDaoImpl<Album> implements AlbumDao {
                     .setArtists(album.getArtists())
                     .setFormat(album.getFormat())
                     .setReleasedDate(album.getReleasedDate())
-                    .setRating(album.getRating());
+                    .setRating(album.getRating())
+                    .build();
+
+            // Set update info if available
+            getUpdateInfo().ifPresent(updateInfo -> albumMutation.set("update_info", updateInfo));
 
             // Update the OJAI Document with specified identifier
-            store.update(id, mutationBuilder.build());
+            store.update(id, albumMutation);
 
             Document updatedOjaiDoc = store.findById(id);
 
