@@ -1,6 +1,7 @@
 package com.mapr.music.dao.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Stopwatch;
 import com.mapr.music.annotation.MaprDbTable;
 import com.mapr.music.dao.MaprDbDao;
 import com.mapr.music.dao.SortOption;
@@ -55,6 +56,8 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
     public List<T> getList() {
         return processStore((connection, store) -> {
 
+            Stopwatch stopwatch = Stopwatch.createStarted();
+
             // Fetch all OJAI Documents from this store
             DocumentStream documentStream = store.find();
             List<T> documents = new ArrayList<>();
@@ -64,6 +67,9 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
                     documents.add(doc);
                 }
             }
+
+            log.info("Get list of '{}' documents from '{}' table. Elapsed time: {}", documents.size(), tablePath,
+                    stopwatch);
 
             return documents;
         });
@@ -120,6 +126,8 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
     public List<T> getList(long offset, long limit, List<SortOption> sortOptions, String... fields) {
         return processStore((connection, store) -> {
 
+            Stopwatch stopwatch = Stopwatch.createStarted();
+
             Query query = buildQuery(connection, offset, limit, fields, sortOptions);
 
             // Fetch all OJAI Documents from this store according to the built query
@@ -131,6 +139,10 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
                     documents.add(doc);
                 }
             }
+
+            log.info("Get list of '{}' documents from '{}' table with offset: '{}', limit: '{}', sortOptions: '{}', " +
+                            "fields: '{}'. Elapsed time: {}", documents.size(), tablePath, offset, limit, sortOptions,
+                    (fields != null) ? Arrays.asList(fields) : "[]", stopwatch);
 
             return documents;
         });
@@ -158,8 +170,13 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
     public T getById(String id, String... fields) {
         return processStore((connection, store) -> {
 
+            Stopwatch stopwatch = Stopwatch.createStarted();
+
             // Fetch single OJAI Document from store by it's identifier. Use projection if fields are defined.
             Document ojaiDoc = (fields == null || fields.length == 0) ? store.findById(id) : store.findById(id, fields);
+
+            log.info("Get by ID from '{}' table with id: '{}', fields: '{}'. Elapsed time: {}", tablePath, id,
+                    (fields != null) ? Arrays.asList(fields) : "[]", stopwatch);
 
             return (ojaiDoc == null) ? null : mapOjaiDocument(ojaiDoc);
         });
@@ -221,7 +238,9 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
     @Override
     public void deleteById(String id) {
         processStore((connection, store) -> {
+            Stopwatch stopwatch = Stopwatch.createStarted();
             store.delete(id);
+            log.info("Delete by ID from '{}' table with id: '{}'. Elapsed time: {}", tablePath, id, stopwatch);
         });
     }
 
@@ -235,11 +254,15 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
     public T create(T entity) {
         return processStore((connection, store) -> {
 
+            Stopwatch stopwatch = Stopwatch.createStarted();
+
             // Create an OJAI Document form the Java bean (there are other ways too)
             final Document createdOjaiDoc = connection.newDocument(entity);
 
             // Insert the document into the OJAI store
             store.insertOrReplace(createdOjaiDoc);
+
+            log.info("Create document '{}' at table: '{}'. Elapsed time: {}", createdOjaiDoc, tablePath, stopwatch);
 
             // Map Ojai document to the actual instance of model class
             return mapOjaiDocument(createdOjaiDoc);

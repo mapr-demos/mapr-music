@@ -1,5 +1,6 @@
 package com.mapr.music.dao.impl;
 
+import com.google.common.base.Stopwatch;
 import com.mapr.music.dao.StatisticDao;
 import com.mapr.music.model.Statistic;
 import org.ojai.Document;
@@ -18,6 +19,8 @@ public class StatisticDaoImpl extends MaprDbDaoImpl<Statistic> implements Statis
     public Statistic update(String id, Statistic statistic) {
         return processStore((connection, store) -> {
 
+            Stopwatch stopwatch = Stopwatch.createStarted();
+
             // Create a DocumentMutation to update non-null fields
             DocumentMutation mutation = connection.newMutation();
 
@@ -30,6 +33,8 @@ public class StatisticDaoImpl extends MaprDbDaoImpl<Statistic> implements Statis
             store.update(id, mutation);
 
             Document updatedOjaiDoc = store.findById(id);
+
+            log.info("Update document from table '{}' with id: '{}'. Elapsed time: {}", tablePath, id, stopwatch);
 
             // Map Ojai document to the actual instance of model class
             return mapOjaiDocument(updatedOjaiDoc);

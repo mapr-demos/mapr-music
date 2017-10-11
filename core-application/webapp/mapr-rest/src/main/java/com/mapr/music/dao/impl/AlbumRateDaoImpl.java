@@ -1,5 +1,6 @@
 package com.mapr.music.dao.impl;
 
+import com.google.common.base.Stopwatch;
 import com.mapr.music.dao.AlbumRateDao;
 import com.mapr.music.model.AlbumRate;
 import org.ojai.Document;
@@ -22,6 +23,8 @@ public class AlbumRateDaoImpl extends MaprDbDaoImpl<AlbumRate> implements AlbumR
     public AlbumRate getRate(String userId, String albumId) {
         return processStore((connection, store) -> {
 
+            Stopwatch stopwatch = Stopwatch.createStarted();
+
             QueryCondition condition = connection.newCondition()
                     .and()
                     .is("user_id", QueryCondition.Op.EQUAL, userId)
@@ -39,6 +42,8 @@ public class AlbumRateDaoImpl extends MaprDbDaoImpl<AlbumRate> implements AlbumR
                 return null;
             }
 
+            log.info("Get rate by album id '{}' and user id '{}' took {}", albumId, userId, stopwatch);
+
             return mapOjaiDocument(documentIterator.next());
         });
     }
@@ -46,6 +51,8 @@ public class AlbumRateDaoImpl extends MaprDbDaoImpl<AlbumRate> implements AlbumR
     @Override
     public List<AlbumRate> getByUserId(String userId) {
         return processStore((connection, store) -> {
+
+            Stopwatch stopwatch = Stopwatch.createStarted();
 
             Query query = connection.newQuery().where(
                     connection.newCondition()
@@ -63,6 +70,8 @@ public class AlbumRateDaoImpl extends MaprDbDaoImpl<AlbumRate> implements AlbumR
                 }
             }
 
+            log.info("Get '{}' rates by user id '{}' took {}", rates.size(), userId, stopwatch);
+
             return rates;
         });
     }
@@ -70,6 +79,8 @@ public class AlbumRateDaoImpl extends MaprDbDaoImpl<AlbumRate> implements AlbumR
     @Override
     public List<AlbumRate> getByAlbumId(String albumId) {
         return processStore((connection, store) -> {
+
+            Stopwatch stopwatch = Stopwatch.createStarted();
 
             Query query = connection.newQuery().where(
                     connection.newCondition()
@@ -87,6 +98,8 @@ public class AlbumRateDaoImpl extends MaprDbDaoImpl<AlbumRate> implements AlbumR
                 }
             }
 
+            log.info("Get '{}' rates by album id '{}' took {}", rates.size(), albumId, stopwatch);
+
             return rates;
         });
     }
@@ -94,6 +107,8 @@ public class AlbumRateDaoImpl extends MaprDbDaoImpl<AlbumRate> implements AlbumR
     @Override
     public AlbumRate update(String id, AlbumRate albumRate) {
         return processStore((connection, store) -> {
+
+            Stopwatch stopwatch = Stopwatch.createStarted();
 
             // Create a DocumentMutation to update non-null fields
             DocumentMutation mutation = connection.newMutation();
@@ -107,6 +122,8 @@ public class AlbumRateDaoImpl extends MaprDbDaoImpl<AlbumRate> implements AlbumR
             store.update(id, mutation);
 
             Document updatedOjaiDoc = store.findById(id);
+
+            log.info("Update document from table '{}' with id: '{}'. Elapsed time: {}", tablePath, id, stopwatch);
 
             // Map Ojai document to the actual instance of model class
             return mapOjaiDocument(updatedOjaiDoc);
