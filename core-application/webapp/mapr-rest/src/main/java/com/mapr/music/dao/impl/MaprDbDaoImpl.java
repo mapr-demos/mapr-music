@@ -17,6 +17,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mapr.music.util.MaprProperties.MAPR_USER_GROUP;
+import static com.mapr.music.util.MaprProperties.MAPR_USER_NAME;
+
 /**
  * Implements common methods to access MapR-DB using OJAI driver.
  *
@@ -24,8 +27,6 @@ import java.util.Optional;
  */
 public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
 
-    protected static final String TEST_USER_NAME = "mapr";
-    protected static final String TEST_USER_GROUP = "mapr";
     protected static final String CONNECTION_URL = "ojai:mapr:";
 
     protected static final Logger log = LoggerFactory.getLogger(MaprDbDaoImpl.class);
@@ -175,7 +176,7 @@ public abstract class MaprDbDaoImpl<T> implements MaprDbDao<T> {
     @Override
     public <R> R processStore(OjaiStoreAction<R> storeAction) {
 
-        loginTestUser(TEST_USER_NAME, TEST_USER_GROUP);
+        loginTestUser(MAPR_USER_NAME, MAPR_USER_GROUP);
 
         // Create an OJAI connection to MapR cluster
         Connection connection = DriverManager.getConnection(CONNECTION_URL);

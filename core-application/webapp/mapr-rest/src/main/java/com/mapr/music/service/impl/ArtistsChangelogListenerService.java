@@ -27,14 +27,13 @@ import javax.inject.Named;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.mapr.music.util.MaprProperties.*;
+
 @Startup
 @Singleton
 public class ArtistsChangelogListenerService {
 
-    private static String ARTISTS_CHANGE_LOG = "/mapr_music_changelog:artists";
     private static long KAFKA_CONSUMER_POLL_TIMEOUT = 500L;
-    private static final String TEST_USER_NAME = "mapr";
-    private static final String TEST_USER_GROUP = "mapr";
 
     private static final Logger log = LoggerFactory.getLogger(ArtistsChangelogListenerService.class);
 
@@ -70,7 +69,7 @@ public class ArtistsChangelogListenerService {
         consumerProperties.setProperty("key.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
         consumerProperties.setProperty("value.deserializer", "com.mapr.db.cdc.ChangeDataRecordDeserializer");
 
-        loginTestUser(TEST_USER_NAME, TEST_USER_GROUP);
+        loginTestUser(MAPR_USER_NAME, MAPR_USER_GROUP);
         consumer = new KafkaConsumer<>(consumerProperties);
         consumer.subscribe(Collections.singletonList(ARTISTS_CHANGE_LOG));
 

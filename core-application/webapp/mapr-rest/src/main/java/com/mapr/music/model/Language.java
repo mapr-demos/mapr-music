@@ -5,12 +5,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mapr.music.annotation.MaprDbTable;
 
+import static com.mapr.music.util.MaprProperties.LANGUAGES_TABLE_NAME;
+
 /**
  * Model class, which represents 'Language' document stored in MapR DB.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@MaprDbTable("/apps/languages")
+@MaprDbTable(LANGUAGES_TABLE_NAME)
 public class Language {
 
     @JsonProperty("_id")
