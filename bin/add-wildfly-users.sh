@@ -6,7 +6,7 @@
 
 NUMBER_REGEX='^[0-9]+$'
 DEFAULT_USER_PASSWORD='music'
-PREDEFINED_USERS=('jdoe', 'sdavis', 'mdupont')
+PREDEFINED_USERS=('jdoe' 'sdavis' 'mdupont')
 
 #######################################################################
 # Functions definition

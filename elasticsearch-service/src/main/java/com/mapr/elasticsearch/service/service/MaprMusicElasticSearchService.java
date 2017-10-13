@@ -7,6 +7,7 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.ojai.Document;
 import org.ojai.DocumentStream;
@@ -85,10 +86,13 @@ public class MaprMusicElasticSearchService {
         TransportClient client = new PreBuiltTransportClient(Settings.EMPTY)
                 .addTransportAddress(new InetSocketTransportAddress(inetAddress, port));
 
-
         // Delete indices
-        client.admin().indices().delete(new DeleteIndexRequest(ALBUMS_INDEX_NAME)).actionGet();
-        client.admin().indices().delete(new DeleteIndexRequest(ARTISTS_INDEX_NAME)).actionGet();
+        try {
+            client.admin().indices().delete(new DeleteIndexRequest(ALBUMS_INDEX_NAME)).actionGet();
+            client.admin().indices().delete(new DeleteIndexRequest(ARTISTS_INDEX_NAME)).actionGet();
+        } catch (IndexNotFoundException e) {
+            log.warn("Tried to delete non-existing indices: '{}', '{}'", ALBUMS_INDEX_NAME, ARTISTS_INDEX_NAME);
+        }
 
         // Recreate indices
         client.admin().indices().prepareCreate(ALBUMS_INDEX_NAME).get();
