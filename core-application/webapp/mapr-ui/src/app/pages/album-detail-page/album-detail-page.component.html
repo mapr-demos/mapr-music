@@ -186,10 +186,10 @@
           Cancel
         </div>
 
-        <div style="padding-top: 35px">
+        <div style="padding-top: 35px" *ngIf="recommendedAlbums.length !== 0">
           <h4>You might also like:</h4>
         </div>
-        <div id="recommendations" class="container row">
+        <div id="recommendations" class="container row" *ngIf="recommendedAlbums.length !== 0">
 
           <div style="display: flex;">
             <div class="container albums-container">
