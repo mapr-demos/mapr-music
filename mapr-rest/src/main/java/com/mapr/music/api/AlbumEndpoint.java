@@ -6,7 +6,6 @@ import com.mapr.music.dto.AlbumDto;
 import com.mapr.music.dto.RateDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.dto.TrackDto;
-import com.mapr.music.model.AlbumRate;
 import com.mapr.music.service.AlbumService;
 import com.mapr.music.service.RateService;
 import com.mapr.music.service.RecommendationService;
@@ -178,7 +177,7 @@ public class AlbumEndpoint {
     @Path("{id}/rating")
     @ApiOperation(value = "Saves users rate for this album. Allowed only for authorized users.")
     public Response saveAlbumRating(@ApiParam(value = "Album's identifier", required = true) @PathParam("id") String id,
-                                     @Context SecurityContext sec, RateDto albumRate) {
+                                    @Context SecurityContext sec, RateDto albumRate) {
 
         if (sec.getUserPrincipal() == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();

@@ -1,11 +1,10 @@
-package com.mapr.music.service.impl;
+package com.mapr.music.service;
 
 import com.mapr.music.dao.AlbumDao;
 import com.mapr.music.dao.ArtistDao;
 import com.mapr.music.dao.MaprDbDao;
 import com.mapr.music.dao.StatisticDao;
 import com.mapr.music.model.Statistic;
-import com.mapr.music.service.StatisticService;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -29,7 +28,7 @@ import static com.mapr.music.util.MaprProperties.*;
 
 @Startup
 @Singleton
-public class StatisticServiceImpl implements StatisticService {
+public class CdcStatisticService implements StatisticService {
 
     @Resource(lookup = THREAD_FACTORY)
     private ManagedThreadFactory threadFactory;
@@ -39,9 +38,9 @@ public class StatisticServiceImpl implements StatisticService {
     private final ArtistDao artistDao;
 
     @Inject
-    public StatisticServiceImpl(@Named("statisticDao") StatisticDao statisticDao,
-                                @Named("albumDao") AlbumDao albumDao,
-                                @Named("artistDao") ArtistDao artistDao) {
+    public CdcStatisticService(@Named("statisticDao") StatisticDao statisticDao,
+                               @Named("albumDao") AlbumDao albumDao,
+                               @Named("artistDao") ArtistDao artistDao) {
 
         this.statisticDao = statisticDao;
         this.albumDao = albumDao;
@@ -159,12 +158,22 @@ public class StatisticServiceImpl implements StatisticService {
         statisticDao.update(ARTISTS_TABLE_NAME, artistsStatistic);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return total number of Album documents.
+     */
     @Override
     public long getTotalAlbums() {
         Statistic albumsStatistic = getStatisticForTable(ALBUMS_TABLE_NAME);
         return albumsStatistic.getDocumentNumber();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return total number of Artist documents.
+     */
     @Override
     public long getTotalArtists() {
         Statistic artistsStatistic = getStatisticForTable(ARTISTS_TABLE_NAME);

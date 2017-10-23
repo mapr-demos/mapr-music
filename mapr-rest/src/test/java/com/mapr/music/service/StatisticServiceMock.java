@@ -3,13 +3,12 @@ package com.mapr.music.service;
 import com.mapr.music.dao.AlbumDao;
 import com.mapr.music.dao.ArtistDao;
 import com.mapr.music.dao.StatisticDao;
-import com.mapr.music.service.impl.StatisticServiceImpl;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 /**
- * Wrapper for actual {@link StatisticServiceImpl}, since {@link StatisticServiceImpl} has {@link javax.ejb.Startup}
+ * Wrapper for actual {@link CdcStatisticService}, since {@link CdcStatisticService} has {@link javax.ejb.Startup}
  * annotation and can not be created at test execution time.
  */
 public class StatisticServiceMock implements StatisticService {
@@ -19,7 +18,7 @@ public class StatisticServiceMock implements StatisticService {
     @Inject
     public StatisticServiceMock(@Named("statisticDao") StatisticDao statisticDao, @Named("albumDao") AlbumDao albumDao,
                                 @Named("artistDao") ArtistDao artistDao) {
-        this.actualService = new StatisticServiceImpl(statisticDao, albumDao, artistDao);
+        this.actualService = new CdcStatisticService(statisticDao, albumDao, artistDao);
     }
 
     @Override

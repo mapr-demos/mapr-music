@@ -2,9 +2,17 @@ package com.mapr.music.dao;
 
 import com.mapr.music.model.Language;
 
-import java.util.List;
+public class LanguageDao extends MaprDbDao<Language> {
 
-public interface LanguageDao {
+    public LanguageDao() {
+        super(Language.class);
+    }
 
-    List<Language> getList();
+    /**
+     * Updating language documents is not supported.
+     */
+    @Override
+    public Language update(String id, Language entity) {
+        throw new UnsupportedOperationException("Language updating is not supported");
+    }
 }

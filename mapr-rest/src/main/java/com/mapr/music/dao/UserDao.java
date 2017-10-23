@@ -1,4 +1,4 @@
-package com.mapr.music.dao.impl;
+package com.mapr.music.dao;
 
 import com.google.common.base.Stopwatch;
 import com.mapr.music.model.User;
@@ -8,9 +8,9 @@ import org.ojai.store.DocumentMutation;
 import javax.inject.Named;
 
 @Named("userDao")
-public class UserDaoImpl extends MaprDbDaoImpl<User> {
+public class UserDao extends MaprDbDao<User> {
 
-    public UserDaoImpl() {
+    public UserDao() {
         super(User.class);
     }
 

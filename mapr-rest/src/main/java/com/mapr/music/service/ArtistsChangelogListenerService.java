@@ -1,4 +1,4 @@
-package com.mapr.music.service.impl;
+package com.mapr.music.service;
 
 import com.mapr.music.dao.AlbumDao;
 import com.mapr.music.dao.AlbumRateDao;

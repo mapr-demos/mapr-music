@@ -4,16 +4,10 @@ import com.mapr.music.dao.AlbumDao;
 import com.mapr.music.dao.ArtistDao;
 import com.mapr.music.dao.MaprDbDao;
 import com.mapr.music.dao.StatisticDao;
-import com.mapr.music.dao.impl.AlbumDaoImpl;
-import com.mapr.music.dao.impl.ArtistDaoImpl;
-import com.mapr.music.dao.impl.MaprDbDaoImpl;
-import com.mapr.music.dao.impl.StatisticDaoImpl;
 import com.mapr.music.dto.ArtistDto;
 import com.mapr.music.dto.ResourceDto;
 import com.mapr.music.exception.ResourceNotFoundException;
 import com.mapr.music.exception.ValidationException;
-import com.mapr.music.service.impl.ArtistServiceImpl;
-import com.mapr.music.service.impl.SlugService;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -37,9 +31,9 @@ public class ArtistServiceIntegrationTest {
     public static WebArchive createDeployment() {
         return ShrinkWrap.create(WebArchive.class)
                 .addClasses(
-                        ArtistService.class, ArtistServiceImpl.class, ArtistDao.class, ArtistDaoImpl.class,
-                        AlbumDao.class, AlbumDaoImpl.class, MaprDbDao.class, MaprDbDaoImpl.class, SlugService.class,
-                        StatisticServiceMock.class, StatisticDao.class, StatisticDaoImpl.class)
+                        ArtistService.class, ArtistService.class, ArtistDao.class, ArtistDao.class,
+                        AlbumDao.class, AlbumDao.class, MaprDbDao.class, MaprDbDao.class, SlugService.class,
+                        StatisticServiceMock.class, StatisticDao.class, StatisticDao.class)
                 .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
