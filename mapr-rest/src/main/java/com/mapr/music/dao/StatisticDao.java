@@ -18,6 +18,7 @@ public class StatisticDao extends MaprDbDao<Statistic> {
      * {@inheritDoc}
      *
      * @param id        identifier of document, which will be updated.
+     * @param id        identifier of document, which will be updated.
      * @param statistic statistic.
      * @return updated statistic.
      */
@@ -40,7 +41,7 @@ public class StatisticDao extends MaprDbDao<Statistic> {
 
             Document updatedOjaiDoc = store.findById(id);
 
-            log.info("Update document from table '{}' with id: '{}'. Elapsed time: {}", tablePath, id, stopwatch);
+            log.debug("Update document from table '{}' with id: '{}'. Elapsed time: {}", tablePath, id, stopwatch);
 
             // Map Ojai document to the actual instance of model class
             return mapOjaiDocument(updatedOjaiDoc);

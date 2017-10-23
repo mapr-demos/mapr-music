@@ -47,7 +47,7 @@ public class AlbumRateDao extends MaprDbDao<AlbumRate> {
                 return null;
             }
 
-            log.info("Get rate by album id '{}' and user id '{}' took {}", albumId, userId, stopwatch);
+            log.debug("Get rate by album id '{}' and user id '{}' took {}", albumId, userId, stopwatch);
 
             return mapOjaiDocument(documentIterator.next());
         });
@@ -80,7 +80,7 @@ public class AlbumRateDao extends MaprDbDao<AlbumRate> {
                 }
             }
 
-            log.info("Get '{}' rates by user id '{}' took {}", rates.size(), userId, stopwatch);
+            log.debug("Get '{}' rates by user id '{}' took {}", rates.size(), userId, stopwatch);
 
             return rates;
         });
@@ -113,7 +113,7 @@ public class AlbumRateDao extends MaprDbDao<AlbumRate> {
                 }
             }
 
-            log.info("Get '{}' rates by album id '{}' took {}", rates.size(), albumId, stopwatch);
+            log.debug("Get '{}' rates by album id '{}' took {}", rates.size(), albumId, stopwatch);
 
             return rates;
         });
@@ -145,7 +145,7 @@ public class AlbumRateDao extends MaprDbDao<AlbumRate> {
 
             Document updatedOjaiDoc = store.findById(id);
 
-            log.info("Update document from table '{}' with id: '{}'. Elapsed time: {}", tablePath, id, stopwatch);
+            log.debug("Update document from table '{}' with id: '{}'. Elapsed time: {}", tablePath, id, stopwatch);
 
             // Map Ojai document to the actual instance of model class
             return mapOjaiDocument(updatedOjaiDoc);

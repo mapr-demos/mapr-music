@@ -73,7 +73,7 @@ public abstract class MaprDbDao<T> {
                 }
             }
 
-            log.info("Get list of '{}' documents from '{}' table. Elapsed time: {}", documents.size(), tablePath,
+            log.debug("Get list of '{}' documents from '{}' table. Elapsed time: {}", documents.size(), tablePath,
                     stopwatch);
 
             return documents;
@@ -144,7 +144,7 @@ public abstract class MaprDbDao<T> {
                 }
             }
 
-            log.info("Get list of '{}' documents from '{}' table with offset: '{}', limit: '{}', sortOptions: '{}', " +
+            log.debug("Get list of '{}' documents from '{}' table with offset: '{}', limit: '{}', sortOptions: '{}', " +
                             "fields: '{}'. Elapsed time: {}", documents.size(), tablePath, offset, limit, sortOptions,
                     (fields != null) ? Arrays.asList(fields) : "[]", stopwatch);
 
@@ -178,7 +178,7 @@ public abstract class MaprDbDao<T> {
             // Fetch single OJAI Document from store by it's identifier. Use projection if fields are defined.
             Document ojaiDoc = (fields == null || fields.length == 0) ? store.findById(id) : store.findById(id, fields);
 
-            log.info("Get by ID from '{}' table with id: '{}', fields: '{}'. Elapsed time: {}", tablePath, id,
+            log.debug("Get by ID from '{}' table with id: '{}', fields: '{}'. Elapsed time: {}", tablePath, id,
                     (fields != null) ? Arrays.asList(fields) : "[]", stopwatch);
 
             return (ojaiDoc == null) ? null : mapOjaiDocument(ojaiDoc);
@@ -241,7 +241,7 @@ public abstract class MaprDbDao<T> {
         processStore((connection, store) -> {
             Stopwatch stopwatch = Stopwatch.createStarted();
             store.delete(id);
-            log.info("Delete by ID from '{}' table with id: '{}'. Elapsed time: {}", tablePath, id, stopwatch);
+            log.debug("Delete by ID from '{}' table with id: '{}'. Elapsed time: {}", tablePath, id, stopwatch);
         });
     }
 
@@ -265,7 +265,7 @@ public abstract class MaprDbDao<T> {
             // Insert the document into the OJAI store
             store.insertOrReplace(createdOjaiDoc);
 
-            log.info("Create document '{}' at table: '{}'. Elapsed time: {}", createdOjaiDoc, tablePath, stopwatch);
+            log.debug("Create document '{}' at table: '{}'. Elapsed time: {}", createdOjaiDoc, tablePath, stopwatch);
 
             // Map Ojai document to the actual instance of model class
             return mapOjaiDocument(createdOjaiDoc);

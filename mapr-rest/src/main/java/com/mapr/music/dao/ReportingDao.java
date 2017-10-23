@@ -100,7 +100,7 @@ public class ReportingDao {
         List<Pair> pairs = new ArrayList<>();
         try {
 
-            log.info("Executing SQL :\n\t" + sql);
+            log.debug("Executing SQL :\n\t" + sql);
 
             Statement st = getConnection().createStatement();
             ResultSet rs = st.executeQuery(sql);
@@ -120,7 +120,7 @@ public class ReportingDao {
             // TODO: Manage exception
         }
 
-        log.info("Performing query: '{}' took: {}", sql, stopwatch);
+        log.debug("Performing query: '{}' took: {}", sql, stopwatch);
         return pairs;
     }
 

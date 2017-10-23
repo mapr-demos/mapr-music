@@ -103,7 +103,7 @@ public class ArtistDao extends MaprDbDao<Artist> {
 
             Document updatedOjaiDoc = store.findById(id);
 
-            log.info("Update document from table '{}' with id: '{}'. Elapsed time: {}", tablePath, id, stopwatch);
+            log.debug("Update document from table '{}' with id: '{}'. Elapsed time: {}", tablePath, id, stopwatch);
 
             // Map Ojai document to the actual instance of model class
             return mapOjaiDocument(updatedOjaiDoc);
@@ -148,7 +148,7 @@ public class ArtistDao extends MaprDbDao<Artist> {
             // Insert the document into the OJAI store
             store.insertOrReplace(createdOjaiDoc);
 
-            log.info("Create document '{}' at table: '{}'. Elapsed time: {}", createdOjaiDoc, tablePath, stopwatch);
+            log.debug("Create document '{}' at table: '{}'. Elapsed time: {}", createdOjaiDoc, tablePath, stopwatch);
 
             // Map Ojai document to the actual instance of model class
             return mapOjaiDocument(createdOjaiDoc);
@@ -193,7 +193,7 @@ public class ArtistDao extends MaprDbDao<Artist> {
                 artists.add(mapOjaiDocument(doc));
             }
 
-            log.info("Get '{}' artists by name entry: '{}' with limit: '{}', fields: '{}'. Elapsed time: {}",
+            log.debug("Get '{}' artists by name entry: '{}' with limit: '{}', fields: '{}'. Elapsed time: {}",
                     artists.size(), nameEntry, limit, (fields != null) ? Arrays.asList(fields) : "[]", stopwatch);
 
             return artists;

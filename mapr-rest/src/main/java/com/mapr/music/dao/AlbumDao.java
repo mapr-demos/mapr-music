@@ -82,7 +82,7 @@ public class AlbumDao extends MaprDbDao<Album> {
                 albums.add(mapOjaiDocument(doc));
             }
 
-            log.info("Get list of '{}' documents from '{}' table by language: '{}' with offset: '{}', limit: '{}', " +
+            log.debug("Get list of '{}' documents from '{}' table by language: '{}' with offset: '{}', limit: '{}', " +
                             "sortOptions: '{}', fields: '{}'. Elapsed time: {}", albums.size(), tablePath, lang, offset,
                     limit, options, (fields != null) ? Arrays.asList(fields) : "[]", stopwatch);
 
@@ -116,7 +116,7 @@ public class AlbumDao extends MaprDbDao<Album> {
                 totalNum++;
             }
 
-            log.info("Counting '{}' albums by language '{}' took {}", totalNum, language, stopwatch);
+            log.debug("Counting '{}' albums by language '{}' took {}", totalNum, language, stopwatch);
 
             return totalNum;
         });
@@ -174,7 +174,7 @@ public class AlbumDao extends MaprDbDao<Album> {
 
             Document updatedOjaiDoc = store.findById(id);
 
-            log.info("Update document from table '{}' with id: '{}'. Elapsed time: {}", tablePath, id, stopwatch);
+            log.debug("Update document from table '{}' with id: '{}'. Elapsed time: {}", tablePath, id, stopwatch);
 
             // Map Ojai document to the actual instance of model class
             return mapOjaiDocument(updatedOjaiDoc);
@@ -238,7 +238,7 @@ public class AlbumDao extends MaprDbDao<Album> {
             // Update the OJAI Document with specified identifier
             store.update(albumId, mutationBuilder.build());
 
-            log.info("Add track to album '{}' took {}", albumId, stopwatch);
+            log.debug("Add track to album '{}' took {}", albumId, stopwatch);
 
         });
 
@@ -272,7 +272,7 @@ public class AlbumDao extends MaprDbDao<Album> {
             // Update the OJAI Document with specified identifier
             store.update(albumId, mutationBuilder.build());
 
-            log.info("Add '{}' tracks to album '{}' took {}", tracks.size(), albumId, stopwatch);
+            log.debug("Add '{}' tracks to album '{}' took {}", tracks.size(), albumId, stopwatch);
 
         });
 
@@ -319,7 +319,7 @@ public class AlbumDao extends MaprDbDao<Album> {
                     .filter(t -> trackId.equals(t.getId()))
                     .findAny();
 
-            log.info("Updating album's track with id '{}' for albumId: '{}' took {}", trackId, albumId, stopwatch);
+            log.debug("Updating album's track with id '{}' for albumId: '{}' took {}", trackId, albumId, stopwatch);
 
             return (trackOptional.isPresent()) ? trackOptional.get() : null;
         });
@@ -363,7 +363,7 @@ public class AlbumDao extends MaprDbDao<Album> {
             // Map Ojai document to the actual instance of model class
             Album updatedAlbum = mapOjaiDocument(updatedOjaiDoc);
 
-            log.info("Updating album's track list for albumId: '{}' took {}", albumId, stopwatch);
+            log.debug("Updating album's track list for albumId: '{}' took {}", albumId, stopwatch);
 
             return updatedAlbum.getTrackList();
         });
@@ -403,7 +403,7 @@ public class AlbumDao extends MaprDbDao<Album> {
             // Update the OJAI Document with specified identifier
             store.update(albumId, mutation);
 
-            log.info("Deleting album's track with id: '{}' for albumId: '{}' took {}", trackId, albumId, stopwatch);
+            log.debug("Deleting album's track with id: '{}' for albumId: '{}' took {}", trackId, albumId, stopwatch);
 
             return true;
         });
@@ -448,7 +448,7 @@ public class AlbumDao extends MaprDbDao<Album> {
                 albums.add(mapOjaiDocument(doc));
             }
 
-            log.info("Get '{}' albums by name entry: '{}' with limit: '{}', fields: '{}'. Elapsed time: {}",
+            log.debug("Get '{}' albums by name entry: '{}' with limit: '{}', fields: '{}'. Elapsed time: {}",
                     albums.size(), nameEntry, limit, (fields != null) ? Arrays.asList(fields) : "[]", stopwatch);
 
             return albums;
