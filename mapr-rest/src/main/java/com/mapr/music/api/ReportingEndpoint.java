@@ -29,8 +29,7 @@ public class ReportingEndpoint {
 
     @Inject
     private ReportingService reportingService;
-
-
+    
     @GET
     @Path("/artists/top-{count}-area")
     @ApiOperation(value = "Get the area with the most artists")

@@ -1,4 +1,4 @@
-package com.mapr.music.service.impl;
+package com.mapr.music.service;
 
 import com.ibm.icu.text.Transliterator;
 import com.mapr.music.dao.MaprDbDao;

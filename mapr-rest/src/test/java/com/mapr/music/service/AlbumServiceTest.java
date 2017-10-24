@@ -5,8 +5,6 @@ import com.mapr.music.dao.AlbumRateDao;
 import com.mapr.music.dao.LanguageDao;
 import com.mapr.music.dao.MaprDbDao;
 import com.mapr.music.model.Artist;
-import com.mapr.music.service.impl.AlbumServiceImpl;
-import com.mapr.music.service.impl.SlugService;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -28,7 +26,7 @@ public class AlbumServiceTest {
         StatisticService statisticService = mock(StatisticService.class);
         MaprDbDao<Artist> artistDao = mock(MaprDbDao.class);
         AlbumRateDao albumRateDao = mock(AlbumRateDao.class);
-        AlbumService albumService = new AlbumServiceImpl(albumDao, artistDao, languageDao, slugService,
+        AlbumService albumService = new AlbumService(albumDao, artistDao, languageDao, slugService,
                 statisticService, albumRateDao);
         albumService.getAlbumsPage(-1L);
     }
@@ -43,7 +41,7 @@ public class AlbumServiceTest {
         StatisticService statisticService = mock(StatisticService.class);
         MaprDbDao<Artist> artistDao = mock(MaprDbDao.class);
         AlbumRateDao albumRateDao = mock(AlbumRateDao.class);
-        AlbumService albumService = new AlbumServiceImpl(albumDao, artistDao, languageDao, slugService,
+        AlbumService albumService = new AlbumService(albumDao, artistDao, languageDao, slugService,
                 statisticService, albumRateDao);
         albumService.getAlbumById("");
     }
