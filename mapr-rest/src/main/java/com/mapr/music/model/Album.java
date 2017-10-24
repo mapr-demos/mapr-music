@@ -9,6 +9,7 @@ import com.mapr.music.annotation.MaprDbTable;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import static com.mapr.music.util.MaprProperties.ALBUMS_TABLE_NAME;
@@ -133,7 +134,7 @@ public class Album {
     private List<String> imagesUrls;
 
     @JsonProperty("released_date")
-    private Long releasedDate;
+    private Date releasedDate;
 
     @NotNull
     @JsonProperty("name")
@@ -277,11 +278,11 @@ public class Album {
         this.country = country;
     }
 
-    public Long getReleasedDate() {
+    public Date getReleasedDate() {
         return releasedDate;
     }
 
-    public void setReleasedDate(Long releasedDate) {
+    public void setReleasedDate(Date releasedDate) {
         this.releasedDate = releasedDate;
     }
 

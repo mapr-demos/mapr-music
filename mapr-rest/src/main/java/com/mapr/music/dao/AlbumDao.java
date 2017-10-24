@@ -1,9 +1,6 @@
 package com.mapr.music.dao;
 
 import com.google.common.base.Stopwatch;
-import com.mapr.music.dao.AlbumMutationBuilder;
-import com.mapr.music.dao.MaprDbDao;
-import com.mapr.music.dao.SortOption;
 import com.mapr.music.model.Album;
 import com.mapr.music.model.Track;
 import org.ojai.Document;
@@ -162,7 +159,7 @@ public class AlbumDao extends MaprDbDao<Album> {
                     .setTrackList(album.getTrackList())
                     .setArtists(album.getArtists())
                     .setFormat(album.getFormat())
-                    .setReleasedDate(album.getReleasedDate())
+                    .setDateDay(album.getReleasedDate())
                     .setRating(album.getRating())
                     .build();
 

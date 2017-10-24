@@ -1,10 +1,7 @@
 package parser;
 
 import client.CoverArtArchiveClient;
-import model.Album;
-import model.Artist;
-import model.Language;
-import model.Track;
+import model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -266,7 +263,7 @@ public class AlbumParser {
             rows.forEach(row -> {
                 List<Album> albumList = releaseGroupIdAlbumMap.get(row[0]);
                 if (albumList != null) {
-                    Long releasedDate = ParserUtils.parseTimeStamp(row[2], row[3], row[4]);
+                    JsonDateDay releasedDate = ParserUtils.parseDateDay(row[2], row[3], row[4]);
                     albumList.forEach(album -> album.setReleasedDate(releasedDate));
                 }
             });

@@ -447,21 +447,6 @@ public class ArtistService implements PaginatedService {
         return artist;
     }
 
-    private AlbumDto albumToDto(Album album) {
-        AlbumDto albumDto = new AlbumDto();
-        PropertyUtilsBean propertyUtilsBean = new PropertyUtilsBean();
-        try {
-            propertyUtilsBean.copyProperties(albumDto, album);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new RuntimeException("Can not create album Data Transfer Object", e);
-        }
-
-        String slug = slugService.getSlugForAlbum(album);
-        albumDto.setSlug(slug);
-
-        return albumDto;
-    }
-
     private AlbumDto shortInfoToAlbumDto(Album.ShortInfo albumShortInfo) {
 
         AlbumDto albumDto = new AlbumDto();

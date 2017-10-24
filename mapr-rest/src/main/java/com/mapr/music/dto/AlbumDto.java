@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -46,7 +47,7 @@ public class AlbumDto {
     private List<String> imagesUrls;
 
     @JsonProperty("released_date")
-    private Long releasedDate;
+    private Date releasedDate;
 
     @JsonProperty("rating")
     private Double rating;
@@ -139,11 +140,11 @@ public class AlbumDto {
         this.country = country;
     }
 
-    public Long getReleasedDate() {
+    public Date getReleasedDate() {
         return releasedDate;
     }
 
-    public void setReleasedDate(Long releasedDate) {
+    public void setReleasedDate(Date releasedDate) {
         this.releasedDate = releasedDate;
     }
 

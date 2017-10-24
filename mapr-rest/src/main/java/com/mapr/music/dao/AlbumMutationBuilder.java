@@ -5,8 +5,10 @@ import com.mapr.music.model.Artist;
 import com.mapr.music.model.Track;
 import org.ojai.store.Connection;
 import org.ojai.store.DocumentMutation;
+import org.ojai.types.ODate;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -123,17 +125,18 @@ public class AlbumMutationBuilder {
         return setStringValue(FORMAT_FIELD, format, setNullValue);
     }
 
-    public AlbumMutationBuilder setReleasedDate(Long releasedDate) {
-        return setReleasedDate(releasedDate, SET_NULL_VALUE_DEFAULT);
+    public AlbumMutationBuilder setDateDay(Date releasedDate) {
+        return setDateDay(releasedDate, SET_NULL_VALUE_DEFAULT);
     }
 
-    public AlbumMutationBuilder setReleasedDate(Long releasedDate, boolean setNullValue) {
+    public AlbumMutationBuilder setDateDay(Date dateDay, boolean setNullValue) {
 
-        if (releasedDate == null && !setNullValue) {
+        if (dateDay == null && !setNullValue) {
             return this;
         }
 
-        this.mutation.set(RELEASED_DATE_FIELD, releasedDate);
+        ODate odate = (dateDay == null) ? null : new ODate(dateDay);
+        this.mutation.set(RELEASED_DATE_FIELD, odate);
         return this;
     }
 

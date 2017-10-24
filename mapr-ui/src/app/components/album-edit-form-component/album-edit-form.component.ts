@@ -1,10 +1,10 @@
 import {Component, Input, OnInit} from "@angular/core";
-import {Album, Track, Language} from "../../models/album";
+import {Album, Language, Track} from "../../models/album";
 import {Subscription} from "rxjs";
 import {AlbumService} from "../../services/album.service";
-import uniqBy from 'lodash/uniqBy';
-import uniqueId from 'lodash/uniqueId';
-import find from 'lodash/find';
+import uniqBy from "lodash/uniqBy";
+import uniqueId from "lodash/uniqueId";
+import find from "lodash/find";
 import {LanguageService} from "../../services/language.service";
 
 declare const $;
@@ -13,7 +13,7 @@ declare const $;
   selector: 'album-edit-form',
   templateUrl: './album-edit-form.component.html',
 })
-export class AlbumEditForm implements OnInit{
+export class AlbumEditForm implements OnInit {
 
   @Input()
   album: Album = null;
@@ -22,10 +22,8 @@ export class AlbumEditForm implements OnInit{
   artistsDisposable: Subscription = null;
   languageOptions: Array<Language>;
 
-  constructor(
-    private albumService: AlbumService,
-    private languageService: LanguageService
-  ) {
+  constructor(private albumService: AlbumService,
+              private languageService: LanguageService) {
   }
 
   ngOnInit(): void {
@@ -42,8 +40,10 @@ export class AlbumEditForm implements OnInit{
         useCurrent: false
       })
       .on('dp.hide', (event) => {
-        console.log(event.date.toDate().getTime());
-        this.album.releasedDate = event.date.toDate();
+        // ignoring client timezone
+        var clientDate = event.date.toDate();
+        var gmtTimestamp = clientDate.valueOf() - clientDate.getTimezoneOffset() * 60000;
+        this.album.releasedDate = new Date(gmtTimestamp);
       });
     $('#new-artist').typeahead({
       source: this.getArtists.bind(this),
@@ -102,9 +102,11 @@ export class AlbumEditForm implements OnInit{
       position: ''
     };
   }
+
   removeTrack(trackId: string) {
     this.album.trackList = this.album.trackList.filter((track) => track.id !== trackId);
   }
+
   onLanguageChange(languageCode: string) {
     this.album.language = languageCode === 'null'
       ? null

@@ -89,7 +89,7 @@ public class Album {
     private List<String> imagesUrls;
 
     @JsonProperty("released_date")
-    private JsonNumberLong releasedDate;
+    private JsonDateDay releasedDate;
 
     @JsonProperty("rating")
     private Double rating;
@@ -218,12 +218,12 @@ public class Album {
         return this;
     }
 
-    public JsonNumberLong getReleasedDate() {
+    public JsonDateDay getReleasedDate() {
         return releasedDate;
     }
 
-    public Album setReleasedDate(Long releasedDate) {
-        this.releasedDate = (releasedDate != null) ? new JsonNumberLong(releasedDate) : null;
+    public Album setReleasedDate(JsonDateDay releasedDate) {
+        this.releasedDate = releasedDate;
         return this;
     }
 
