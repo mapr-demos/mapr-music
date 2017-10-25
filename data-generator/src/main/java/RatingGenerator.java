@@ -8,6 +8,11 @@ import java.util.stream.Collectors;
 
 public final class RatingGenerator {
 
+    /**
+     * Maximum percent of documents, which can be rated by single user.
+     */
+    public static final int MAX_PERCENT_OF_RATED_DOCUMENTS = 20;
+
     private static final Random random = new Random();
     private static final Random rateRandom = new Random();
 
@@ -39,7 +44,8 @@ public final class RatingGenerator {
     private static Set<Rating> imitateUserBehaviour(String userId, Set<String> documentIdsModifiableSet) {
 
         Set<Rating> ratings = new HashSet<>();
-        int documentsWillBeRatedByUser = random.nextInt(documentIdsModifiableSet.size());
+        int bound = documentIdsModifiableSet.size() * MAX_PERCENT_OF_RATED_DOCUMENTS / 100;
+        int documentsWillBeRatedByUser = random.nextInt(bound);
         for (int i = 0; i < documentsWillBeRatedByUser; i++) {
 
             String documentId = popRandomDocumentId(documentIdsModifiableSet);
