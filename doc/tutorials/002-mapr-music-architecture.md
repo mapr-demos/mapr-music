@@ -1,5 +1,30 @@
 # MapR Music Architecture
 
+MapR Music Application consists of the following modules:
+1. [MapR Music REST Service](https://github.com/mapr-demos/mapr-music/tree/devel/mapr-rest)
+
+MapR Music REST Service, built on top of MapR-DB. 
+
+2. [MapR Music UI](https://github.com/mapr-demos/mapr-music/tree/devel/mapr-ui)
+                  
+Angular app, which provides user interface.
+
+3. [Elastic Search Service](https://github.com/mapr-demos/mapr-music/tree/devel/elasticsearch-service)
+                           
+MapR Music Elastic Search Service, which listens changelogs and publishes the changes to the ElasticSearch.
+
+4. [Recommendation Engine](https://github.com/mapr-demos/mapr-music/tree/devel/recommendation-engine)
+
+Recommendation Engine, built using Spark MLlib's Alternating Least Squares algorithm, which allows to make 
+Albums/Artists recommendations.
+
+5. [Data Generator](https://github.com/mapr-demos/mapr-music/tree/devel/data-generator)
+                   
+Utility application which allows to convert [MusicBrainz](https://musicbrainz.org/) database dump into MapR Music Data 
+Set.
+
+## MapR Music REST Service Architecture
+
 For developing MapR Music Application the layered architecture pattern was chosen. It's the most common architecture pattern, 
 also known as the n-tier architecture pattern. It is the de facto standard for most Java EE applications and therefore 
 is widely known by most architects, designers, and developers.
