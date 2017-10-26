@@ -8,7 +8,6 @@ import org.ojai.store.DocumentMutation;
 import org.ojai.types.ODate;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -125,18 +124,17 @@ public class AlbumMutationBuilder {
         return setStringValue(FORMAT_FIELD, format, setNullValue);
     }
 
-    public AlbumMutationBuilder setDateDay(Date releasedDate) {
+    public AlbumMutationBuilder setDateDay(ODate releasedDate) {
         return setDateDay(releasedDate, SET_NULL_VALUE_DEFAULT);
     }
 
-    public AlbumMutationBuilder setDateDay(Date dateDay, boolean setNullValue) {
+    public AlbumMutationBuilder setDateDay(ODate dateDay, boolean setNullValue) {
 
         if (dateDay == null && !setNullValue) {
             return this;
         }
 
-        ODate odate = (dateDay == null) ? null : new ODate(dateDay);
-        this.mutation.set(RELEASED_DATE_FIELD, odate);
+        this.mutation.set(RELEASED_DATE_FIELD, dateDay);
         return this;
     }
 

@@ -12,6 +12,7 @@ import com.mapr.music.model.Artist;
 import com.mapr.music.model.Language;
 import com.mapr.music.model.Track;
 import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.ojai.types.ODate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -661,6 +662,10 @@ public class AlbumService implements PaginatedService {
             albumDto.setArtistList(artistDtoList);
         }
 
+        if (album.getReleasedDate() != null) {
+            albumDto.setReleasedDateDay(album.getReleasedDate().toDate());
+        }
+
         return albumDto;
     }
 
@@ -716,6 +721,10 @@ public class AlbumService implements PaginatedService {
                     .collect(toList());
 
             album.setArtists(artistShortInfoList);
+        }
+
+        if (albumDto.getReleasedDateDay() != null) {
+            album.setReleasedDate(new ODate(albumDto.getReleasedDateDay()));
         }
 
         return album;

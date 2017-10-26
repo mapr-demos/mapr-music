@@ -1,15 +1,12 @@
 package com.mapr.music.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import com.mapr.music.annotation.MaprDbTable;
+import org.ojai.types.ODate;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import static com.mapr.music.util.MaprProperties.ALBUMS_TABLE_NAME;
@@ -133,8 +130,7 @@ public class Album {
     @JsonProperty("images_urls")
     private List<String> imagesUrls;
 
-    @JsonProperty("released_date")
-    private Date releasedDate;
+    private ODate releasedDate;
 
     @NotNull
     @JsonProperty("name")
@@ -278,12 +274,18 @@ public class Album {
         this.country = country;
     }
 
-    public Date getReleasedDate() {
+    @JsonGetter("released_date")
+    public ODate getReleasedDate() {
         return releasedDate;
     }
 
-    public void setReleasedDate(Date releasedDate) {
+    public void setReleasedDate(ODate releasedDate) {
         this.releasedDate = releasedDate;
+    }
+
+    @JsonSetter("released_date")
+    public void setReleasedDate(String dateDayString) {
+        this.releasedDate = ODate.parse(dateDayString);
     }
 
     public String getBarcode() {

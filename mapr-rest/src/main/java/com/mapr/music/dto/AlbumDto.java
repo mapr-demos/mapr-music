@@ -47,7 +47,7 @@ public class AlbumDto {
     private List<String> imagesUrls;
 
     @JsonProperty("released_date")
-    private Date releasedDate;
+    private Date releasedDateDay;
 
     @JsonProperty("rating")
     private Double rating;
@@ -140,12 +140,12 @@ public class AlbumDto {
         this.country = country;
     }
 
-    public Date getReleasedDate() {
-        return releasedDate;
+    public Date getReleasedDateDay() {
+        return releasedDateDay;
     }
 
-    public void setReleasedDate(Date releasedDate) {
-        this.releasedDate = releasedDate;
+    public void setReleasedDateDay(Date releasedDateDay) {
+        this.releasedDateDay = releasedDateDay;
     }
 
     public String getStyle() {
