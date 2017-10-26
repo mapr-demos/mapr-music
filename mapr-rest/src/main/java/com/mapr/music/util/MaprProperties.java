@@ -20,8 +20,8 @@ public final class MaprProperties {
     public static final String STATISTICS_TABLE_NAME = "/apps/statistics";
     public static final String USERS_TABLE_NAME = "/apps/users";
 
-    public static final String ARTISTS_CHANGE_LOG = getOrDefault("ARTISTS_CHANGE_LOG", "/mapr_music_changelog:artists");
-    public static final String ALBUMS_CHANGE_LOG = getOrDefault("ALBUMS_CHANGE_LOG", "/mapr_music_changelog:albums");
+    public static final String ARTISTS_CHANGE_LOG = getOrDefault("ARTISTS_CHANGE_LOG", "/apps/mapr_music_changelog:artists");
+    public static final String ALBUMS_CHANGE_LOG = getOrDefault("ALBUMS_CHANGE_LOG", "/apps/mapr_music_changelog:albums");
 
     public static final String ES_REST_HOST = getOrDefault("ELASTIC_SEARCH_REST_HOST", "localhost");
     public static final int ES_REST_PORT = getOrDefault("ELASTIC_SEARCH_REST_PORT", 9200);

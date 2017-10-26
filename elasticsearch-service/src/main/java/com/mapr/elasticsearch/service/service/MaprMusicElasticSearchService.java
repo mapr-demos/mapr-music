@@ -26,7 +26,7 @@ public class MaprMusicElasticSearchService {
     private static final String TEST_USER_GROUP = "mapr";
     private static final String CONNECTION_URL = "ojai:mapr:";
 
-    private static final String MAPR_MUSIC_CHANGELOG = "/mapr_music_changelog";
+    private static final String MAPR_MUSIC_CHANGELOG = "/apps/mapr_music_changelog";
     private static final String ARTISTS_CHANGELOG = MAPR_MUSIC_CHANGELOG + ":artists";
     private static final String ARTISTS_INDEX_NAME = "artists";
     private static final String ARTISTS_TYPE_NAME = "artist";
