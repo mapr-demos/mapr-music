@@ -86,10 +86,10 @@ public class Artist {
     private Set<String> imagesUrls = new HashSet<>();
 
     @JsonProperty("begin_date")
-    private JsonNumberLong beginDate;
+    private JsonDateDay beginDate;
 
     @JsonProperty("end_date")
-    private JsonNumberLong endDate;
+    private JsonDateDay endDate;
 
     @JsonProperty("rating")
     private Double rating;
@@ -227,21 +227,21 @@ public class Artist {
         return this;
     }
 
-    public JsonNumberLong getBeginDate() {
+    public JsonDateDay getBeginDate() {
         return beginDate;
     }
 
-    public Artist setBeginDate(Long beginDate) {
-        this.beginDate = (beginDate != null) ? new JsonNumberLong(beginDate) : null;
+    public Artist setBeginDate(JsonDateDay beginDate) {
+        this.beginDate = beginDate;
         return this;
     }
 
-    public JsonNumberLong getEndDate() {
+    public JsonDateDay getEndDate() {
         return endDate;
     }
 
-    public Artist setEndDate(Long endDate) {
-        this.endDate = (endDate != null) ? new JsonNumberLong(endDate) : null;
+    public Artist setEndDate(JsonDateDay endDate) {
+        this.endDate = endDate;
         return this;
     }
 

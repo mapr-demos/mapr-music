@@ -276,7 +276,7 @@ Contains `10281` Artist JSON documents, which are ready to be imported into MapR
      "profile_image_url": "https://upload.wikimedia.org/wikipedia/commons/a/a0/David_Cook_Toads_cropped.jpg",
      "images_urls": [],
      "begin_date": {
-        "$numberLong": 409190400000
+        "$dateDay": "1982-12-20"
      },
      "rating": 2.919355
   }

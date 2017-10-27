@@ -456,8 +456,8 @@ public class ArtistParser {
         artist.setDisambiguationComment(values[13]);
         artist.setSlugPostfix(0);
 
-        artist.setBeginDate(ParserUtils.parseTimeStamp(values[4], values[5], values[6]));
-        artist.setEndDate(ParserUtils.parseTimeStamp(values[7], values[8], values[9]));
+        artist.setBeginDate(ParserUtils.parseDateDay(values[4], values[5], values[6]));
+        artist.setEndDate(ParserUtils.parseDateDay(values[7], values[8], values[9]));
 
         artist.setArea(values[11]); // area id
         artist.setGender(values[12]); // gender id

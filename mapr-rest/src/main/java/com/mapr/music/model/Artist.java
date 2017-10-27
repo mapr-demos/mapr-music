@@ -1,10 +1,8 @@
 package com.mapr.music.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import com.mapr.music.annotation.MaprDbTable;
+import org.ojai.types.ODate;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -148,11 +146,9 @@ public class Artist {
     @JsonProperty("images_urls")
     private String[] imagesUrls;
 
-    @JsonProperty("begin_date")
-    private Long beginDate;
+    private ODate beginDate;
 
-    @JsonProperty("end_date")
-    private Long endDate;
+    private ODate endDate;
 
     @JsonProperty("deleted")
     private Boolean deleted;
@@ -275,20 +271,44 @@ public class Artist {
         this.imagesUrls = imagesUrls;
     }
 
-    public Long getBeginDate() {
+    @JsonGetter("begin_date")
+    public ODate getBeginDate() {
         return beginDate;
     }
 
-    public void setBeginDate(Long beginDate) {
+    public void setBeginDate(ODate beginDate) {
         this.beginDate = beginDate;
     }
 
-    public Long getEndDate() {
+    @JsonSetter("begin_date")
+    public void setBeginDate(String dateDayString) {
+
+        if (dateDayString == null) {
+            this.beginDate = null;
+            return;
+        }
+
+        this.beginDate = ODate.parse(dateDayString);
+    }
+
+    @JsonGetter("end_date")
+    public ODate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Long endDate) {
+    public void setEndDate(ODate endDate) {
         this.endDate = endDate;
+    }
+
+    @JsonSetter("end_date")
+    public void setEndDate(String dateDayString) {
+
+        if (dateDayString == null) {
+            this.endDate = null;
+            return;
+        }
+
+        this.endDate = ODate.parse(dateDayString);
     }
 
     public ShortInfo getShortInfo() {

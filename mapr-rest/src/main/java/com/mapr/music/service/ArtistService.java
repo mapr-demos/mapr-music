@@ -11,6 +11,7 @@ import com.mapr.music.exception.ValidationException;
 import com.mapr.music.model.Album;
 import com.mapr.music.model.Artist;
 import org.apache.commons.beanutils.PropertyUtilsBean;
+import org.ojai.types.ODate;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -425,6 +426,14 @@ public class ArtistService implements PaginatedService {
         String slug = slugService.getSlugForArtist(artist);
         artistDto.setSlug(slug);
 
+        if (artist.getBeginDate() != null) {
+            artistDto.setBeginDateDay(artist.getBeginDate().toDate());
+        }
+
+        if (artist.getEndDate() != null) {
+            artistDto.setEndDateDay(artist.getEndDate().toDate());
+        }
+
         return artistDto;
     }
 
@@ -442,6 +451,14 @@ public class ArtistService implements PaginatedService {
                     .map(this::albumDtoToShortInfo)
                     .collect(Collectors.toList());
             artist.setAlbums(albums);
+        }
+
+        if (artistDto.getBeginDateDay() != null) {
+            artist.setBeginDate(new ODate(artistDto.getBeginDateDay()));
+        }
+
+        if (artistDto.getEndDateDay() != null) {
+            artist.setEndDate(new ODate(artistDto.getEndDateDay()));
         }
 
         return artist;

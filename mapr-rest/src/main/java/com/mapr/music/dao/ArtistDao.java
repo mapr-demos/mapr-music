@@ -140,6 +140,22 @@ public class ArtistDao extends MaprDbDao<Artist> {
                 artistJsonNode.set("slug_postfix", slugPostfix);
             }
 
+            // Since we creating artist from JSON string we have to specify tags explicitly.
+            if (artist.getBeginDate() != null) {
+
+                ObjectNode beginDate = mapper.createObjectNode();
+                beginDate.put("$dateDay", artist.getBeginDate().toDateStr());
+                artistJsonNode.set("begin_date", beginDate);
+            }
+
+            // Since we creating artist from JSON string we have to specify tags explicitly.
+            if (artist.getEndDate() != null) {
+
+                ObjectNode endDate = mapper.createObjectNode();
+                endDate.put("$dateDay", artist.getEndDate().toDateStr());
+                artistJsonNode.set("end_date", endDate);
+            }
+
             String artistJsonString = artistJsonNode.toString();
 
             // Create an OJAI Document form the JSON string (there are other ways too)

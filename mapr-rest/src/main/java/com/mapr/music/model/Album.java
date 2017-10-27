@@ -285,6 +285,12 @@ public class Album {
 
     @JsonSetter("released_date")
     public void setReleasedDate(String dateDayString) {
+
+        if (dateDayString == null) {
+            this.releasedDate = null;
+            return;
+        }
+
         this.releasedDate = ODate.parse(dateDayString);
     }
 

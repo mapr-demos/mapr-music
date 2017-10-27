@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,10 +48,10 @@ public class ArtistDto {
     private String[] imagesUrls;
 
     @JsonProperty("begin_date")
-    private Long beginDate;
+    private Date beginDateDay;
 
     @JsonProperty("end_date")
-    private Long endDate;
+    private Date endDateDay;
 
     @JsonProperty("rating")
     private Double rating;
@@ -151,20 +152,20 @@ public class ArtistDto {
         this.imagesUrls = imagesUrls;
     }
 
-    public Long getBeginDate() {
-        return beginDate;
+    public Date getBeginDateDay() {
+        return beginDateDay;
     }
 
-    public void setBeginDate(Long beginDate) {
-        this.beginDate = beginDate;
+    public void setBeginDateDay(Date beginDateDay) {
+        this.beginDateDay = beginDateDay;
     }
 
-    public Long getEndDate() {
-        return endDate;
+    public Date getEndDateDay() {
+        return endDateDay;
     }
 
-    public void setEndDate(Long endDate) {
-        this.endDate = endDate;
+    public void setEndDateDay(Date endDateDay) {
+        this.endDateDay = endDateDay;
     }
 
     public Double getRating() {
