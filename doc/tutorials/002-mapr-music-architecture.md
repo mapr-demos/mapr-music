@@ -43,8 +43,6 @@ Performs business logic on domains.
 
 Includes the data persistence mechanisms.
 
-TODO: find appropriate scheme.
-
 ## Data layer
 
 Albums data will be stored in 
@@ -75,9 +73,9 @@ In order to implement Data layer we will use [DAO](https://en.wikipedia.org/wiki
 for 'data access object', the object that provides an abstract interface to some type of database or other persistence 
 mechanism. But first off all, we need to define Album model. 
 
-According to  [Release](https://github.com/mapr-demos/mapr-music/wiki/Design-docs#release) entity from the 
-[Database Design](https://github.com/mapr-demos/mapr-music/wiki/Design-docs) such model will be similar to the  example 
-below:
+Below you can see code snippet of 
+[Album](https://github.com/mapr-demos/mapr-music/blob/devel/mapr-rest/src/main/java/com/mapr/music/model/Album.java) 
+model class:
 ```
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -86,27 +84,21 @@ public class Album {
     
     @JsonProperty("_id")
     private String id;
-    private String name;
-    private String genre;
-    private String style;
-    private String barcode;
-    private String status;
-    private String packaging;
-    private String language;
-    private String script;
-    private String MBID;
-    private String format;
-    private String country;
-    private List reviews;
 
-    @JsonProperty("artist_list")
-    private List artistList;
+    @JsonProperty("slug_name")
+    private String slugName;
+
+    @JsonProperty("slug_postfix")
+    private Long slugPostfix;
+
+    @JsonProperty("artists")
+    private List<Artist.ShortInfo> artists;
 
     @JsonProperty("catalog_numbers")
     private List catalogNumbers;
 
-    @JsonProperty("track_list")
-    private List trackList;
+    @JsonProperty("tracks")
+    private List<Track> trackList;
 
     @JsonProperty("cover_image_url")
     private String coverImageUrl;
@@ -114,15 +106,47 @@ public class Album {
     @JsonProperty("images_urls")
     private List<String> imagesUrls;
 
-    @JsonProperty("released_date")
-    private Long releasedDate;
+    private ODate releasedDate;
+
+    @NotNull
+    @JsonProperty("name")
+    private String name;
+
+    @JsonProperty("barcode")
+    private String barcode;
+
+    @JsonProperty("status")
+    private String status;
+
+    @JsonProperty("packaging")
+    private String packaging;
+
+    @JsonProperty("language")
+    private String language;
+
+    @JsonProperty("script")
+    private String script;
+
+    @JsonProperty("MBID")
+    private String MBID;
+
+    @JsonProperty("format")
+    private String format;
+
+    @JsonProperty("country")
+    private String country;
+
+    @JsonProperty("reviews")
+    private List reviews;
+
+    @JsonProperty("rating")
+    private Double rating;
  
     // Getters and setters are omitted for the sake of brevity
 }
 ```
-The model class completely reflects [Release](https://github.com/mapr-demos/mapr-music/wiki/Design-docs#release) entity 
-and using of Jackson annotations helps to bypass some mismatches, related to differences in naming conventions. Also 
-you can notice `@MaprDbTable` annotation. It's custom annotation used to define MapR-DB JSON Table path so 
+
+You can notice `@MaprDbTable` annotation. It's custom annotation used to define MapR-DB JSON Table path so 
 implementation of DAO will know which table to query.
 
 OJAI Driver allows to create OJAI connection to the cluster and access the OJAI Document Store in the following way:
@@ -150,11 +174,14 @@ OJAI Driver allows to create OJAI connection to the cluster and access the OJAI 
     ...
 ```
 
-This approach is used by by [abstract DAO class](LINK), which implements common operations.
+This approach is used by by 
+[MaprDbDao](https://github.com/mapr-demos/mapr-music/blob/devel/mapr-rest/src/main/java/com/mapr/music/dao/MaprDbDao.java) 
+class, which implements common operations.
 
 OJAI [Connection](https://docstage.mapr.com/public/beta/OJAI/org/ojai/store/Connection.html) interface along with 
 [DocumentStore](https://docstage.mapr.com/public/beta/OJAI/org/ojai/store/DocumentStore.html) interface defines all
 key methods to interact with MapR-DB.
+
 #### Query the Documents in the DocumentStore 
 
 Get all Documents using 
@@ -235,7 +262,8 @@ For more information about OJAI Driver refer [OJAI API library javadoc](https://
 
 Business layer is responsible of performing business logic. It provides data to the presentation layer in a suitable 
 form using DTO pattern, implements pagination logic, communicates with Data Layer in order to fetch and persist the 
-data. Source code of all interfaces and actual implementation classes can be found at [service package](LINK). 
+data. Source code of all interfaces and actual implementation classes can be found at 
+[service package](https://github.com/mapr-demos/mapr-music/tree/devel/mapr-rest/src/main/java/com/mapr/music/service). 
 
 ## Presentation Layer
 
@@ -256,41 +284,44 @@ Presentation Layer of Album Service is represented by REST API endpoints.
         <ul>
             <li>'page' - specifies page number</li>
             <li>'per_page' - specifies number of albums per page</li>
-            <li>'sort_type' - 'ASC' or 'DESC' sort type</li>
-            <li>'sort_fields' - fields for ordering</li>
+            <li>'sort' - sort string, which contains 'ASC' or 'DESC' sort type and comma separated list of sort fields</li>
         </ul>
       </td>
-      <td><code>curl -X GET "http://localhost:8080/mapr-music/api/1.0/albums?per_page=1&page=1548&sort_type=DESC&sort_fields=_id&sort_fields=name"</code></td>
+      <td><code>curl -X GET "http://localhost:8080/mapr-music-rest/api/1.0/albums?per_page=2&page=1548&sort=ASC,released_date,name"</code></td>
     </tr>
     <tr>
           <td>GET</td>
           <td>/api/1.0/albums/{id}</td>
           <td>Get single album by it's identifier</td>
-          <td><code>curl -X GET http://localhost:8080/mapr-music/api/1.0/albums/1</code></td>
+          <td><code>curl -X GET http://localhost:8080/mapr-music-rest/api/1.0/albums/1</code></td>
     </tr>
     <tr>
           <td>DELETE</td>
           <td>/api/1.0/albums/{id}</td>
           <td>Delete single album by it's identifier</td>
-          <td><code>curl -X DELETE http://localhost:8080/mapr-music/api/1.0/albums/1</code></td>
+          <td><code>curl -u jdoe:music -X DELETE http://localhost:8080/mapr-music-rest/api/1.0/albums/1</code></td>
     </tr>
     <tr>
           <td>PUT</td>
           <td>/api/1.0/albums/{id}</td>
           <td>Update single album by it's identifier</td>
-          <td><code>curl -d '{"name":"NEW NAME"}' -H "Content-Type: application/json" -X PUT http://localhost:8080/mapr-music/api/1.0/albums/1</code></td>
+          <td><code>curl -u jdoe:music -d '{"name":"NEW NAME"}' -H "Content-Type: application/json" -X PUT http://localhost:8080/mapr-music-rest/api/1.0/albums/1</code></td>
     </tr>
     <tr>
           <td>POST</td>
           <td>/api/1.0/albums</td>
           <td>Creates album according to the request body</td>
-          <td><code>curl -d '{"name":"NEWLY CREATED"}' -H "Content-Type: application/json" -X POST http://localhost:8080/mapr-music/api/1.0/albums</code></td>
+          <td><code>curl -u jdoe:music -d '{"name":"NEWLY CREATED"}' -H "Content-Type: application/json" -X POST http://localhost:8080/mapr-music-rest/api/1.0/albums</code></td>
     </tr>
   </tbody>
 </table>
 
-Album service presentation layer implemented using JAX-RS. It communicates with business layer to get the Albums data in 
-a suitable form and sends it as response to the client's request. Here is the listing of Album endpoint:
+Note: to get detailed endpoints description, follow [API Reference](http://localhost:8080/api-reference) link, at MapR Music UI.
+
+Note: all modification operations require user authorization.
+ 
+Presentation layer implemented using JAX-RS annotations. It communicates with business layer to get the model data in 
+a suitable form and sends it as response to the client's request. Here is code snippet of Album endpoint:
 ```
 /**
  * Endpoint for accessing 'Album' resources.
@@ -305,44 +336,27 @@ public class AlbumEndpoint {
     @Inject
     private AlbumService albumService;
 
+    @Inject
+    private RecommendationService recommendationService;
+
+    @Inject
+    private RateService rateService;
+
     @GET
     @Path("{id}")
     @ApiOperation(value = "Get single album by it's identifier")
-    public AlbumDto getAlbum(@PathParam("id") String id) {
+    public AlbumDto getAlbum(@ApiParam(value = "Album's identifier", required = true) @PathParam("id") String id) {
         return albumService.getAlbumById(id);
     }
 
     @GET
-    @Path("/")
-    @ApiOperation(value = "Get list of albums, which is represented by page")
-    public ResourceDto<AlbumDto> getAllAlbums(@QueryParam("per_page") Long perPage,
-                                              @QueryParam("page") Long page,
-                                              @QueryParam("sort_type") String order,
-                                              @QueryParam("sort_fields") List<String> orderFields) {
-
-        return albumService.getAlbumsPage(perPage, page, order, orderFields);
+    @Path("/slug/{slug}")
+    @ApiOperation(value = "Get single album by it's slug name")
+    public AlbumDto getAlbumBySlugName(@ApiParam(value = "Slug name", required = true) @PathParam("slug") String slug) {
+        return albumService.getAlbumBySlugName(slug);
     }
-
-    @DELETE
-    @Path("{id}")
-    @ApiOperation(value = "Delete single album by it's identifier")
-    public void deleteAlbum(@PathParam("id") String id) {
-        albumService.deleteAlbumById(id);
-    }
-
-    @PUT
-    @Path("{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Update single album")
-    public AlbumDto updateAlbum(@PathParam("id") String id, Album album) {
-        return albumService.updateAlbum(id, album);
-    }
-
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Create album")
-    public AlbumDto createAlbum(Album album) {
-        return albumService.createAlbum(album);
-    }
+    
+    ...
+    
 }
 ```
