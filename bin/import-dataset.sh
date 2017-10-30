@@ -48,7 +48,9 @@ Options:
     --batch     Specifies batch size of imported documents, allows to import large dataset 
                 and prevent problems related to lack of memory. Default value is '20000'.
 
-    --recreate  When specified, MapR-DB JSON Tables for dataset will be recreated.
+    --recreate  When specified, MapR-DB JSON Tables for dataset will be recreated. 
+                Note, that in case of tables recreation all added changelogs will be deleted 
+                and must be readded manually after script completion.
 
     --help      Prints usage information.
 EOM
