@@ -17,6 +17,7 @@ application with MapR Converged Data Platform.
 * [Building a UI with Angular](https://github.com/mapr-demos/mapr-music/blob/devel/doc/tutorials/009-building-a-ui-with-angular.md)
 * [Working Arrays](https://github.com/mapr-demos/mapr-music/blob/devel/doc/tutorials/010-working-with-arrays.md)
 * [CDC](https://github.com/mapr-demos/mapr-music/blob/devel/doc/tutorials/011-change-data-capture.md)
+* [Creating Recommendation Engine](https://github.com/mapr-demos/mapr-music/blob/devel/doc/tutorials/012-creating-recommendation-engine.md)
 
 ## Repository overview
 
