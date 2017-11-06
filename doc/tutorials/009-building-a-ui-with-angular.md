@@ -1,6 +1,6 @@
 # Building a UI with Angular
 
-MapR Music Application has [MapR Music UI module](https://github.com/mapr-demos/mapr-music/tree/devel/mapr-ui), 
+MapR Music Application has [MapR Music UI module](https://github.com/mapr-demos/mapr-music/tree/master/mapr-ui), 
 which is [Angular](https://angular.io/) project. 
 
 ## Basics
@@ -63,7 +63,7 @@ To get more details about Angular apps development, please refer
 
 
 ## Build with Maven
-[MapR Music UI module](https://github.com/mapr-demos/mapr-music/tree/devel/mapr-ui) is Maven module, which can be built 
+[MapR Music UI module](https://github.com/mapr-demos/mapr-music/tree/master/mapr-ui) is Maven module, which can be built 
 into `war` using Maven install command:
 ```
 $ cd mapr-music/mapr-ui/

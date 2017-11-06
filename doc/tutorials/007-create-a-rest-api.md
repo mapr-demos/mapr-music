@@ -2,9 +2,9 @@
 
 ## MapR Music REST Service API
 
-[MapR Music REST Service](https://github.com/mapr-demos/mapr-music/tree/devel/mapr-rest) is core module of MapR 
+[MapR Music REST Service](https://github.com/mapr-demos/mapr-music/tree/master/mapr-rest) is core module of MapR 
 Music application. It exposes REST API, which allows to manage Albums, Artists, Users resources. 
-[MapR Music UI](https://github.com/mapr-demos/mapr-music/tree/devel/mapr-ui) is built on top of MapR Music REST Service 
+[MapR Music UI](https://github.com/mapr-demos/mapr-music/tree/master/mapr-ui) is built on top of MapR Music REST Service 
 API and provides user interface to perform various operations.
 
 #### MapR Music REST Service Endpoints
@@ -221,4 +221,4 @@ Swagger annotation, which is used to document separate method.
 
 
 MapR Music REST Service implemented using layered architecture pattern. To get more info, see 
-[MapR Music Architecture](https://github.com/mapr-demos/mapr-music/blob/devel/doc/tutorials/002-mapr-music-architecture.md#mapr-music-rest-service-architecture).
+[MapR Music Architecture](https://github.com/mapr-demos/mapr-music/blob/master/doc/tutorials/002-mapr-music-architecture.md#mapr-music-rest-service-architecture).

@@ -166,9 +166,9 @@ MapR-DB OJAI Connector for Apache Spark allows us to easily store recommendation
 
 ## Running the Engine manually
 
-[RecommendationEngine.scala](https://github.com/mapr-demos/mapr-music/blob/devel/recommendation-engine/src/main/scala/com/mapr/recommendation/engine/RecommendationEngine.scala)
+[RecommendationEngine.scala](https://github.com/mapr-demos/mapr-music/blob/master/recommendation-engine/src/main/scala/com/mapr/recommendation/engine/RecommendationEngine.scala)
 represents separate Spark job, which can be run manually from Dev machine. You have to be sure that you have MapR Client 
-properly [installed and configured](https://github.com/mapr-demos/mapr-music/blob/devel/doc/tutorials/003-setup.md#installing-and-configuring-mapr-client). 
+properly [installed and configured](https://github.com/mapr-demos/mapr-music/blob/master/doc/tutorials/003-setup.md#installing-and-configuring-mapr-client). 
 Use the following commands to run the engine:
 ```
 $ cd core-application/processing/recommendation-engine
@@ -197,7 +197,7 @@ Thus, you have following options to run Recommendation Engine in automatic mode:
 
 You can create Changelog and add it to rating table. After that you are free to use Kafka Consumer and receive Change 
 Data records to trigger Engine retraining. For more information about CDC refer 
-[Change Data Capture](https://github.com/mapr-demos/mapr-music/blob/devel/doc/tutorials/011-change-data-capture.md) 
+[Change Data Capture](https://github.com/mapr-demos/mapr-music/blob/master/doc/tutorials/011-change-data-capture.md) 
 document.
 
 3. Using Spark MLLib streaming machine learning options:
@@ -313,7 +313,7 @@ done
 EXPECTED_ALBUM=$(curl -s -X GET http://${REST_SERVICE_HOST}:${REST_SERVICE_PORT}/${ALBUMS_ENDPOINT}/${expected_album_id})
 ```
 
-[Here](https://github.com/mapr-demos/mapr-music/blob/devel/bin/user-rating-influence.sh) you can find the listing of 
+[Here](https://github.com/mapr-demos/mapr-music/blob/master/bin/user-rating-influence.sh) you can find the listing of 
 the resulting script.
 
 #### Running the script

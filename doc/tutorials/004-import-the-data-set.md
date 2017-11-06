@@ -1,11 +1,11 @@
 # Import the Data Set
 
-Repository contains sample [dataset](https://github.com/mapr-demos/mapr-music/tree/devel/dataset), which can be used by 
+Repository contains sample [dataset](https://github.com/mapr-demos/mapr-music/tree/master/dataset), which can be used by 
 MapR Music Application. This document explains the Data Set structure and shows various ways to import it into MapR-DB.
 
 ## Data Set description
 
-Sample dataset archive [dataset.tar.gz](https://github.com/mapr-demos/mapr-music/tree/devel/dataset) contains JSON 
+Sample dataset archive [dataset.tar.gz](https://github.com/mapr-demos/mapr-music/tree/master/dataset) contains JSON 
 documents, placed in 6 directories:
 1. `albums`
 
@@ -352,11 +352,11 @@ Contains `300` User JSON documents, which are ready to be imported into MapR-DB 
 ## How to import the Data Set
 
 You can import dataset either manually or using 
-[import-dataset.sh](https://github.com/mapr-demos/mapr-music/blob/devel/bin/import-dataset.sh) script.
+[import-dataset.sh](https://github.com/mapr-demos/mapr-music/blob/master/bin/import-dataset.sh) script.
 
 ### 'import-dataset.sh' script
 
-[import-dataset.sh](https://github.com/mapr-demos/mapr-music/blob/devel/bin/import-dataset.sh) will extract dataset 
+[import-dataset.sh](https://github.com/mapr-demos/mapr-music/blob/master/bin/import-dataset.sh) will extract dataset 
 archive and import it to MapR-DB JSON Tables. Below you can find script usage information:
 ```
 $ import-dataset.sh -h
@@ -381,6 +381,9 @@ $ ./import-dataset.sh -r -b 10000 --path /path/to/dataset/directory/
 ```
 
 Note, that script assumes that dataset archive has default name(`dataset.tar.gz`).
+Note, that in case of tables recreation all added changelogs will be deleted and must be 
+[readded manually](https://github.com/mapr-demos/mapr-music/blob/master/doc/tutorials/003-setup.md#create-changelog) 
+after script completion.
 
 ### Manual import
 

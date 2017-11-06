@@ -1,24 +1,24 @@
 # MapR Music Architecture
 
 MapR Music Application consists of the following modules:
-1. [MapR Music REST Service](https://github.com/mapr-demos/mapr-music/tree/devel/mapr-rest)
+1. [MapR Music REST Service](https://github.com/mapr-demos/mapr-music/tree/master/mapr-rest)
 
 MapR Music REST Service, built on top of MapR-DB. 
 
-2. [MapR Music UI](https://github.com/mapr-demos/mapr-music/tree/devel/mapr-ui)
+2. [MapR Music UI](https://github.com/mapr-demos/mapr-music/tree/master/mapr-ui)
                   
 Angular app, which provides user interface.
 
-3. [Elastic Search Service](https://github.com/mapr-demos/mapr-music/tree/devel/elasticsearch-service)
+3. [Elastic Search Service](https://github.com/mapr-demos/mapr-music/tree/master/elasticsearch-service)
                            
 MapR Music Elastic Search Service, which listens changelogs and publishes the changes to the ElasticSearch.
 
-4. [Recommendation Engine](https://github.com/mapr-demos/mapr-music/tree/devel/recommendation-engine)
+4. [Recommendation Engine](https://github.com/mapr-demos/mapr-music/tree/master/recommendation-engine)
 
 Recommendation Engine, built using Spark MLlib's Alternating Least Squares algorithm, which allows to make 
 Albums/Artists recommendations.
 
-5. [Data Generator](https://github.com/mapr-demos/mapr-music/tree/devel/data-generator)
+5. [Data Generator](https://github.com/mapr-demos/mapr-music/tree/master/data-generator)
                    
 Utility application which allows to convert [MusicBrainz](https://musicbrainz.org/) database dump into MapR Music Data 
 Set.
@@ -74,7 +74,7 @@ for 'data access object', the object that provides an abstract interface to some
 mechanism. But first off all, we need to define Album model. 
 
 Below you can see code snippet of 
-[Album](https://github.com/mapr-demos/mapr-music/blob/devel/mapr-rest/src/main/java/com/mapr/music/model/Album.java) 
+[Album](https://github.com/mapr-demos/mapr-music/blob/master/mapr-rest/src/main/java/com/mapr/music/model/Album.java) 
 model class:
 ```
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -175,7 +175,7 @@ OJAI Driver allows to create OJAI connection to the cluster and access the OJAI 
 ```
 
 This approach is used by by 
-[MaprDbDao](https://github.com/mapr-demos/mapr-music/blob/devel/mapr-rest/src/main/java/com/mapr/music/dao/MaprDbDao.java) 
+[MaprDbDao](https://github.com/mapr-demos/mapr-music/blob/master/mapr-rest/src/main/java/com/mapr/music/dao/MaprDbDao.java) 
 class, which implements common operations.
 
 OJAI [Connection](https://docstage.mapr.com/public/beta/OJAI/org/ojai/store/Connection.html) interface along with 
@@ -263,7 +263,7 @@ For more information about OJAI Driver refer [OJAI API library javadoc](https://
 Business layer is responsible of performing business logic. It provides data to the presentation layer in a suitable 
 form using DTO pattern, implements pagination logic, communicates with Data Layer in order to fetch and persist the 
 data. Source code of all interfaces and actual implementation classes can be found at 
-[service package](https://github.com/mapr-demos/mapr-music/tree/devel/mapr-rest/src/main/java/com/mapr/music/service). 
+[service package](https://github.com/mapr-demos/mapr-music/tree/master/mapr-rest/src/main/java/com/mapr/music/service). 
 
 ## Presentation Layer
 

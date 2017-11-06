@@ -1,8 +1,8 @@
 # Working with Java
 
 MapR Music Application is multi module Maven project, which consists of 5 modules. Each of them, except of 
-[Recommendation Engine](https://github.com/mapr-demos/mapr-music/tree/devel/recommendation-engine), written using Java 
-programming language. [Recommendation Engine](https://github.com/mapr-demos/mapr-music/tree/devel/recommendation-engine)
+[Recommendation Engine](https://github.com/mapr-demos/mapr-music/tree/master/recommendation-engine), written using Java 
+programming language. [Recommendation Engine](https://github.com/mapr-demos/mapr-music/tree/master/recommendation-engine)
 uses Scala MapR-DB OJAI Connector for Apache Spark and therefore it is written on Scala.
 
 ## Maven Dependencies
@@ -174,9 +174,9 @@ val ds = spark.loadFromMapRDB(tableName)
 ## Calling Drill from Java
 
 Drill configuration for web applications includes creating 
-[Drill JDBC module](https://github.com/mapr-demos/mapr-music/blob/devel/doc/tutorials/008-deploy-to-wildfly.md#drill-jdbc-driver-module) 
+[Drill JDBC module](https://github.com/mapr-demos/mapr-music/blob/master/doc/tutorials/008-deploy-to-wildfly.md#drill-jdbc-driver-module) 
 and defining 
-[Drill Data Source](https://github.com/mapr-demos/mapr-music/blob/devel/doc/tutorials/008-deploy-to-wildfly.md#drill-data-source) 
+[Drill Data Source](https://github.com/mapr-demos/mapr-music/blob/master/doc/tutorials/008-deploy-to-wildfly.md#drill-data-source) 
 at Widlfly.
 
 After that, you can use Drill Data Source from Java web app:

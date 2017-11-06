@@ -9,8 +9,8 @@ and process them.
 #### Statistics
 MapR Music App uses CDC in order to maintain `/apps/statistics` table, which contains statistics information about 
 Albums/Artists tables.
-[REST Service](https://github.com/mapr-demos/mapr-music/tree/devel/mapr-rest) has 
-[CdcStatisticService](https://github.com/mapr-demos/mapr-music/blob/devel/mapr-rest/src/main/java/com/mapr/music/service/ArtistsChangelogListenerService.java) 
+[REST Service](https://github.com/mapr-demos/mapr-music/tree/master/mapr-rest) has 
+[CdcStatisticService](https://github.com/mapr-demos/mapr-music/blob/master/mapr-rest/src/main/java/com/mapr/music/service/ArtistsChangelogListenerService.java) 
 class, which listens Artist's and Album's changelog and updates `/apps/statistics` table.
 Service run in separate thread using `ManagedThreadFactory`, which must be configured at Wildfly. Below you can see code 
 snippet which is responsible of updating `/apps/statistics` table
@@ -106,8 +106,8 @@ public class CdcStatisticService implements StatisticService {
 
 #### Artists deletion
 Artists deletion is performed using CDC. MapR Music 
-[REST Service](https://github.com/mapr-demos/mapr-music/tree/devel/mapr-rest) has 
-[ArtistsChangelogListenerService](https://github.com/mapr-demos/mapr-music/blob/devel/mapr-rest/src/main/java/com/mapr/music/service/CdcStatisticService.java) 
+[REST Service](https://github.com/mapr-demos/mapr-music/tree/master/mapr-rest) has 
+[ArtistsChangelogListenerService](https://github.com/mapr-demos/mapr-music/blob/master/mapr-rest/src/main/java/com/mapr/music/service/CdcStatisticService.java) 
 class, which listens Artist's changelog and deletes Artist and it's rates, albums. 
 Service is also run in separate thread using `ManagedThreadFactory`. Below you can find code snippet, which implements 
 actual Artist deletion logic:
@@ -203,7 +203,7 @@ actual Artist deletion logic:
 
 #### Elastic Search Integration
 CDC is used in Elastic Search integration. MapR Music 
-[Elastic Search Service](https://github.com/mapr-demos/mapr-music/tree/devel/elasticsearch-service) listens changelogs 
+[Elastic Search Service](https://github.com/mapr-demos/mapr-music/tree/master/elasticsearch-service) listens changelogs 
 and publishes the changes to the ElasticSearch.
 
 MapR Elastic Search Service implementation is based on `ChangelogListener`:

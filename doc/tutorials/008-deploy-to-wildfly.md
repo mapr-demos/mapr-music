@@ -1,7 +1,7 @@
 # Deploy to Wildfly
 
-[MapR Music REST Service](https://github.com/mapr-demos/mapr-music/tree/devel/mapr-rest) and 
-[MapR Music UI](https://github.com/mapr-demos/mapr-music/tree/devel/mapr-ui) are deployed on Wildfly application server.
+[MapR Music REST Service](https://github.com/mapr-demos/mapr-music/tree/master/mapr-rest) and 
+[MapR Music UI](https://github.com/mapr-demos/mapr-music/tree/master/mapr-ui) are deployed on Wildfly application server.
 This document explains how to properly install and configure Wildfly application server, create required by MapR Music 
 app modules.
 
