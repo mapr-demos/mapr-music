@@ -1,0 +1,22 @@
+<app-bar></app-bar>
+
+<artist-edit-form
+  *ngIf="artist"
+  [artist]="artist"
+>
+</artist-edit-form>
+<div
+  class="container"
+>
+  <div *ngIf="errors && errors.length > 0" style="padding: 10px" class="alert alert-danger">
+    <div *ngFor="let error of errors" >{{error}}</div>
+  </div>
+  <div class="form-group" style="padding: 10px">
+    <div
+      class="btn btn-primary btn-block"
+      (click)="onArtistSave()"
+    >
+      Save
+    </div>
+  </div>
+</div>

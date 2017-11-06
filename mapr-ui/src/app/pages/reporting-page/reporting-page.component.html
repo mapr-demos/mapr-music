@@ -1,0 +1,31 @@
+<app-bar
+  [sourceURL]="sourceURL"
+>
+</app-bar>
+<div class="container">
+  <div class="col-md-4">
+    <div class="list-group">
+      <a
+        href="#"
+        class="list-group-item"
+        *ngFor="let option of reportingOptions"
+        [ngClass]="{'active': option.value === selectedReportOption}"
+        (click) = "onSelectReportOption($event, option.value)"
+      >
+        {{option.label}}
+      </a>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <table class="table table-striped table-bordered" *ngIf="reportingResults">
+      <tr>
+        <th>Key</th>
+        <th>Value</th>
+      </tr>
+      <tr *ngFor="let reportResult of reportingResults">
+        <td>{{reportResult.key}}</td>
+        <td>{{reportResult.value}}</td>
+      </tr>
+    </table>
+  </div>
+</div>

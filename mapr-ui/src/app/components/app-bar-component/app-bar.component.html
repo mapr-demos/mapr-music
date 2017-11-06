@@ -1,0 +1,58 @@
+<nav class="navbar navbar-inverse">
+  <div class="container">
+    <div class="navbar-collapse collapse">
+      <a class="navbar-brand" routerLink="/">
+        <img alt="Brand" src="https://mapr.com/assets/images/logo_mapr_red.svg" width="80" height="26">
+      </a>
+      <ul class="nav navbar-nav">
+        <li><a routerLink="/"><i class="fa fa-home fa-fw" aria-hidden="true"></i>&nbsp;<b>Albums</b></a></li>
+      </ul>
+      <ul class="nav navbar-nav">
+        <li><a routerLink="/artists"><i class="fa fa-users fa-fw" aria-hidden="true"></i>&nbsp;<b>Artists</b></a></li>
+      </ul>
+      <ul class="nav navbar-nav">
+        <li><a routerLink="/reporting"><i class="fa fa-bars fa-fw" aria-hidden="true"></i>&nbsp;<b>Reporting</b></a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav" style="padding: 7px;">
+        <li style="display: flex; flex-direction: row;">
+          <input type="text" class="form-control" id="search-entry" #searchEntry (keyup.enter)="onSearchClick($event, searchEntry.value)"/>
+          <button class="btn btn-default" type="submit" (click)="onSearchClick($event, searchEntry.value)">
+            <i class="fa fa-search"></i>
+          </button>
+        </li>
+      </ul>
+      <ul
+        class="nav navbar-nav navbar-right"
+        *ngIf="!(isAuthenticated | async)"
+      >
+        <li>
+          <a routerLink="/login">Login</a>
+        </li>
+      </ul>
+      <ul
+        class="nav navbar-nav navbar-right"
+        *ngIf="isAuthenticated | async"
+      >
+        <li>
+          <a (click)="onLogoutClick()">Logout</a>
+        </li>
+      </ul>
+      <ul
+        class="nav navbar-nav navbar-right"
+      >
+        <li>
+          <a routerLink="/api-reference">API Reference</a>
+        </li>
+      </ul>
+      <ul
+        class="nav navbar-nav navbar-right"
+        *ngIf="sourceURL"
+      >
+        <li>
+          <a href="{{sourceURL}}">View Source</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

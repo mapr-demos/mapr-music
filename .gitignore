@@ -32,8 +32,7 @@ hs_err_pid*
 *.ipr
 
 # Maven
-core-application/webapp/mapr-rest/target
-data/target
+target
 
 # Logs
 logs

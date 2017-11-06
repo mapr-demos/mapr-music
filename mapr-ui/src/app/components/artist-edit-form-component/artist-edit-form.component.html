@@ -1,0 +1,63 @@
+<div class="container">
+  <div class="form-group" style="margin: 10px">
+    <input class="form-control form-group" [(ngModel)]="artist.name" placeholder="Artist name">
+    <select class="form-control form-group" [(ngModel)]="artist.gender" placeholder="Artist name">
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
+    <input class="form-control form-group" [(ngModel)]="artist.avatarURL" placeholder="Artist profile image">
+    <input class="form-control form-group" [(ngModel)]="artist.area" placeholder="Artist's area">
+    <input class="form-control form-group" [(ngModel)]="artist.IPI" placeholder="Artist IPI">
+    <input class="form-control form-group" [(ngModel)]="artist.ISNI" placeholder="Artist ISNI">
+    <div
+      *ngIf="artist.avatarURL"
+      style="text-align: center"
+    >
+      <div>Preview:</div>
+      <div>
+        <img
+          src="{{artist.avatarURL}}"
+          width="150"
+          height="150"
+        >
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div
+        class="panel-heading"
+        style="display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 0"
+      >
+        <div>
+          <h4>
+            Albums:
+          </h4>
+        </div>
+        <div style="width: 40%">
+          <input
+            class="form-control form-group"
+            type="text"
+            id="new-album"
+            placeholder="Select new album"
+          >
+        </div>
+      </div>
+      <div
+        *ngIf="!artist.albums.length"
+        class="panel-body"
+      >
+        No albums
+      </div>
+      <div class="panel-body">
+        <div
+          *ngFor="let album of artist.albums"
+          style="display: flex; margin: 5px; align-items: center"
+        >
+          <div>
+            {{album.title}}
+          </div>
+          <i class="fa fa-times" aria-hidden="true" (click)="removeAlbumById(album.id)"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

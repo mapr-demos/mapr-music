@@ -1,0 +1,11 @@
+<module xmlns="urn:jboss:module:1.3" name="org.apache.drill">
+    <resources>
+         <resource-root path="drill-jdbc-all-1.11.0.jar"/> 
+    </resources>
+
+    <dependencies>
+        <module name="javax.api"/>
+        <module name="javax.transaction.api"/>
+        <module name="sun.jdk"/>
+    </dependencies>
+</module>
