@@ -1,4 +1,4 @@
-# Working with MapR-DB
+# Discovering MapR-DB Shell and Apache Drill
 
 ## MapR DB Shell utility
 
