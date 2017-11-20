@@ -1,4 +1,4 @@
-# Setup
+# Setting up your environment
 
 ## Install MapR
 

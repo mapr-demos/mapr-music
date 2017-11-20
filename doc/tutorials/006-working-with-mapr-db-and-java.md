@@ -1,4 +1,4 @@
-# Working with Java
+# Working with MapR-DB and Java
 
 MapR Music Application is multi module Maven project, which consists of 5 modules. Each of them, except of 
 [Recommendation Engine](https://github.com/mapr-demos/mapr-music/tree/master/recommendation-engine), written using Java 
