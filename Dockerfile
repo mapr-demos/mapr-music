@@ -1,4 +1,4 @@
-FROM maprtech/pacc:5.2.2_3.0.1_centos7
+FROM maprtech/pacc:6.0.0_4.0.0_centos7
 
 EXPOSE 8080
 EXPOSE 9300
