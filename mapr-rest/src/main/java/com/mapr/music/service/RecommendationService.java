@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -91,7 +92,12 @@ public class RecommendationService {
 
         int actualLimit = (limit == null || limit < 0) ? DEFAULT_LIMIT : (limit > MAX_LIMIT) ? MAX_LIMIT : limit;
 
-        return getRecommendationForUser(user).getRecommendedArtistsIds().stream()
+        Recommendation recommendationForUser = getRecommendationForUser(user);
+        if (recommendationForUser == null) {
+            return new ArrayList<ArtistDto>();
+        }
+
+        return recommendationForUser.getRecommendedArtistsIds().stream()
                 .filter(Objects::nonNull)
                 .filter(recommendedId -> !recommendedId.equals(id))
                 .map(artistId -> artistDao.getById(artistId, ARTIST_SHORT_INFO_FIELDS))
@@ -129,7 +135,12 @@ public class RecommendationService {
 
         int actualLimit = (limit == null || limit < 0) ? DEFAULT_LIMIT : (limit > MAX_LIMIT) ? MAX_LIMIT : limit;
 
-        return getRecommendationForUser(user).getRecommendedAlbumsIds().stream()
+        Recommendation recommendationForUser = getRecommendationForUser(user);
+        if  (recommendationForUser == null) {
+            return new ArrayList<AlbumDto>();
+        }
+
+        return recommendationForUser.getRecommendedAlbumsIds().stream()
                 .filter(Objects::nonNull)
                 .filter(recommendedId -> !recommendedId.equals(id))
                 .map(albumId -> albumDao.getById(albumId, ALBUM_SHORT_INFO_FIELDS))
