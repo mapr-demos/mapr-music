@@ -98,8 +98,8 @@ $ mapr importJSON -idField _id -src /tmp/albums/* -dst /apps/albums -mapreduce f
 $ mapr importJSON -idField _id -src /tmp/artists/* -dst /apps/artists -mapreduce false
 $ mapr importJSON -idField _id -src /tmp/languages/* -dst /apps/languages -mapreduce false
 $ mapr importJSON -idField _id -src /tmp/users/* -dst /apps/users -mapreduce false
-$ mapr importJSON -idField _id -src /tmp/albums_ratings/* -dst /apps/albums_ratings -mapreduce false
-$ mapr importJSON -idField _id -src /tmp/artists_ratings/* -dst /apps/artists_ratings -mapreduce false
+$ mapr importJSON -idField _id -src /tmp/ratings-albums/* -dst /apps/albums_ratings -mapreduce false
+$ mapr importJSON -idField _id -src /tmp/ratings-artists/* -dst /apps/artists_ratings -mapreduce false
 ```
 
 Note: in case of lack of memory while importing ratings documents try to split ratings into multiple sets and import 
