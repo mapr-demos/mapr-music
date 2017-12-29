@@ -42,14 +42,14 @@ function print_usage() {
     cat <<EOM
 Usage: $(basename $0) [-p|--path] [-b|--batch] [-r|--recreate] [-h|--help]
 Options:
-    --path      Specifies path to the dataset archive. Default value is current directory. 
+    --path      Specifies path to the dataset archive directory. Default value is current directory.
                 Assumes dataset archive name is 'dataset.tar.gz'.
 
-    --batch     Specifies batch size of imported documents, allows to import large dataset 
+    --batch     Specifies batch size of imported documents, allows to import large dataset
                 and prevent problems related to lack of memory. Default value is '20000'.
 
-    --recreate  When specified, MapR-DB JSON Tables for dataset will be recreated. 
-                Note, that in case of tables recreation all added changelogs will be deleted 
+    --recreate  When specified, MapR-DB JSON Tables for dataset will be recreated.
+                Note, that in case of tables recreation all added changelogs will be deleted
                 and must be readded manually after script completion.
 
     --help      Prints usage information.
@@ -57,7 +57,7 @@ EOM
 }
 
 function create_table() {
-    
+
     TABLE_NAME=$1
     RECREATE=$2
 
@@ -66,7 +66,8 @@ function create_table() {
     EXISTS=$?
 
     if [ "$EXISTS" -eq 0 ] && [ "$RECREATE" -eq 0 ]; then
-        echo "error: Table '$TABLE_NAME' already exists. Exiting. Please, specify '[-r|--recreate]' if you want to recreate it."
+        echo "error: Table '$TABLE_NAME' already exists. Exiting. "
+        echo "Please, specify '[-r|--recreate]' if you want to recreate it."
         cleanup
         exit 1
     fi
@@ -84,7 +85,7 @@ function create_table() {
 }
 
 function import_documents() {
-    
+
     local DIRECTORY=$1
     local TABLE_NAME=$2
     local MFS_DIRECTORY=$3
@@ -106,19 +107,19 @@ function import_documents() {
     if [ "$DOCUMENTS_NUM" -lt "$BATCH_SIZE" ];then
         load_into_mapr $DIRECTORY $TABLE_NAME $MFS_DIRECTORY
     else
-        
+
         BATCHES=$(expr $DOCUMENTS_NUM / $BATCH_SIZE + 1)
 
         echo "Number of documents('$DOCUMENTS_NUM') is greater than batch size('$BATCH_SIZE')."
         echo "Documents will be imported batch by batch. Total number of batches: '$BATCHES'"
 
         for (( b=0; b<$BATCHES; b++ ))
-        do  
+        do
             echo "Processing batch '$b' ..."
-            
+
             # Clean temp directory
             { rm ${TEMP_DIR}/*; } 2> /dev/null
-            
+
             # Copy files to temp directory
             OFFSET=$(expr $b \* $BATCH_SIZE + 1)
             find ${DIRECTORY} -maxdepth 1 -type f | tail -n "+$OFFSET" | head -n "$BATCH_SIZE" |xargs cp -t "$TEMP_DIR"
@@ -151,10 +152,10 @@ function load_into_mapr() {
 function change_table_permissions() {
     local TABLE_NAME=$1
     maprcli table cf edit -path $TABLE_NAME -cfname default -readperm p -writeperm p -traverseperm  p
-} 
+}
 
 function create_temp_directory() {
-    
+
     # Create temporary directory to import documents batch by batch
     mkdir $TEMP_DIRECTORY
     OUT=$?
@@ -166,7 +167,13 @@ function create_temp_directory() {
 }
 
 function cleanup() {
-    { rm -Rf $TEMP_DIRECTORY $ALBUMS_DIRECTORY $ARTISTS_DIRECTORY $LANGUAGES_DIRECTORY $RATINGS_ALBUMS_DIRECTORY $RATINGS_ARTISTS_DIRECTORY $USERS_DIRECTORY ; } 2> /dev/null
+    { rm -Rf $ARCHIVE_DIRECTORY_PATH/$TEMP_DIRECTORY \
+    $ARCHIVE_DIRECTORY_PATH/$ALBUMS_DIRECTORY \
+    $ARCHIVE_DIRECTORY_PATH/$ARTISTS_DIRECTORY \
+    $ARCHIVE_DIRECTORY_PATH/$LANGUAGES_DIRECTORY \
+    $ARCHIVE_DIRECTORY_PATH/$RATINGS_ALBUMS_DIRECTORY \
+    $ARCHIVE_DIRECTORY_PATH/$RATINGS_ARTISTS_DIRECTORY \
+    $ARCHIVE_DIRECTORY_PATH/$USERS_DIRECTORY ; } 2> /dev/null
 }
 
 #######################################################################
@@ -224,18 +231,18 @@ create_table $USERS_TABLE $RECREATE_TABLES
 #######################################################################
 echo "Extracting dataset archive to '$ARCHIVE_DIRECTORY_PATH'"
 tar -zxf $ARCHIVE_PATH --directory $ARCHIVE_DIRECTORY_PATH
-echo "Archive is extracted" 
+echo "Archive is extracted"
 
 #######################################################################
 # Import documents into MapR-DB JSON Tables using importJSON utility
 #######################################################################
 create_temp_directory
-import_documents $ALBUMS_DIRECTORY $ALBUMS_TABLE $ALBUMS_MFS_DIRECTORY $BATCH $TEMP_DIRECTORY
-import_documents $ARTISTS_DIRECTORY $ARTISTS_TABLE $ARTISTS_MFS_DIRECTORY $BATCH $TEMP_DIRECTORY
-import_documents $LANGUAGES_DIRECTORY $LANGUAGES_TABLE $LANGUAGES_MFS_DIRECTORY $BATCH $TEMP_DIRECTORY
-import_documents $RATINGS_ALBUMS_DIRECTORY $RATINGS_ALBUMS_TABLE $RATINGS_ALBUMS_MFS_DIRECTORY $BATCH $TEMP_DIRECTORY
-import_documents $RATINGS_ARTISTS_DIRECTORY $RATINGS_ARTISTS_TABLE $RATINGS_ARTISTS_MFS_DIRECTORY $BATCH $TEMP_DIRECTORY
-import_documents $USERS_DIRECTORY $USERS_TABLE $USERS_MFS_DIRECTORY $BATCH $TEMP_DIRECTORY
+import_documents $ARCHIVE_DIRECTORY_PATH/$ALBUMS_DIRECTORY $ALBUMS_TABLE $ALBUMS_MFS_DIRECTORY $BATCH $TEMP_DIRECTORY
+import_documents $ARCHIVE_DIRECTORY_PATH/$ARTISTS_DIRECTORY $ARTISTS_TABLE $ARTISTS_MFS_DIRECTORY $BATCH $TEMP_DIRECTORY
+import_documents $ARCHIVE_DIRECTORY_PATH/$LANGUAGES_DIRECTORY $LANGUAGES_TABLE $LANGUAGES_MFS_DIRECTORY $BATCH $TEMP_DIRECTORY
+import_documents $ARCHIVE_DIRECTORY_PATH/$RATINGS_ALBUMS_DIRECTORY $RATINGS_ALBUMS_TABLE $RATINGS_ALBUMS_MFS_DIRECTORY $BATCH $TEMP_DIRECTORY
+import_documents $ARCHIVE_DIRECTORY_PATH/$RATINGS_ARTISTS_DIRECTORY $RATINGS_ARTISTS_TABLE $RATINGS_ARTISTS_MFS_DIRECTORY $BATCH $TEMP_DIRECTORY
+import_documents $ARCHIVE_DIRECTORY_PATH/$USERS_DIRECTORY $USERS_TABLE $USERS_MFS_DIRECTORY $BATCH $TEMP_DIRECTORY
 
 #######################################################################
 # Change MapR-DB Tables permissions
