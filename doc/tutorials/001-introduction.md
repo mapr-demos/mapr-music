@@ -62,3 +62,7 @@ Recommendation Engine, built using Spark MLlib's Alternating Least Squares (ALS)
 
 Moreover, repository contains [Dockerfile](https://github.com/mapr-demos/mapr-music/blob/master/Dockerfile), which allows 
 you to build Mapr Music Docker image based on [MapR PACC](https://mapr.com/products/persistent-application-client-container/), download,configure and start: Wildfly, Elasticsearh and deploy MapR Music application.
+
+---
+
+Next : [MapR Music Architecture](002-mapr-music-architecture.md)
