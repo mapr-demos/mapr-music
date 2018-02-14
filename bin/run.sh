@@ -13,6 +13,11 @@ else
     exit 1
 fi
 
+# Check owner of work directory to find if container started for the first time.
+# It's the first start of container if 'root' owns the working directory.
+OWNER=$(stat -c "%U" $WORK_DIR)
+[[ ${OWNER} == "root" ]] && FIRST_START=true || FIRST_START=false
+
 # Change permissions
 sudo chown -R $MAPR_CONTAINER_USER:$MAPR_CONTAINER_GROUP $WORK_DIR
 
@@ -26,15 +31,20 @@ sed -i -e "s/yournodename/$DRILL_NODE/g" ${WORK_DIR}/wildfly-11.0.0.Beta1/standa
 ${WORK_DIR}/wildfly-11.0.0.Beta1/bin/standalone.sh -b 0.0.0.0 &
 
 # Deploy MapR Music REST Service
-OUT=1
-while [ $OUT -ne 0 ]
-do
-   ${WORK_DIR}/wildfly-11.0.0.Beta1/bin/jboss-cli.sh --connect --command="deploy --force $WORK_DIR/mapr-music-rest.war"
-   OUT=$?
-done
+# There is no need to deploy the app if Docker container was started before
+if [ ${FIRST_START} = true ] ; then
 
-# Deploy MapR Music UI
-${WORK_DIR}/wildfly-11.0.0.Beta1/bin/jboss-cli.sh --connect --command="deploy --force $WORK_DIR/mapr-music-ui.war"
+  OUT=1
+  while [ $OUT -ne 0 ]
+  do
+     ${WORK_DIR}/wildfly-11.0.0.Beta1/bin/jboss-cli.sh --connect --command="deploy --force $WORK_DIR/mapr-music-rest.war"
+     OUT=$?
+  done
+
+  # Deploy MapR Music UI
+  ${WORK_DIR}/wildfly-11.0.0.Beta1/bin/jboss-cli.sh --connect --command="deploy --force $WORK_DIR/mapr-music-ui.war"
+
+fi
 
 # Add Wildfly users
 #export WILDFLY_HOME="${WORK_DIR}/wildfly-11.0.0.Beta1/"
