@@ -12,27 +12,20 @@ Let's create indexes on the `albums` and `artists` tables, connect to your MapR 
 
 ```
 
-$ maprcli table index add -path /apps/albums -index idx_language -indexedfields 'language' -includedfields 'name, barcode, _id, artists '
+$ maprcli table index add -path /apps/albums -index idx_language -indexedfields '_id,name,slug_name,slug_postfix,barcode,format,country,catalog_numbers,released_date,cover_image_url,artists'
 
-$ maprcli table index add -path /apps/albums -index idx_name_asc -indexedfields 'name'
+$ maprcli table index add -path /apps/albums -index idx_name_asc -indexedfields '_id,name,slug_name,slug_postfix,barcode,format,country,catalog_numbers,released_date,cover_image_url,artists'
 
-$ maprcli table index add -path /apps/albums -index idx_name_desc -indexedfields 'name:desc'
+$ maprcli table index add -path /apps/albums -index idx_name_desc -indexedfields 'name:desc' -indexedfields '_id,name,slug_name,slug_postfix,barcode,format,country,catalog_numbers,released_date,cover_image_url,artists'
 
-$ maprcli table index add -path /apps/albums -index idx_released_date_asc -indexedfields 'released_date'
+$ maprcli table index add -path /apps/albums -index idx_released_date_asc -indexedfields 'released_date' -indexedfields '_id,name,slug_name,slug_postfix,barcode,format,country,catalog_numbers,released_date,cover_image_url,artists'
 
-$ maprcli table index add -path /apps/albums -index idx_released_date_desc -indexedfields 'released_date:desc'
-
-
+$ maprcli table index add -path /apps/albums -index idx_released_date_desc -indexedfields 'released_date:desc' -indexedfields '_id,name,slug_name,slug_postfix,barcode,format,country,catalog_numbers,released_date,cover_image_url,artists'
 
 
+$ maprcli table index add -path /apps/albums -index idx_slug -indexedfields 'slug_name,slug_postfix' -indexedfields '_id,name,slug_name,slug_postfix,barcode,format,country,catalog_numbers,released_date,cover_image_url,artists'
 
-$ maprcli table index add -path /apps/albums -index idx_slug -indexedfields '"slug_name","slug_postfix"' -includedfields 'name,artists,released_date'
-
-$ maprcli table index add -path /apps/artists -index idx_area -indexedfields '"area":1'
-
-$ maprcli table index add -path /apps/artists -index idx_name -indexedfields '"name":1'
-
-$ maprcli table index add -path /apps/artists -index idx_slug -indexedfields '"slug_name":1,"slug_postfix":1' -includedfields 'name,albums'
+$ maprcli table index add -path /apps/artists -index idx_slug -indexedfields 'slug_name,slug_postfix' -includedfields 'name,albums'
 
 ```
 
