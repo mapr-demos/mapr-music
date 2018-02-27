@@ -2,10 +2,10 @@
 
 ## MapR Music REST Service API
 
-[MapR Music REST Service](https://github.com/mapr-demos/mapr-music/tree/master/mapr-rest) is core module of MapR 
+[MapR Music REST Service](https://github.com/mapr-demos/mapr-music/tree/master/mapr-rest) is the core module of MapR 
 Music application. It exposes REST API, which allows to manage Albums, Artists, Users resources. 
 [MapR Music UI](https://github.com/mapr-demos/mapr-music/tree/master/mapr-ui) is built on top of MapR Music REST Service 
-API and provides user interface to perform various operations.
+API and provides user interface to perform various operations. MapR Music UI is developed with [Angular(https://angular.io/)]
 
 #### MapR Music REST Service Endpoints
 
@@ -38,8 +38,10 @@ page of MapR Music UI.
 #### JAX-RS `javax.ws.rs.core.Application` class
 
 Creating JAX-RS Web Application starts with defining main class, that extends `javax.ws.rs.core.Application` class. 
+
 Below, you can see code snippet of such `MaprMusicApp` class:
-```
+
+```java
 @ApplicationPath("/api/1.0/")
 public class MaprMusicApp extends Application {
 
@@ -90,7 +92,9 @@ per-request. The default life-cycle for providers (registered directly or via a 
 #### `beans.xml` deployment descriptor
 
 In order to use dependency injection in your application, you must define `beans.xml` deployment descriptor file. 
+
 Below you can see basic `beans.xml` file, which is used in MapR Music REST Service:
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans
@@ -107,6 +111,7 @@ Below you can see basic `beans.xml` file, which is used in MapR Music REST Servi
 Although, providing `web.xml` deployment descriptor file is not required, MapR Music REST Service uses this file to 
 define security constrains on various resources. As you can see below, all modification operations require users to be 
 authorized:
+
 ```xml
 <?xml version="1.0"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -154,7 +159,8 @@ authorized:
 Presentation layer of MapR Music REST Service is responsible of exposing REST API. It implemented using JAX-RS 
 annotations. It communicates with business layer to get the model data in a suitable form and sends it as response to 
 the client's request. Here is code snippet of Album endpoint:
-```
+
+```java
 /**
  * Endpoint for accessing 'Album' resources.
  */
@@ -222,3 +228,8 @@ Swagger annotation, which is used to document separate method.
 
 MapR Music REST Service implemented using layered architecture pattern. To get more info, see 
 [MapR Music Architecture](https://github.com/mapr-demos/mapr-music/blob/master/doc/tutorials/002-mapr-music-architecture.md#mapr-music-rest-service-architecture).
+
+
+---
+
+Next: [Deploy to Wildfly](009-deploy-to-wildfly.md)

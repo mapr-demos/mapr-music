@@ -41,9 +41,9 @@ COPY ./conf/wildfly-drill-module.xml wildfly-11.0.0.Beta1/modules/system/layers/
 RUN wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.3.tar.gz
 RUN tar -zxf elasticsearch-5.6.3.tar.gz
 
-# Copy dataset, which will be used to register Wildfly users (only extract users)
+# Copy dataset, which will be used to register Wildfly users
 COPY ./dataset/dataset.tar.gz /usr/share/mapr-apps/mapr-music/dataset/dataset.tar.gz
-RUN tar -zxf dataset/dataset.tar.gz --directory dataset/ users
+RUN tar -zxf dataset/dataset.tar.gz --directory dataset/
 
 # Register Wildfly users
 RUN export WILDFLY_HOME=wildfly-11.0.0.Beta1/ && ./add-wildfly-users.sh --path dataset/users

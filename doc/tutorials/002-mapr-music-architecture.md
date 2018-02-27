@@ -11,7 +11,7 @@ MapR Music Application consists of the following modules:
 2. [MapR Music UI](https://github.com/mapr-demos/mapr-music/tree/master/mapr-ui): [Angular](https://angular.io/) application that consume the REST APIs to allow user to browse, edit and create albums and artists.
 
 
-3. [Elastic Search Service](https://github.com/mapr-demos/mapr-music/tree/master/elasticsearch-service): which listens albums and artists table events and publishes the changes to the Elasticsearch. This service use MapR-DB Change Data Capture (CDC) feature.
+3. [Elasticsearch Service](https://github.com/mapr-demos/mapr-music/tree/master/elasticsearch-service): which listens albums and artists table events and publishes the changes to the Elasticsearch to provide full text search on albums and artists names. This service use MapR-DB Change Data Capture (CDC) feature.
 
 4. [Recommendation Engine](https://github.com/mapr-demos/mapr-music/tree/master/recommendation-engine): this service uses the [MapR-DB OJAI Connector for Apache Spark](https://maprdocs.mapr.com/home/Spark/NativeSparkConnectorJSON.html) to read albums, artists ratings, and writes the recommendations back into MapR-DB.
 
@@ -19,7 +19,7 @@ MapR Music Application consists of the following modules:
 
 ## MapR Music REST Service Architecture
 
-For developing MapR Music Application the layered architecture pattern was chosen. It's the most common architecture pattern, 
+The layered architecture pattern was chosen to build the MapR Music Application. It's the most common architecture pattern, 
 also known as the n-tier architecture pattern. It is the de facto standard for most Java EE applications and therefore 
 is widely known by most architects, designers, and developers.
 
@@ -35,11 +35,11 @@ application:
 ## Data layer
 
 Albums data are stored in 
-[MapR-DB JSON Tables](https://docstage.mapr.com/public/beta/60/MapR-DB/JSON_DB/json_tables.html). The application uses the [MapR OJAI library](https://maprdocs.mapr.com/apidocs/60/OJAI/index.html) to insert, update, delete and query documents.
+[MapR-DB JSON Tables](https://maprdocs.mapr.com/home/MapR-DB/JSON_DB/json_tables.html). The application uses the [MapR OJAI library](https://maprdocs.mapr.com/apidocs/60/OJAI/index.html) to insert, update, delete and query documents.
 
 The first step to develop MapR-DB Application in Java, you must add the MapR OJAI Driver library to your Maven project `pom.xml` file:
 
-```
+```xml 
     <properties>
         <mapr.library.version>6.0.0-mapr</mapr.library.version>
         ...
@@ -56,14 +56,12 @@ The first step to develop MapR-DB Application in Java, you must add the MapR OJA
     </dependencies>
 ```
 
-In order to implement Data layer we will use [DAO](https://en.wikipedia.org/wiki/Data_access_object) pattern. DAO stands 
-for 'data access object', the object that provides an abstract interface to some type of database or other persistence 
-mechanism. But first off all, we need to define Album model. 
+In order to implement Data layer we will use the [Data Access Object (DAO)](https://en.wikipedia.org/wiki/Data_access_object) pattern. The DAO provides an abstract interface to the persistence engine, MapR-DB JSON Tables in this application.
 
-Below you can see code snippet of 
-[Album](https://github.com/mapr-demos/mapr-music/blob/master/mapr-rest/src/main/java/com/mapr/music/model/Album.java) 
-model class:
-```
+
+Let's create the [Album](https://github.com/mapr-demos/mapr-music/blob/master/mapr-rest/src/main/java/com/mapr/music/model/Album.java)  model: 
+
+```java
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @MaprDbTable("/apps/albums")
@@ -133,9 +131,10 @@ public class Album {
 }
 ```
 
-You can notice [`@MaprDbTable`](https://github.com/mapr-demos/mapr-music/blob/master/mapr-rest/src/main/java/com/mapr/music/annotation/MaprDbTable.java) annotation;  it's custom annotation used to define MapR-DB JSON Table path so implementation of DAO will know which table to query.
+You can notice [`@MaprDbTable`](https://github.com/mapr-demos/mapr-music/blob/master/mapr-rest/src/main/java/com/mapr/music/annotation/MaprDbTable.java) annotation;  this custom annotation is used to define MapR-DB JSON Table path so implementation of DAO will know which table to query.
 
 OJAI Driver allows to create OJAI connection to the cluster and access the OJAI Document Store in the following way:
+
 ```java 
     ...
     
@@ -206,8 +205,8 @@ interface defines the APIs to perform mutation of a Document already stored in a
 * [DocumentStore#update(String _id, DocumentMutation mutation)](https://maprdocs.mapr.com/apidocs/60/OJAI/org/ojai/store/DocumentStore.html#update-java.lang.String-org.ojai.store.DocumentMutation-)
 * [DocumentStore#update(Value _id, DocumentMutation mutation)](https://maprdocs.mapr.com/apidocs/60/OJAI/org/ojai/store/DocumentStore.html#update-org.ojai.Value-org.ojai.store.DocumentMutation-)
 
-For instance:
-```
+For example, to modify a document :
+```java
     ...
     
     // Create an OJAI connection to MapR cluster
@@ -218,9 +217,9 @@ For instance:
 
     String documentId = "ae425a74-7da0-49d8-a583-1b74943bde9a";
     
-    // Create a DocumentMutation to update the zipCode field
+    // Create a DocumentMutation to update the language field
     DocumentMutation mutation = connection.newMutation()
-        .set("address.zipCode", 95196L);
+        .set("language", "fra");
     
     // Update the Document with '_id' = "ae425a74-7da0-49d8-a583-1b74943bde9a"
     store.update(documentId, mutation);
@@ -233,6 +232,8 @@ For instance:
     
     ...
 ```
+
+Note that when doing this operation, only the mutation is sent over the network, same in the DB. MapR-DB JSON with its Document model provides a very efficient way to manipulate JSON Documents (mutation, projections and queries).
 
 #### Delete Documents
 
@@ -299,11 +300,12 @@ Presentation Layer of Album Service is represented by REST API endpoints.
   </tbody>
 </table>
 
-Note: to get detailed endpoints description, follow [API Reference](http://localhost:8080/api-reference) link, at MapR Music UI.
+Note: to get detailed endpoints description, follow [API Reference](http://localhost:8080/api-reference) (Swagger) link, at MapR Music UI.
 
 Note: all modification operations require user authorization.
  
 Presentation layer is implemented using JAX-RS annotations. It communicates with business layer to get the model data in a suitable form and sends it as response to the client's request. Here is code snippet of Album endpoint:
+
 ``` java 
 /**
  * Endpoint for accessing 'Album' resources.
@@ -342,3 +344,9 @@ public class AlbumEndpoint {
     
 }
 ```
+
+If you do not want to learn about all the details now, and you want to run the application you can do it using Docker, see ["Running the MapR Music Application in Docker"](015-run-the-application-in-docker.md)
+
+---
+
+Next : [Setting up your environment](003-setting-up-your-environment.md)

@@ -1,15 +1,14 @@
 # Working with MapR-DB and Java
 
-MapR Music Application is multi module Maven project, which consists of 5 modules. Each of them, except of 
-[Recommendation Engine](https://github.com/mapr-demos/mapr-music/tree/master/recommendation-engine), written using Java 
-programming language. [Recommendation Engine](https://github.com/mapr-demos/mapr-music/tree/master/recommendation-engine)
-uses Scala MapR-DB OJAI Connector for Apache Spark and therefore it is written on Scala.
+MapR Music Application is multi module **Maven** project. [Apache Maven](https://maven.apache.org/) is a software project management and comprehension tool.
+
+Let's explore the project and its dependencies.
 
 ## Maven Dependencies
 
-Apache Maven is a software project management and comprehension tool. Based on the concept of a project object model 
-(POM), Maven can manage a project's build, reporting and documentation from a central piece of information. Maven 
+Maven is used to manage the project's build, reporting and documentation from a central piece of information. Maven 
 manages project's modules, repositories and dependencies.
+
 Let's start from root MapR Music `pom.xml`:
 ```xml
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -31,8 +30,7 @@ Let's start from root MapR Music `pom.xml`:
 </project>
 ```
 
-As you can see, it declares 5 MapR Music modules and allows you to build all of them at once using `mvn clean install` 
-command.
+You can see the 5 modules used to build this project. You can build them using the simple command `mvn clean install` or any IDE with proper Maven integration.
 
 #### MapR Music REST Service dependencies
 
@@ -54,10 +52,11 @@ the MapR Maven Repository and the MapR OJAI Dependencies to your project.
     <dependency>
       <artifactId>mapr-ojai-driver</artifactId>
       <groupId>com.mapr.ojai</groupId>
-      <version>6.0.0-mapr-beta</version>
+      <version>6.0.0-mapr</version>
     </dependency>
 ```
-After that you can use OJAI classes in your project.
+
+This dependencies make all MapR-DB JSON available to your Java application using the OJAI API.
 
 * OJAI Connection
 
@@ -68,6 +67,11 @@ The first thing to do when you want to use MapR-DB is to get an OJAI connection 
     Connection connection = DriverManager.getConnection("ojai:mapr:");
 	
 ```
+
+In a previous step, you  have installed the MapR-Client, this client is used to determine which cluster to use to connect your application.
+In a next step, you will also learn how to run the application using a Docker container, this container will also have the MapR-Client installed and configure to connect to the cluster.
+
+The authentication of the application is done using the user that is running the Java process, or using a Ticket (MapR Ticket, or Kerberos) when you are using a Secured Cluster. This to explain that you should not be surprised by the fact that you do not see any username in the connection string, the user is linked to the system or ticket.
 
 * Access a Document Store
 
@@ -81,26 +85,28 @@ The `/apps/users` is a path to a MapR-DB JSON Table that must exist.
 
 * Create and insert a Document
 
-Use the `connection.newDocument()` method to create a new document from a `String`, `Map`, Java Bean or JSON Object.
-Once the document is created use the `store.insertOrUpdate()` method, or other, to insert the document in the table.
+Use the [`connection.newDocument()`](https://maprdocs.mapr.com/apidocs/60/OJAI/org/ojai/store/Connection.html#newDocument--) method to create a new document from a `String`, `Map`, Java Bean or JSON Object.
+Once the document is created use the [`store.insertOrReplace()`](https://maprdocs.mapr.com/apidocs/60/OJAI/org/ojai/store/DocumentStore.html#insertOrReplace-org.ojai.Document-) method, or other, to insert the document in the table.
 
 ```
     store.insertOrReplace(userDocument);
 ```
 
+We are using here the `insertOrReplace()` method, that insert the document if it does not already exist, or simply replace it. This means the database does not have to check if a document exist with this `_id`. If you do a simple `insert()` the database check if a document with this `_id` exists the server will raise an exception.
 
-Also, MapR Music Application uses Mapr-DB Change Data Capture feature, so you must also declare CDC dependencies:
+Also, MapR Music Application uses [Mapr-DB Change Data Capture](https://maprdocs.mapr.com/home/MapR-DB/DB-ChangeData/changeData-overview.html) feature, so you must also declare CDC dependencies:
+
 ```xml
     <dependency>
         <groupId>com.mapr.db</groupId>
         <artifactId>maprdb-cdc</artifactId>
-        <version>6.0.0-mapr-beta</version>
+        <version>6.0.0-mapr</version>
     </dependency>
 ```
 
-After that, you can use `com.mapr.db.cdc.ChangeDataRecordDeserializer` as value deserializer for your Kafka Change Data 
+You can now use `com.mapr.db.cdc.ChangeDataRecordDeserializer` as value deserializer for your Kafka Change Data 
 Records consumer:
-```
+```java
     ...
     
     Properties consumerProperties = new Properties();
@@ -123,8 +129,7 @@ Records consumer:
 
 #### MapR Music Recommendation Engine dependencies
 
-MapR Music Recommendation Engine implemented using Scala MapR-DB OJAI Connector for Apache Spark. Therefore, 
-Recommendation Engine's `pom.xml` must declare MapR Maven Repository and MapR Spark dependencies.
+MapR Music Recommendation Engine implemented using Scala [MapR-DB OJAI Connector for Apache Spark](https://maprdocs.mapr.com/home/Spark/NativeSparkConnectorJSON.html. The recommendation engine's `pom.xml` must declare MapR Maven Repository and MapR Spark dependencies.
 
 * MapR Maven Repository
 
@@ -150,7 +155,7 @@ Recommendation Engine's `pom.xml` must declare MapR Maven Repository and MapR Sp
     <dependency>
         <groupId>com.mapr.db</groupId>
         <artifactId>maprdb-spark</artifactId>
-        <version>6.0.0-mapr-beta</version>
+        <version>6.0.0-mapr</version>
     </dependency>
 
     <!-- MapR Spark ML library, which is used to get recommendation predictions -->
@@ -165,13 +170,16 @@ Recommendation Engine's `pom.xml` must declare MapR Maven Repository and MapR Sp
 * Loading data via MapR-DB OJAI Connector for Apache Spark
 
 MapR-DB OJAI Connector for Apache Spark allows us to load rating data from MapR-DB JSON Tables into Spark Dataset:
-```
+
+```scala
 val ds = spark.loadFromMapRDB(tableName)
       .map(row => MaprRating(row.getAs[String]("_id"), row.getAs[String]("user_id"), row.getAs[String]("document_id"),
         row.getAs[Double]("rating")))
 ```
 
 ## Calling Drill from Java
+
+MapR Music, like many other applications, needs to do some advanced queries with some aggregations that are not available in OJAI, for example to count the number of albums per country, or year. Instead of write code to do the compute on the client side, it is possible to use SQL to do all the aggregation; for this you just need to use the Apache Drill JDBC Driver and execute queries from your Java application.
 
 Drill configuration for web applications includes creating 
 [Drill JDBC module](https://github.com/mapr-demos/mapr-music/blob/master/doc/tutorials/008-deploy-to-wildfly.md#drill-jdbc-driver-module) 
@@ -195,3 +203,7 @@ The `com.mapr.music.dao.impl.ReportingDaoImpl` class shows how to use the Dataso
     ResultSet rs = st.executeQuery("SELECT * FROM ...");
     ....
 ```
+
+---
+
+Next : [MapR-DB Indexes](007-mapr-db-indexes.md)

@@ -1,17 +1,20 @@
 # Adding Full Text Search to the Application
 
-It is very common for applications to require some advanced search capabilities, that could not be covered by MapR-DB querying and indexing features. This includes, 
-insentitive case search, fuzzy search and many more.
+It is very common for applications to require some advanced search capabilities, that could not be covered by MapR-DB querying and indexing features. This includes, insentitive case search, fuzzy search and many more.
 
-A option for this is to use an indexing engine, like Elasticsearch, and send the attributed to use from MapR-DB Table to Elasticsearch when a document is inserting, updated or deleted.
+An option for this is to use an indexing engine, like Elasticsearch, and send the attributes to use from MapR-DB Table to Elasticsearch when a document is inserting, updated or deleted.
 
 This is another place where the Change Data Capture introduce in the previous step could be used.
+
+
+## Indexing MapR-DB attributes in Elasticsearch
 
 [Elastic Search Service](https://github.com/mapr-demos/mapr-music/tree/master/elasticsearch-service) listens changelogs 
 and publishes the changes to the ElasticSearch.
 
 MapR Elastic Search Service implementation is based on `ChangelogListener`:
-```
+
+```java 
 public interface ChangelogListener {
 
     interface ChangeDataRecordCallback {
@@ -29,7 +32,8 @@ public interface ChangelogListener {
 ```
 
 Actual implementation is based on `KafkaConsumer`, which listens changelog:
-```
+
+```java 
 public final class ChangelogListenerImpl implements ChangelogListener {
 
     /**
@@ -81,3 +85,53 @@ public final class ChangelogListenerImpl implements ChangelogListener {
     
 }
 ```
+
+This CDC consumer, sends the artists name and albums names with the document _id to Elasticsearch for indexing. Also when an artist or albums is deleted from the index. The `MaprElasticSearchServiceBuilder.java` class is used to update the Elasticsearch index.
+
+```java 
+public class MaprElasticSearchServiceBuilder {
+
+    ...
+    // update the index
+    IndexResponse response = client.prepareIndex(indexName, typeName, documentId)
+        .setSource(allowed.toString(), XContentType.JSON)
+        .get();
+    ...
+
+    ...
+    // Delete the value in the index
+    ...
+    client.prepareDelete(indexName, typeName, id).get());
+    ...
+
+}
+```
+
+## Querying Elasticsearch and MapR-DB
+
+Once you have data in MapR-DB and Elasticsearch, the application must call the Elasticsearch server to do a full text search.
+
+The `ESSearchService.java` is the class used to achieve this.
+
+```java 
+public class ESSearchService implements PaginatedService {
+
+    ...
+        JsonNode jsonQuery = matchQueryByName(nameEntry);
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.query(QueryBuilders.wrapperQuery(jsonQuery.toString()));
+
+        int offset = (page - 1) * perPage;
+        sourceBuilder.from(offset);
+        sourceBuilder.size(perPage);
+
+        SearchRequest searchRequest = new SearchRequest(indices);
+        searchRequest.source(sourceBuilder);
+    ...
+
+}
+```
+
+
+---
+Next: [Creating Recommendation Engine with Spark ML lib](014-creating-recommendation-engine.md)

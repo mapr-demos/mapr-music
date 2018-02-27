@@ -7,7 +7,8 @@ MapR Music Application. This document explains the Data Set structure and shows 
 
 Sample dataset archive [dataset.tar.gz](https://github.com/mapr-demos/mapr-music/tree/master/dataset) contains JSON 
 documents, placed in 6 directories:
-1. `albums`
+
+### albums
 
 Contains `6117` Album JSON documents, which are ready to be imported into MapR-DB JSON Table.
 <details> 
@@ -185,7 +186,7 @@ Contains `6117` Album JSON documents, which are ready to be imported into MapR-D
   
 </details>
 
-2. `artists`
+### artists
 
 Contains `10281` Artist JSON documents, which are ready to be imported into MapR-DB JSON Table. 
 <details> 
@@ -284,7 +285,9 @@ Contains `10281` Artist JSON documents, which are ready to be imported into MapR
   
 </details>
 
-3. `languages`
+
+
+### languages
 
 Contains `56` Language JSON documents, which are ready to be imported into MapR-DB JSON Table. 
 <details> 
@@ -299,7 +302,7 @@ Contains `56` Language JSON documents, which are ready to be imported into MapR-
   
 </details>
 
-4. `ratings-albums`
+### ratings-albums
 
 Contains `175413` Album Rating JSON documents, which are ready to be imported into MapR-DB JSON Table. 
 <details> 
@@ -316,7 +319,7 @@ Contains `175413` Album Rating JSON documents, which are ready to be imported in
   
 </details>
 
-5. `rating-artists`
+### rating-artists
 
 Contains `316065` Artist Rating JSON documents, which are ready to be imported into MapR-DB JSON Table. 
 <details> 
@@ -333,7 +336,7 @@ Contains `316065` Artist Rating JSON documents, which are ready to be imported i
   
 </details>
 
-6. `users`
+### users
 
 Contains `300` User JSON documents, which are ready to be imported into MapR-DB JSON Table. 
 <details> 
@@ -353,6 +356,66 @@ Contains `300` User JSON documents, which are ready to be imported into MapR-DB 
 
 You can import dataset either manually or using 
 [import-dataset.sh](https://github.com/mapr-demos/mapr-music/blob/master/bin/import-dataset.sh) script.
+
+
+
+### Manual import
+
+> The `dataset.tar.gz` contains all artists, albums and users, but only a subset of the ratings (albums and artist), this to make the extract and import of the data faster. If you want to run the application with a more complete dataset you can use the `dataset-full-ratings.tar.gz` file.
+
+**1 - Copy the dataset archive to one of the nodes of your cluster:**
+
+```
+$ scp dataset.tar.gz youruser@nodehostname:/dataset/path/at/node
+```
+
+Copy the file into the MapR File System `/tmp` folder.
+If the file system is mounted using NFS you can simply copy the file directly into MapR-FS for example using the following command:
+
+```
+$ scp dataset.tar.gz youruser@nodehostname:/mapr/<your-cluster>/tmp
+```
+
+If you are running the MapR Container for Developers you can run this command `scp -P 2222 dataset.tar.gz root@localhost:/mapr/tmp/`.
+
+**2 - Extract the archive:**
+
+```
+$ tar -zxf dataset.tar.gz
+```
+
+**3 - Load data into MapR-FS:**
+
+If you have uploaded directly in MapR FS you do not need to run the following command. 
+
+You check that all files are already in the folder, using the following command `hadoop fs -ls /tmp`
+
+```
+$ hadoop fs -copyFromLocal albums/ /tmp/albums
+$ hadoop fs -copyFromLocal artists/ /tmp/artists
+$ hadoop fs -copyFromLocal languages/ /tmp/languages
+$ hadoop fs -copyFromLocal users/ /tmp/users
+$ hadoop fs -copyFromLocal ratings-albums/ /tmp/albums_ratings
+$ hadoop fs -copyFromLocal ratings-artists/ /tmp/artists_ratings
+```
+
+You can also use a simple file copy using NFS if you have mounted MapR File System on your development environment.
+
+**4 - Import data into MapR-DB JSON Tables using `importJSON` tool:**
+
+```
+$ mapr importJSON -idField _id -src /tmp/albums/* -dst /apps/albums -mapreduce false
+$ mapr importJSON -idField _id -src /tmp/artists/* -dst /apps/artists -mapreduce false
+$ mapr importJSON -idField _id -src /tmp/languages/* -dst /apps/languages -mapreduce false
+$ mapr importJSON -idField _id -src /tmp/users/* -dst /apps/users -mapreduce false
+$ mapr importJSON -idField _id -src /tmp/albums_ratings/* -dst /apps/albums_ratings -mapreduce false
+$ mapr importJSON -idField _id -src /tmp/artists_ratings/* -dst /apps/artists_ratings -mapreduce false
+```
+
+Note: in case of lack of memory while importing ratings documents try to split ratings into multiple sets and import 
+them one by one.
+
+After that dataset is ready to be used by MapR-Music application. You can move to the next step and discover [MapR-DB and Drill](005-discovering-mapr-db-shell-and-drill.md).
 
 ### 'import-dataset.sh' script
 
@@ -380,46 +443,14 @@ Here is example of script usage:
 $ ./import-dataset.sh -r -b 10000 --path /path/to/dataset/directory/
 ```
 
-Note, that script assumes that dataset archive has default name(`dataset.tar.gz`).
+Note, that script assumes that dataset archive has default name(`dataset-full-ratings.tar.gz`).
 Note, that in case of tables recreation all added changelogs will be deleted and must be 
-[readded manually](https://github.com/mapr-demos/mapr-music/blob/master/doc/tutorials/003-setup.md#create-changelog) 
+[readded manually](003-setup.md#create-changelog) 
 after script completion.
 
-### Manual import
 
-* Copy the dataset archive to one of the nodes of your cluster:
+After that dataset is ready to be used by MapR-Music application. You can move to the next step and discover [MapR-DB and Drill](005-discovering-mapr-db-shell-and-drill.md).
 
-```
-$ scp dataset.tar.gz youruser@nodehostname:/dataset/path/at/node
-```
+---
 
-* Extract the archive:
-
-```
-$ tar -zxf dataset.tar.gz
-```
-
-* Load data into MapR-FS:
-```
-$ hadoop fs -copyFromLocal albums/ /tmp/albums
-$ hadoop fs -copyFromLocal artists/ /tmp/artists
-$ hadoop fs -copyFromLocal languages/ /tmp/languages
-$ hadoop fs -copyFromLocal users/ /tmp/users
-$ hadoop fs -copyFromLocal ratings-albums/ /tmp/albums_ratings
-$ hadoop fs -copyFromLocal ratings-artists/ /tmp/artists_ratings
-```
-
-* Import data into MapR-DB JSON Tables using `importJSON` tool:
-```
-$ mapr importJSON -idField _id -src /tmp/albums/* -dst /apps/albums -mapreduce false
-$ mapr importJSON -idField _id -src /tmp/artists/* -dst /apps/artists -mapreduce false
-$ mapr importJSON -idField _id -src /tmp/languages/* -dst /apps/languages -mapreduce false
-$ mapr importJSON -idField _id -src /tmp/users/* -dst /apps/users -mapreduce false
-$ mapr importJSON -idField _id -src /tmp/albums_ratings/* -dst /apps/albums_ratings -mapreduce false
-$ mapr importJSON -idField _id -src /tmp/artists_ratings/* -dst /apps/artists_ratings -mapreduce false
-```
-
-Note: in case of lack of memory while importing ratings documents try to split ratings into multiple sets and import 
-them one by one.
-
-After that dataset is ready to be used by MapR-Music application.
+Next : [Discover MapR-DB and Drill](005-discovering-mapr-db-shell-and-drill.md).

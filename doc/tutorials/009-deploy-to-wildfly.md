@@ -2,8 +2,12 @@
 
 [MapR Music REST Service](https://github.com/mapr-demos/mapr-music/tree/master/mapr-rest) and 
 [MapR Music UI](https://github.com/mapr-demos/mapr-music/tree/master/mapr-ui) are deployed on Wildfly application server.
+
+
 This document explains how to properly install and configure Wildfly application server, create required by MapR Music 
 app modules.
+
+You can also run the application using [MapR Persistent Application Client Container (PACC)](https://maprdocs.mapr.com/home/AdvancedInstallation/UsingtheMapRPACC.html), in this case all the configuration, deployment and run is done in the container, see [Run MapR Music in Docker Container](015-run-the-application-in-docker.md)
 
 ## Installing and configuring Wildfly
 
@@ -19,9 +23,9 @@ Now we have to specify `-Dmapr.library.flatclass` parameter via `JAVA_OPTS` envi
 Native Library is loaded in a proper way. Otherwise you will face `UnsatisfiedLinkError`. 
 The parameter `-Dmapr.library.flatclass`, when specified with Java, disables the injection of code via the root class 
 loader, thus disabling the loading of the MapR Native Library using the root class loader. 
-To get more details about loading MapR Native Library see: 
-https://docstage.mapr.com/public/beta/60/DevelopmentGuide/c-loading-mapr-native-library.html
- 
+To get more details about loading MapR Native Library in the MapR Documentation [Loading the MapR Native Library
+](https://maprdocs.mapr.com/home/DevelopmentGuide/c-loading-mapr-native-library.html).
+
 Start application server in standalone mode:
 ```
 /wildfly-10.1.0.Final/bin$ export JAVA_OPTS='-Dmapr.library.flatclass'
@@ -34,12 +38,14 @@ MapR Music Application consumes change data records in separate threads. Thus, w
 within Wildfly:
 * Modify `$WILDFLY_HOME/standalone/configuration/standalone.xml` configuration file. Add the following code snippet as 
 child of the `<managed-thread-factories>` element:
-```
+
+```xml
 <managed-thread-factory name="maprMusicThreadFactory" jndi-name="java:jboss/ee/concurrency/factory/MaprMusicThreadFactory" context-service="default" priority="1"/>
 ```
 * Restart Wildfly
 * Now you can access Managed Thread Factory:
-```
+
+```java 
   @Resource(lookup = "java:jboss/ee/concurrency/factory/MaprMusicThreadFactory")
   private ManagedThreadFactory threadFactory;
   
@@ -152,6 +158,7 @@ once  and can be shared between different web apps. Thus, MapR Native Library wi
 Wildfly module.
 
 To create MapR-FS Wildfly module we have to:
+
 ##### Get maprfs JAR and it's dependencies
 
 Lets use maven dependency plugin to download maprfs jar and it's dependencies:
@@ -164,7 +171,8 @@ $ nano pom.xml
 ```
 
 Paste the following into `pom.xml`:
-```
+
+```xml
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -178,7 +186,7 @@ Paste the following into `pom.xml`:
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <dependency.plugin.version>3.0.1</dependency.plugin.version>
-        <mapr.library.version>6.0.0-mapr-beta</mapr.library.version>
+        <mapr.library.version>6.0.0-mapr</mapr.library.version>
     </properties>
 
     <dependencies>
@@ -236,16 +244,16 @@ $ cd com/maprfs/module/main
 
 ##### Create `module.xml` module descriptor file and paste the following code snippet
 
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <module xmlns="urn:jboss:module:1.3" name="com.maprfs.module">
     <resources>
-        <resource-root path="maprfs-6.0.0-mapr-beta.jar"/>
+        <resource-root path="maprfs-6.0.0-mapr.jar"/>
         <resource-root path="commons-logging-1.1.3.jar"/>
         <resource-root path="protobuf-java-2.5.0.jar"/>
-        <resource-root path="hadoop-annotations-2.7.0-mapr-1707-beta.jar"/>
-        <resource-root path="hadoop-auth-2.7.0-mapr-1707-beta.jar"/>
-        <resource-root path="hadoop-common-2.7.0-mapr-1707-beta.jar"/>
+        <resource-root path="hadoop-annotations-2.7.0-mapr-1707.jar"/>
+        <resource-root path="hadoop-auth-2.7.0-mapr-1707.jar"/>
+        <resource-root path="hadoop-common-2.7.0-mapr-1707.jar"/>
         <resource-root path="htrace-core-3.1.0-incubating.jar"/>
         <resource-root path="commons-configuration-1.6.jar"/>
         <resource-root path="commons-lang-2.6.jar"/>
@@ -278,7 +286,8 @@ $ cp ~/maprfs-module/target/dependency/*.jar .
 ##### Create `jboss-deployment-structure.xml` file at `WEB-INF` project directory
 
 `jboss-deployment-structure.xml` declares dependency on MapR-FS module:
-```
+
+```xml 
 <?xml version="1.0"?>
 <jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
     <deployment>
@@ -293,7 +302,8 @@ $ cp ~/maprfs-module/target/dependency/*.jar .
 ##### Change client application `pom.xml`
 
 At this point you have to change client's web application `pom.xml` to use `maprfs` as provided dependency:
-```
+
+```xml 
     <!--MapR-FS provided by newly created module-->
     <dependency>
         <artifactId>maprfs</artifactId>
@@ -332,6 +342,7 @@ $ mvn clean install
 ```
 
 Use Wildfly Command Line Interface (CLI) management tool to deploy REST Service and UI:
+
 ```
 /wildfly-10.1.0.Final/bin$ ./jboss-cli.sh --connect
 
@@ -367,3 +378,6 @@ $  curl -v http://localhost:8080/mapr-music-rest/api/1.0/albums?per_page=1
 ```
 
 Navigate to [http://localhost:8080](http://localhost:8080) in order to access MapR Music UI.
+
+---
+Next: [Build the user interface with Angular](010-building-a-ui-with-angular.md)

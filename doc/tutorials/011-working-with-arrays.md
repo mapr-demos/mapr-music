@@ -4,8 +4,9 @@ This document explains how to manage arrays operations on JSON documents, that s
 examples of arrays operations, which are performed using MapR-DB shell tool and OJAI Driver.
 
 ## Sample document
+
 Examples use the following sample JSON document:
-```
+```json
 {
   "_id": "id1",
   "nested_doc_field": {
@@ -18,8 +19,11 @@ Note: Each of the examples depends on modified document as result of executing t
 to try the examples it is recommended to follow them step by step.
 
 You can use the following command to insert such document usin MapR-DB shell:
+
 ```
-insert /table_name --value '{ "_id": "id1", "nested_doc_field": { "array_field_a": [{"boolean":false}, {"decimal": 123.456}] }, "array_field_b": ["MapR wins"] }'
+maprdb mapr:> create /sample_table
+
+maprdb mapr:> insert /sample_table --value '{ "_id": "id1", "nested_doc_field": { "array_field_a": [{"boolean":false}, {"decimal": 123.456}] }, "array_field_b": ["MapR wins"] }'
 ```
 
 ## Arrays operations examples
@@ -35,19 +39,30 @@ If there is type mismatch in any intermediate field specified in fieldpath with 
 error.
 
 MapR-DB shell example:
+
 ```
-update /table_name --id id1 --m '{ "$append":[{"nested_doc_field.array_field_a":{"some_field": "some_value"}},{"array_field_b":["First", "Second"]}] }'
+maprdb mapr:> jsonoptions --pretty true
+
+maprdb mapr:> find /sample_table --id id1
+
+maprdb mapr:> update /sample_table --id id1 --m '{ "$append":[{"nested_doc_field.array_field_a":{"some_field": "some_value"}},{"array_field_b":["First", "Second"]}] }'
+
+maprdb mapr:> find /sample_table --id id1
+
 ```
 
+You should see the new values added to the `nested_doc_field.array_field_a` and `array_field_b` arrays.
+
 The example above is equivalent to the following code, which uses OJAI Driver:
-```
+
+```java 
     ...
     
     // Create an OJAI connection to MapR cluster
     Connection connection = DriverManager.getConnection("ojai:mapr:");
 
     // Get an instance of OJAI DocumentStore
-    final DocumentStore store = connection.getStore("/table_name");
+    final DocumentStore store = connection.getStore("/sample_table");
 
     String documentId = "id1";
     
@@ -74,7 +89,7 @@ The example above is equivalent to the following code, which uses OJAI Driver:
 ```
 
 Result:
-```
+```json 
 {
   "_id" : "id1",
   "array_field_b" : [ "MapR wins", "First", "Second" ],
@@ -100,20 +115,25 @@ of new value, then the entire mutation fails. The list of field paths and values
 comma-separated key-value pairs. If there is a single field path, array representation is not required.
 
 MapR-DB shell example:
+
 ```
-update /table_name --id id1 --m '{ "$set":[{"nested_doc_field.array_field_a[0].boolean":true},{"array_field_b[2]":"Updated"}] }'
+maprdb mapr:>  update /sample_table --id id1 --m '{ "$set":[{"nested_doc_field.array_field_a[0].boolean":true},{"array_field_b[2]":"Updated"}] }'
+
+maprdb mapr:> find /sample_table --id id1
+
 ```
 Note, that element of array is referenced by it's index. 
 
 The example above is equivalent to the following code, which uses OJAI Driver:
-```
+
+```java 
     ...
     
     // Create an OJAI connection to MapR cluster
     Connection connection = DriverManager.getConnection("ojai:mapr:");
 
     // Get an instance of OJAI DocumentStore
-    final DocumentStore store = connection.getStore("/table_name");
+    final DocumentStore store = connection.getStore("/sample_table");
 
     String documentId = "id1";
     
@@ -136,7 +156,7 @@ The example above is equivalent to the following code, which uses OJAI Driver:
 ```
 
 Result:
-```
+```json 
 {
   "_id" : "id1",
   "array_field_b" : [ "MapR wins", "First", "Updated" ],
@@ -163,19 +183,25 @@ comma-separated key-value pairs. If there is a single field path, array represen
 
 MapR-DB shell example:
 ```
-update /table_name --id id1 --m '{ "$delete":["nested_doc_field.array_field_a[2]","array_field_b[2]"] }'
+
+maprdb mapr:> update /sample_table --id id1 --m '{ "$delete":["nested_doc_field.array_field_a[2]","array_field_b[2]"] }'
+
+
+maprdb mapr:> find /sample_table --id id1
+
 ```
 Note, that element of array is referenced by it's index. 
 
 The example above is equivalent to the following code, which uses OJAI Driver:
-```
+
+```java 
     ...
     
     // Create an OJAI connection to MapR cluster
     Connection connection = DriverManager.getConnection("ojai:mapr:");
 
     // Get an instance of OJAI DocumentStore
-    final DocumentStore store = connection.getStore("/table_name");
+    final DocumentStore store = connection.getStore("/sample_table");
 
     String documentId = "id1";
     
@@ -197,7 +223,7 @@ The example above is equivalent to the following code, which uses OJAI Driver:
 ```
 
 Result:
-```
+```json 
 {
   "_id" : "id1",
   "array_field_b" : [ "MapR wins", "First" ],
@@ -211,3 +237,12 @@ Result:
 }
 
 ```
+
+Finally you can drop the table from the shell using the following command:
+
+```
+maprdb mapr:> drop /sample_table 
+```
+
+---
+Next : [MapR-DB Change Data Capture](012-change-data-capture.md)

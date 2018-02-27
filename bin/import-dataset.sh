@@ -5,7 +5,7 @@
 #######################################################################
 
 NUMBER_REGEX='^[0-9]+$'
-DEFAULT_DATASET_ARCHIVE_NAME='dataset.tar.gz'
+DEFAULT_DATASET_ARCHIVE_NAME='dataset-full-ratings.tar.gz'
 DEFAULT_BATCH_SIZE=20000
 DEFAULT_TEMP_DIR_NAME='tmp'
 

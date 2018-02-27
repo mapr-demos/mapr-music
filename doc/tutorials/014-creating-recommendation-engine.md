@@ -26,7 +26,8 @@ Spark MLlib implements a collaborative filtering algorithm called Alternating Le
 
 ALS requires rating dataset to build `MatrixFactorizationModel`. MapR Music App uses `/apps/albums_ratings` and 
 `/apps/artists_ratings` JSON tables, which contain documents in the following format:
-```
+
+```json 
 {
   "_id" : "04a459de-cdbe-49a8-8438-9cfbedadc769",
   "document_id" : "05771ef2-9116-4144-918c-4d8e2ade6cec",
@@ -39,7 +40,8 @@ ALS requires rating dataset to build `MatrixFactorizationModel`. MapR Music App 
 
 1. Loading data via MapR-DB OJAI Connector for Apache Spark
 MapR-DB OJAI Connector for Apache Spark allows us to load rating data from MapR-DB JSON Tables into Spark Dataset:
-```
+
+```scala 
 val ds = spark.loadFromMapRDB(tableName)
       .map(row => MaprRating(row.getAs[String]("_id"), row.getAs[String]("user_id"), row.getAs[String]("document_id"),
         row.getAs[Double]("rating")))
@@ -47,7 +49,8 @@ val ds = spark.loadFromMapRDB(tableName)
 
 2. Adding anonymous user ratings
 We will add anonymous user ratings to the training data to allow get recommendations for unauthorized MapR Music App users:
-```
+
+```scala 
   /**
     * Adds anonymous user rates to the original dataset. Anonymous user represents non-existing user, for which
     * recommendations will be computed.
@@ -83,7 +86,8 @@ which has following properties:
 * `rating : Double` - rating;
 
 First of all, we need to convert our string identifiers into integer ones. We will do it using `org.apache.spark.ml.feature.StringIndexer`:
-```
+
+```scala 
   /**
     * Indexes string value in order to get corresponding unique numeric value.
     *
@@ -106,7 +110,8 @@ First of all, we need to convert our string identifiers into integer ones. We wi
 After that we can easily map ratings datasets to `org.apache.spark.mllib.recommendation.Rating`.
 
 4. Training the model
-```
+
+```scala
     val ratingsDatasetWithNumericIds = ratingsDataset.map(mapToRating)
 
     // Randomly split ratings RDD into training data RDD and test data RDD
@@ -121,7 +126,8 @@ After that we can easily map ratings datasets to `org.apache.spark.mllib.recomme
 5. Get recommendations
 
 MapR Music App uses `/apps/recommendations` JSON table to store users' recommendations in the following format:
-```
+
+```scala
 {
   "_id" : "abergstrom",
   "recommended_albums" : [ "0147ae5f-775e-4d2d-90f3-d945459201fd", "02c147df-37f2-4fef-a88f-1f743aa06ef9", "05771ef2-9116-4144-918c-4d8e2ade6cec", "0257ff8e-0e61-446f-b102-7cfa0fa7f4d3", "03fa133e-c1b6-4ba9-a610-9a5c2e0a6fee", "03900035-38f1-4bd5-8dd0-8ecf2f1df3c7", "06c2ccf1-59a8-421e-89bc-342e2b0d746b", "00327e39-61f8-48b6-ab7d-0d374182ce1b", "037081d0-a0b7-4126-87a0-7f1668e73c88", "06ce6c38-da57-4f28-81af-ca5c1c40d233" ],
@@ -130,8 +136,10 @@ MapR Music App uses `/apps/recommendations` JSON table to store users' recommend
 ```
 
 `MatrixFactorizationModel#recommendProductsForUsers` method allows us to get users recommendations as ``. 
+
 Lets map it to our `Recommendation` case class:
-```
+
+```scala
     // Map RDD of org.apache.spark.mllib.recommendation.Rating to the RDD of Recommendation
     val maprEnhancedRatingsArray = ratingsDataset.collect()
     val recommendationRDD = model.recommendProductsForUsers(RecommendedDocumentsNum)
@@ -150,7 +158,8 @@ Lets map it to our `Recommendation` case class:
 
 6. Storing the recommendations
 MapR-DB OJAI Connector for Apache Spark allows us to easily store recommendations data into MapR-DB JSON Tables:
-```
+
+```scala
     // Get user albums recommendations
     val albumsRecommendationsRDD = computeRecommended(sparkSession, AlbumsRatingsTableName)
 
@@ -170,12 +179,14 @@ MapR-DB OJAI Connector for Apache Spark allows us to easily store recommendation
 represents separate Spark job, which can be run manually from Dev machine. You have to be sure that you have MapR Client 
 properly [installed and configured](https://github.com/mapr-demos/mapr-music/blob/master/doc/tutorials/003-setup.md#installing-and-configuring-mapr-client). 
 Use the following commands to run the engine:
+
 ```
 $ cd core-application/processing/recommendation-engine
 $ mvn clean install scala:run
 ```
 
 After job completion you can get user recommendations using UI, REST client or `curl`:
+
 ```
 $ export USERNAME='aleannon'
 $ export DEFAULT_USER_PASSWORD='music'
@@ -240,7 +251,8 @@ rate these albums on behalf of these users and print album, which is expected to
 
 First of all, we have to obtain usernames to rate on behalf of users. In order to do so, we will parse User JSON 
 documents from the dataset, which are contained at `users` directory:
-```
+
+```bash 
 USERNAMES_ARRAY=()
 
 #######################################################################
@@ -263,7 +275,9 @@ done
 ```
 
 After that, we will get albums to rate by doing HTTP call to MapR Music REST service:
-```
+
+
+```bash 
 ALBUM_IDS_ARRAY=()
 
 #######################################################################
@@ -282,7 +296,8 @@ IFS=$SAVEIFS
 ```
 
 Now we can rate on behalf of users using MapR Music REST rating endpoint:
-```
+
+```bash 
 #######################################################################
 # Rate
 #######################################################################
@@ -326,7 +341,11 @@ $ ./user-rating-influence.sh --path ~/mapr-music-dataset/users
 2. After script completion you will be able to see output similar to:
 ```
 $ ./user-rating-influence.sh --path ~/mapr-music-dataset/users
+```
+
 After model retraining the next album is expected to be recommended for user 'aleannon':
+
+```json
 {
   "name": "A Definite Maybe",
   "barcode": "",
@@ -376,3 +395,8 @@ $ curl -u ${TEST_USERNAME}:${DEFAULT_USER_PASSWORD} -X GET http://localhost:8080
 ```
 
 If user recommendation list contains expected album you will be able to see non-empty output in your shell.
+
+---
+
+Next : [Running the application in Docker](015-run-the-application-in-docker.md)
+

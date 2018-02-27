@@ -2,9 +2,9 @@
 
 ## MapR DB Shell utility
 
-The mapr dbshell is a tool that allows you to create and perform basic manipulation of JSON tables and documents. 
+The `mapr dbshell` is a tool that allows you to manipulates MapR-DB JSON tables and documents. 
 You can run dbshell by executing `mapr dbshell` command on one of the nodes of MapR cluster.
-As `mapr` user in a terminal enter the following commands to get familiar with the shell
+As `mapr` user (or any user of the cluster) in a terminal enter the following commands to get familiar with the shell
 
 ```
 $ mapr dbshell
@@ -13,6 +13,10 @@ maprdb mapr:> jsonoptions --pretty true --withtags false
 
 maprdb mapr:> find /apps/users --limit 2
 ```
+
+The first command sets the shell print JSON document in a pretty format.
+
+The second command returns documents of the `/apps/users` table, limited to the 2 first documents.
 
 To get a list of supported dbshell commands, run `help` at the shell prompt:
 ```
@@ -71,15 +75,12 @@ insert --table <table path> --id <row-key> --value '{< table field >}'
 ##### Examples
 With `_id` field:
 ```
-maprdb mapr:> insert /apps/users --value '{"_id":"kblock", 
-                              "first_name":"Ken", 
-                              "last_name":"Block"}'
+maprdb mapr:> insert /apps/users --value '{"_id":"kblock", "first_name":"Ken", "last_name":"Block"}'
 ```
 
 With `--id` parameter:
 ```
-maprdb mapr:> insert /apps/users --id kblock --value '{"first_name":"Ken", 
-                                                "last_name":"Block"}'
+maprdb mapr:> insert /apps/users --id kblock --value '{"first_name":"Ken", "last_name":"Block"}'
 ```
 #### Update document
 Update operations are performed with mutations. These mutation operations are specified with sub-commands that are used 
@@ -113,8 +114,24 @@ Delete a document by ID:
 maprdb mapr:> delete /apps/users --id kblock
 ```
 
+
+#### Find with condition
+The dbshell `find` command has many options; and it is possible to query with specific condition and list of field (projection)
+
+##### Syntax
+```
+find <table path> <options>
+```
+
+##### Examples
+Find 10 albums in French, returning only the name, _id, release_date sorted by release_date descending.
+```
+maprdb mapr:> find /apps/albums --where '{"$eq" : {"language" : "fra"}}' --fields 'name,_id,released_date' --orderby 'released_date:desc' --limit 10
+```
+
+
 ## MapR Drill
-Drill is a low-latency distributed query engine for large-scale datasets, including structured and 
+Drill is a distributed query engine for large-scale datasets, including structured and 
 semi-structured/nested data. Inspired by Google’s Dremel, Drill is designed to scale to several thousands of nodes and 
 query petabytes of data at interactive speeds that BI/Analytics environments require.
 
@@ -128,7 +145,13 @@ Open a terminal and run sqlline:
 ```
 $ sqlline
 
-sqlline> !connect jdbc:drill:zk=hostname:5181
+sqlline> !connect jdbc:drill:zk=<hostname>:5181
+```
+
+or you can open your browser and go one of the MapR cluster using the following URL:
+
+```
+http://<cluster-node>:8047
 ```
 
 Where `hostname` is a node where Zookeeper is running, then enter the `mapr` username and password when prompted.
@@ -138,3 +161,7 @@ You can now execute SQL queries:
 sqlline> select _id, first_name, last_name from dfs.`/apps/users` where first_name = 'Ken';
 sqlline> select name from dfs.`/apps/albums` where rating > 3 order by name limit 10;
 ```
+
+---
+
+Next : [Working with MapR-DB and Java](006-working-with-mapr-db-and-java.md).

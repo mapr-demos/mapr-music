@@ -1,14 +1,15 @@
 # Building a UI with Angular
 
 MapR Music Application has [MapR Music UI module](https://github.com/mapr-demos/mapr-music/tree/master/mapr-ui), 
-which is [Angular](https://angular.io/) project. 
+which is an [Angular](https://angular.io/) project. 
 
 ## Basics
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli). The Angular CLI is a command 
-line interface tool that can create a project, add files, and perform a variety of ongoing development tasks such as 
+line interface tool that can create a project, add files, and perform a variety of development tasks such as 
 testing, bundling, and deployment.
 
 Building UI with Angular consists of the following steps:
+
 * Set up the Development Environment
 * Create a new project
 * Serve the application
@@ -71,7 +72,8 @@ $ mvn clean install
 ```
 
 You can turn your Angular project into Maven module by adding `pom.xml`. Here is listing of MapR Music UI `pom.xml`:
-```
+
+```xml 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
@@ -180,6 +182,7 @@ You can turn your Angular project into Maven module by adding `pom.xml`. Here is
 </project>
 
 ```
+
 As you can see, `pom.xml` declares [frontend-maven-plugin](https://github.com/eirslett/frontend-maven-plugin), which 
 downloads/installs Node and NPM locally for your project, runs `npm install`, and then any combination of Bower, Grunt, 
 Gulp, Jspm, Karma, or Webpack. It's supposed to work on Windows, OS X and Linux.
@@ -189,7 +192,8 @@ dependencies, classes and resources of the web application and packaging them in
 
 You can notice that `maven-war-plugin` refers `/WEB-INF/web.xml` file. Here is listing of such file for MapR Music UI 
 app:
-```
+
+```xml 
 <web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
@@ -226,10 +230,12 @@ app:
 </web-app>
 
 ```
+
 It declares Servlets Mappings for MapR Music UI application.
 
 After executing `mvn clean install` project, you will be able to find web application archive at Maven's `target` 
 directory. This `war` is ready to be deployed at Wildfly:
+
 ```
 /wildfly-10.1.0.Final/bin$ ./jboss-cli.sh --connect
 [standalone@localhost:9990 /] deploy ~/mapr-music/mapr-ui/target/mapr-music-ui.war
@@ -239,7 +245,8 @@ directory. This `war` is ready to be deployed at Wildfly:
 
 In order to define MapR Music UI context root, `WEB-INF` directory of MapR Music UI project contains `jboss-web.xml` 
 deployment descriptor file:
-```
+
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <jboss-web xmlns="http://www.jboss.com/xml/ns/javaee"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -253,3 +260,7 @@ deployment descriptor file:
 It defines MapR Music UI context root to be `/`. Thus, MapR Music UI can be accessed by 
 [http://localhost:8080/](http://localhost:8080/) instead of 
 [http://localhost:8080/mapr-music-ui/](http://localhost:8080/mapr-music-ui/).
+
+
+---
+Next : [Working with Arrays](011-working-with-arrays.md)

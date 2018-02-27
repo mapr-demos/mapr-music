@@ -1,117 +1,32 @@
 # Change Data Capture(CDC)
 
-The Change Data Capture (CDC) system allows you to capture changes made to data records in MapR-DB tables 
+The Change Data Capture (CDC) allows you to capture changes made to data records in MapR-DB tables 
 (JSON or binary). These data changes are the result of inserts, updates, and deletions and are called change data 
 records. Once the change data records are propagated to a topic, a MapR-ES/Kafka consumer application is used to read 
 and process them.
 
+You can find more information about CDC in the documentation: [Change Data Capture](https://maprdocs.mapr.com/home/MapR-DB/DB-ChangeData/changeData-overview.html)
+
 ## MapR Music Application CDC use cases
-#### Statistics
-MapR Music App uses CDC in order to maintain `/apps/statistics` table, which contains statistics information about 
-Albums/Artists tables.
-[REST Service](https://github.com/mapr-demos/mapr-music/tree/master/mapr-rest) has 
-[CdcStatisticService](https://github.com/mapr-demos/mapr-music/blob/master/mapr-rest/src/main/java/com/mapr/music/service/ArtistsChangelogListenerService.java) 
-class, which listens Artist's and Album's changelog and updates `/apps/statistics` table.
-Service run in separate thread using `ManagedThreadFactory`, which must be configured at Wildfly. Below you can see code 
-snippet which is responsible of updating `/apps/statistics` table
-```
-@Startup
-@Singleton
-public class CdcStatisticService implements StatisticService {
-    
-    @Resource(lookup = THREAD_FACTORY)
-    private ManagedThreadFactory threadFactory;
 
-    ...
-    
-    static class ChangeDataRecordHandler implements Runnable {
-    
-        private static long KAFKA_CONSUMER_POLL_TIMEOUT = 500L;
+MapR Music application use CDC in various places:
 
-        interface Action {
-            void handle(String documentId);
-        }
+* Delete albums and ratings when an Artists is deleted
+* Calculate table statistics 
+* Index some fields in Elasticsearch)
 
-        KafkaConsumer<byte[], ChangeDataRecord> consumer;
-        Action onInsert;
-        Action onDelete;
-
-        ChangeDataRecordHandler(KafkaConsumer<byte[], ChangeDataRecord> consumer) {
-            this.consumer = consumer;
-        }
-
-        @Override
-        public void run() {
-            while (true) {
-
-                ConsumerRecords<byte[], ChangeDataRecord> changeRecords = consumer.poll(KAFKA_CONSUMER_POLL_TIMEOUT);
-                for (ConsumerRecord<byte[], ChangeDataRecord> consumerRecord : changeRecords) {
-
-                    // The ChangeDataRecord contains all the changes made to a document
-                    ChangeDataRecord changeDataRecord = consumerRecord.value();
-                    String documentId = changeDataRecord.getId().getString();
-
-                    // Handle 'RECORD_INSERT'
-                    if (changeDataRecord.getType() == ChangeDataRecordType.RECORD_INSERT && this.onInsert != null) {
-                        this.onInsert.handle(documentId);
-                    }
-
-                    // Handle 'RECORD_DELETE'
-                    if (changeDataRecord.getType() == ChangeDataRecordType.RECORD_DELETE && this.onDelete != null) {
-                        this.onDelete.handle(documentId);
-                    }
-
-                }
-            }
-        }
-
-        public void setOnInsert(Action onInsert) {
-            this.onInsert = onInsert;
-        }
-
-        public void setOnDelete(Action onDelete) {
-            this.onDelete = onDelete;
-        }
-
-    }
-    
-    ...
-    
-    @PostConstruct
-    public void init() {
-
-        ...
-        
-        // Create and adjust consumer which is used to consume MapR-DB CDC events for Albums table.
-        KafkaConsumer<byte[], ChangeDataRecord> albumsChangelogConsumer = new KafkaConsumer<>(consumerProperties);
-        albumsChangelogConsumer.subscribe(Collections.singletonList(ALBUMS_CHANGE_LOG));
-        ChangeDataRecordHandler albumsHandler = new ChangeDataRecordHandler(albumsChangelogConsumer);
-        albumsHandler.setOnDelete((id) -> decrementAlbums());
-        albumsHandler.setOnInsert((id) -> incrementAlbums());
-
-        // Create and adjust consumer which is used to consume MapR-DB CDC events for Artists table.
-        KafkaConsumer<byte[], ChangeDataRecord> artistsChangelogConsumer = new KafkaConsumer<>(consumerProperties);
-        artistsChangelogConsumer.subscribe(Collections.singletonList(ARTISTS_CHANGE_LOG));
-        ChangeDataRecordHandler artistsHandler = new ChangeDataRecordHandler(artistsChangelogConsumer);
-        artistsHandler.setOnDelete((id) -> decrementArtists());
-        artistsHandler.setOnInsert((id) -> incrementArtists());
-
-        threadFactory.newThread(albumsHandler).start();
-        threadFactory.newThread(artistsHandler).start();
-    }
-        
-    ...
-}
-```
 
 #### Artists deletion
-Artists deletion is performed using CDC. MapR Music 
+
+MapR Music 
 [REST Service](https://github.com/mapr-demos/mapr-music/tree/master/mapr-rest) has 
 [ArtistsChangelogListenerService](https://github.com/mapr-demos/mapr-music/blob/master/mapr-rest/src/main/java/com/mapr/music/service/CdcStatisticService.java) 
-class, which listens Artist's changelog and deletes Artist and it's rates, albums. 
-Service is also run in separate thread using `ManagedThreadFactory`. Below you can find code snippet, which implements 
+class, which listens Artist's changelog and deletes Artist and it's ratings, albums. 
+
+This Service is executed in a separate thread using `ManagedThreadFactory`, which must be configured in Wildfly (we have done that in a previous step). Below you can find code snippet, which implements 
 actual Artist deletion logic:
-```
+
+```java 
   ...
   
   threadFactory.newThread(() -> {
@@ -201,3 +116,107 @@ actual Artist deletion logic:
 
 ```
 
+#### Statistics
+
+MapR Music App uses CDC in order to maintain `/apps/statistics` table, which contains statistics information about 
+Albums/Artists tables.
+[REST Service](https://github.com/mapr-demos/mapr-music/tree/master/mapr-rest) has 
+[CdcStatisticService](https://github.com/mapr-demos/mapr-music/blob/master/mapr-rest/src/main/java/com/mapr/music/service/ArtistsChangelogListenerService.java) 
+class, which listens Artist's and Album's changelog and updates `/apps/statistics` table.
+
+This service ervice is executed in a separate thread using `ManagedThreadFactory`, which must be configured in Wildfly (we have done that in a previous step). Below you can see code  snippet which is responsible of updating `/apps/statistics` table
+
+```java 
+@Startup
+@Singleton
+public class CdcStatisticService implements StatisticService {
+    
+    @Resource(lookup = THREAD_FACTORY)
+    private ManagedThreadFactory threadFactory;
+
+    ...
+    
+    static class ChangeDataRecordHandler implements Runnable {
+    
+        private static long KAFKA_CONSUMER_POLL_TIMEOUT = 500L;
+
+        interface Action {
+            void handle(String documentId);
+        }
+
+        KafkaConsumer<byte[], ChangeDataRecord> consumer;
+        Action onInsert;
+        Action onDelete;
+
+        ChangeDataRecordHandler(KafkaConsumer<byte[], ChangeDataRecord> consumer) {
+            this.consumer = consumer;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+
+                ConsumerRecords<byte[], ChangeDataRecord> changeRecords = consumer.poll(KAFKA_CONSUMER_POLL_TIMEOUT);
+                for (ConsumerRecord<byte[], ChangeDataRecord> consumerRecord : changeRecords) {
+
+                    // The ChangeDataRecord contains all the changes made to a document
+                    ChangeDataRecord changeDataRecord = consumerRecord.value();
+                    String documentId = changeDataRecord.getId().getString();
+
+                    // Handle 'RECORD_INSERT'
+                    if (changeDataRecord.getType() == ChangeDataRecordType.RECORD_INSERT && this.onInsert != null) {
+                        this.onInsert.handle(documentId);
+                    }
+
+                    // Handle 'RECORD_DELETE'
+                    if (changeDataRecord.getType() == ChangeDataRecordType.RECORD_DELETE && this.onDelete != null) {
+                        this.onDelete.handle(documentId);
+                    }
+
+                }
+            }
+        }
+
+        public void setOnInsert(Action onInsert) {
+            this.onInsert = onInsert;
+        }
+
+        public void setOnDelete(Action onDelete) {
+            this.onDelete = onDelete;
+        }
+
+    }
+    
+    ...
+    
+    @PostConstruct
+    public void init() {
+
+        ...
+        
+        // Create and adjust consumer which is used to consume MapR-DB CDC events for Albums table.
+        KafkaConsumer<byte[], ChangeDataRecord> albumsChangelogConsumer = new KafkaConsumer<>(consumerProperties);
+        albumsChangelogConsumer.subscribe(Collections.singletonList(ALBUMS_CHANGE_LOG));
+        ChangeDataRecordHandler albumsHandler = new ChangeDataRecordHandler(albumsChangelogConsumer);
+        albumsHandler.setOnDelete((id) -> decrementAlbums());
+        albumsHandler.setOnInsert((id) -> incrementAlbums());
+
+        // Create and adjust consumer which is used to consume MapR-DB CDC events for Artists table.
+        KafkaConsumer<byte[], ChangeDataRecord> artistsChangelogConsumer = new KafkaConsumer<>(consumerProperties);
+        artistsChangelogConsumer.subscribe(Collections.singletonList(ARTISTS_CHANGE_LOG));
+        ChangeDataRecordHandler artistsHandler = new ChangeDataRecordHandler(artistsChangelogConsumer);
+        artistsHandler.setOnDelete((id) -> decrementArtists());
+        artistsHandler.setOnInsert((id) -> incrementArtists());
+
+        threadFactory.newThread(albumsHandler).start();
+        threadFactory.newThread(artistsHandler).start();
+    }
+        
+    ...
+}
+```
+
+In the next step you will learn how to use CDC to index documents values from MapR-DB JSON into Elasticseach to provide a Full Text Search feature. 
+
+---
+Next: [Adding Full Text Search to the Application](013-adding-full-text-search-to-the-application'.md)
