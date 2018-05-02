@@ -5,8 +5,12 @@ MapR Music Application. This document explains the Data Set structure and shows 
 
 ## Data Set description
 
-Sample dataset archive [dataset.tar.gz](https://github.com/mapr-demos/mapr-music/tree/master/dataset) contains JSON 
-documents, placed in 6 directories:
+The sample dataset is made of 2 files:
+
+* [dataset-full-ratings.tar.gz](https://github.com/mapr-demos/mapr-music/tree/master/dataset) contains the complete dataset including a large number of ratings. This one should be used when you work on a larger cluster.
+* [dataset.tar.gz](https://github.com/mapr-demos/mapr-music/tree/master/dataset) contains a subset of the complete dataset and could be used in smaller environment such as the MapR Container for developers.
+
+The archives contain the following directory structure and files: *(the number of documents matches the complete dataset)*
 
 ### albums
 
@@ -302,7 +306,7 @@ Contains `56` Language JSON documents, which are ready to be imported into MapR-
   
 </details>
 
-### ratings-albums
+### albums_ratings
 
 Contains `175413` Album Rating JSON documents, which are ready to be imported into MapR-DB JSON Table. 
 <details> 
@@ -395,8 +399,8 @@ $ hadoop fs -copyFromLocal albums/ /tmp/albums
 $ hadoop fs -copyFromLocal artists/ /tmp/artists
 $ hadoop fs -copyFromLocal languages/ /tmp/languages
 $ hadoop fs -copyFromLocal users/ /tmp/users
-$ hadoop fs -copyFromLocal ratings-albums/ /tmp/albums_ratings
-$ hadoop fs -copyFromLocal ratings-artists/ /tmp/artists_ratings
+$ hadoop fs -copyFromLocal albums_ratings/ /tmp/albums_ratings
+$ hadoop fs -copyFromLocal albums_artists/ /tmp/artists_ratings
 ```
 
 You can also use a simple file copy using NFS if you have mounted MapR File System on your development environment.
