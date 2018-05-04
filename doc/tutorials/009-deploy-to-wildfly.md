@@ -112,7 +112,7 @@ $ mkdir -p modules/system/layers/base/org/apache/drill/main
 * Copy the JDBC Driver in the new directory
 
 ```
-$ cp $DRILL_HOME/jars/jdbc-driver/drill-jdbc-all-1.11.0.jar \ 
+$ cp $DRILL_HOME/jars/jdbc-driver/drill-jdbc-all-1.13.0.jar \ 
      $WILDFLY_HOME/modules/system/layers/base/org/apache/drill/main
 ```
 
@@ -122,7 +122,7 @@ Driver, with the following content:
 ```xml
 <module xmlns="urn:jboss:module:1.3" name="org.apache.drill">
     <resources>
-         <resource-root path="drill-jdbc-all-1.11.0.jar"/> 
+         <resource-root path="drill-jdbc-all-1.13.0.jar"/> 
     </resources>
 
     <dependencies>

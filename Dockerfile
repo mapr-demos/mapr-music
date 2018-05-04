@@ -31,10 +31,10 @@ RUN echo 'JAVA_OPTS="$JAVA_OPTS -Dmapr.library.flatclass"' >> wildfly-11.0.0.Bet
 COPY conf/standalone.xml wildfly-11.0.0.Beta1/standalone/configuration/standalone.xml
 
 # Install Drill JDBC Driver
-RUN wget http://apache.ip-connect.vn.ua/drill/drill-1.11.0/apache-drill-1.11.0.tar.gz
-RUN tar -zxf apache-drill-1.11.0.tar.gz
+RUN wget http://apache.mediamirrors.org/drill/drill-1.13.0/apache-drill-1.13.0.tar.gz
+RUN tar -zxf apache-drill-1.13.0.tar.gz
 RUN mkdir -p wildfly-11.0.0.Beta1/modules/system/layers/base/org/apache/drill/main
-RUN cp apache-drill-1.11.0/jars/jdbc-driver/drill-jdbc-all-1.11.0.jar wildfly-11.0.0.Beta1/modules/system/layers/base/org/apache/drill/main
+RUN cp apache-drill-1.13.0/jars/jdbc-driver/drill-jdbc-all-1.13.0.jar wildfly-11.0.0.Beta1/modules/system/layers/base/org/apache/drill/main
 COPY ./conf/wildfly-drill-module.xml wildfly-11.0.0.Beta1/modules/system/layers/base/org/apache/drill/main/module.xml
 
 # Install ElasticSearch

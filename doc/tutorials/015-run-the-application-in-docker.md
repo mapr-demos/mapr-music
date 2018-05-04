@@ -25,7 +25,7 @@ login into application.
 
 In order to create and run container from existing `mapr-music` image use the following command: (adapt the host and cluster name to your environment)
 ```
-$ docker run -it -e MAPR_CONTAINER_USER=mapr -e MAPR_CONTAINER_GROUP=mapr -e MAPR_CONTAINER_UID=5000 -e MAPR_CONTAINER_GID=5000 -e MAPR_CLDB_HOSTS=192.168.99.18 -e MAPR_CLUSTER='my.cluster.com' -e DRILL_NODE=192.168.99.18  -p 9090:9090 -p 9300:9300 -p 9200:9200  mapr-music
+$ docker run -it -e MAPR_CONTAINER_USER=mapr -e MAPR_CONTAINER_GROUP=mapr -e MAPR_CONTAINER_UID=5000 -e MAPR_CONTAINER_GID=5000 -e MAPR_CLDB_HOSTS=172.20.10.2 -e MAPR_CLUSTER='maprdemo.mapr.io' -e DRILL_NODE=172.20.10.2  -p 9090:8080  mapr-music
 
 ```
 
@@ -57,5 +57,5 @@ The name of the cluster.
 * `DRILL_NODE`
 Drill node hostname.
 
-In the example above, containers Wildfly port `9090` is bound to the hosts `9090` port, so navigate to 
+In the example above, containers Wildfly port `8080` is bound to the hosts `9090` port, so navigate to 
 [http://localhost:9090](http://localhost:9090) in order to access MapR Music UI.

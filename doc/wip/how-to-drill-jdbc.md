@@ -10,7 +10,7 @@ This document explains how to configure your environment to use Apache Drill run
 For this tutorial:
 
 * `$WILDFLY_HOME` is the Wildfly home directory for example `~/wildfly-10.1.0.Final/`
-* `$DRILL_HOME` is the Drill home directory for example `~/apache-drill-1.11.0/`
+* `$DRILL_HOME` is the Drill home directory for example `~/apache-drill-1.13.0/`
 
 ## Install Drill JDBC Driver
 
@@ -32,7 +32,7 @@ $ mkdir -p modules/system/layers/base/org/apache/drill/main
 * Copy the JDBC Driver in the new directory
 
 ```
-$ cp $DRILL_HOME/jars/jdbc-driver/drill-jdbc-all-1.11.0.jar \ 
+$ cp $DRILL_HOME/jars/jdbc-driver/drill-jdbc-all-1.13.0.jar \ 
      $WILDFLY_HOME/modules/system/layers/base/org/apache/drill/main
 ```
 
@@ -41,7 +41,7 @@ $ cp $DRILL_HOME/jars/jdbc-driver/drill-jdbc-all-1.11.0.jar \
 ```xml
 <module xmlns="urn:jboss:module:1.3" name="org.apache.drill">
     <resources>
-         <resource-root path="drill-jdbc-all-1.11.0.jar"/> 
+         <resource-root path="drill-jdbc-all-1.13.0.jar"/> 
     </resources>
 
     <dependencies>

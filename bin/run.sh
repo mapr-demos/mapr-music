@@ -22,35 +22,36 @@ OWNER=$(stat -c "%U" $WORK_DIR)
 sudo chown -R $MAPR_CONTAINER_USER:$MAPR_CONTAINER_GROUP $WORK_DIR
 
 # Start ElasticSearch
-#${WORK_DIR}/elasticsearch-5.6.3/bin/elasticsearch &
+export ES_JAVA_OPTS="-Xms256m -Xmx256m"
+${WORK_DIR}/elasticsearch-5.6.3/bin/elasticsearch &
 
 # Change Wildfly standalone.xml to configure Drill DataSource according to the specified Drill node
 sed -i -e "s/yournodename/$DRILL_NODE/g" ${WORK_DIR}/wildfly-11.0.0.Beta1/standalone/configuration/standalone.xml
 
 # Start Wildfly
-#${WORK_DIR}/wildfly-11.0.0.Beta1/bin/standalone.sh -b 0.0.0.0 &
+${WORK_DIR}/wildfly-11.0.0.Beta1/bin/standalone.sh -b 0.0.0.0 &
 
 # Deploy MapR Music REST Service
 # There is no need to deploy the app if Docker container was started before
-#if [ ${FIRST_START} = true ] ; then
+if [ ${FIRST_START} = true ] ; then
 
-#  OUT=1
-#  while [ $OUT -ne 0 ]
-#  do
-#     ${WORK_DIR}/wildfly-11.0.0.Beta1/bin/jboss-cli.sh --connect --command="deploy --force $WORK_DIR/mapr-music-rest.war"
-#     OUT=$?
-#  done
+  OUT=1
+  while [ $OUT -ne 0 ]
+  do
+     ${WORK_DIR}/wildfly-11.0.0.Beta1/bin/jboss-cli.sh --connect --command="deploy --force $WORK_DIR/mapr-music-rest.war"
+     OUT=$?
+  done
 
   # Deploy MapR Music UI
-#  ${WORK_DIR}/wildfly-11.0.0.Beta1/bin/jboss-cli.sh --connect --command="deploy --force $WORK_DIR/mapr-music-ui.war"
+  ${WORK_DIR}/wildfly-11.0.0.Beta1/bin/jboss-cli.sh --connect --command="deploy --force $WORK_DIR/mapr-music-ui.war"
 
-#fi
+fi
 
 # Add Wildfly users
 #export WILDFLY_HOME="${WORK_DIR}/wildfly-11.0.0.Beta1/"
 #${WORK_DIR}/add-wildfly-users.sh --path ${WORK_DIR}/dataset/users/
 
 # Run MapR Music ElasricSearch Service
-#java -jar ${WORK_DIR}/elasticsearch-service.jar -r &
+java -jar ${WORK_DIR}/elasticsearch-service.jar -r &
 
 sleep infinity
