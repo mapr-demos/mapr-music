@@ -5,7 +5,7 @@
 #######################################################################
 
 NUMBER_REGEX='^[0-9]+$'
-DEFAULT_DATASET_ARCHIVE_NAME='dataset-full-ratings.tar.gz'
+DEFAULT_DATASET_ARCHIVE_NAME='dataset.tar.gz'
 DEFAULT_BATCH_SIZE=20000
 DEFAULT_TEMP_DIR_NAME='tmp'
 
@@ -13,8 +13,8 @@ DEFAULT_TEMP_DIR_NAME='tmp'
 ALBUMS_DIRECTORY='albums'
 ARTISTS_DIRECTORY='artists'
 LANGUAGES_DIRECTORY='languages'
-RATINGS_ALBUMS_DIRECTORY='ratings-albums'
-RATINGS_ARTISTS_DIRECTORY='ratings-artists'
+RATINGS_ALBUMS_DIRECTORY='albums_ratings'
+RATINGS_ARTISTS_DIRECTORY='artists_ratings'
 USERS_DIRECTORY='users'
 
 # MapR-DB JSON Tables
