@@ -323,7 +323,7 @@ Contains `175413` Album Rating JSON documents, which are ready to be imported in
   
 </details>
 
-### rating-artists
+### artists_ratings
 
 Contains `316065` Artist Rating JSON documents, which are ready to be imported into MapR-DB JSON Table. 
 <details> 
@@ -400,7 +400,7 @@ $ hadoop fs -copyFromLocal artists/ /tmp/artists
 $ hadoop fs -copyFromLocal languages/ /tmp/languages
 $ hadoop fs -copyFromLocal users/ /tmp/users
 $ hadoop fs -copyFromLocal albums_ratings/ /tmp/albums_ratings
-$ hadoop fs -copyFromLocal albums_artists/ /tmp/artists_ratings
+$ hadoop fs -copyFromLocal artists_ratings/ /tmp/artists_ratings
 ```
 
 You can also use a simple file copy using NFS if you have mounted MapR File System on your development environment.
