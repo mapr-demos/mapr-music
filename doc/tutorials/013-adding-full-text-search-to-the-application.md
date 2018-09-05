@@ -1,11 +1,15 @@
 # Adding Full Text Search to the Application
 
-It is very common for applications to require some advanced search capabilities, that could not be covered by MapR-DB querying and indexing features. This includes, insentitive case search, fuzzy search and many more.
+It is very common for applications to require some advanced search capabilities, such as insentitive case search, fuzzy search and many more. These full text search capabilties are generally well suited for MapR-DB's query and index capabilities, however one can combine MapR-DB with an indexing engine, such as Elasticsearch, designed specifically for full text search. To accomplish this, Elasticsearch listens to MapR-DB's Change Data Capture (CDC) stream. Anytime a CRUD operation is performed on a table in MapR-DB, Elasticsearch is notified via the CDC stream and updates its own indices accordingly. Anytime an end-user does search, the web app (e.g. JBoss) will direct that request to the Elasticsearch search API.
 
-An option for this is to use an indexing engine, like Elasticsearch, and send the attributes to use from MapR-DB Table to Elasticsearch when a document is inserting, updated or deleted.
+Elasticsearch listens for requests on port 9200. This is configurable in [mapr-music/mapr-rest/src/main/java/com/mapr/music/util/MaprProperties.java](https://github.com/mapr-demos/mapr-music/blob/32a2e66b6874d6ad01d8defc485595b70b4ef596/mapr-rest/src/main/java/com/mapr/music/util/MaprProperties.java). Anytime you search for an album or artist in the MapR Music webapp, your search results will come from Elasticsearch.  You can also query Elasticsearch with `curl`, like this:
 
-This is another place where the Change Data Capture introduce in the previous step could be used.
-
+```
+# Show all indices
+curl -X GET "localhost:9200/_cat/indices?v"
+# Search for Wyclef
+curl -X GET "localhost:9200/artists/_search?q=name:wyclef&pretty"
+```
 
 ## Indexing MapR-DB attributes in Elasticsearch
 
@@ -131,7 +135,6 @@ public class ESSearchService implements PaginatedService {
 
 }
 ```
-
 
 ---
 Next: [Creating Recommendation Engine with Spark ML lib](014-creating-recommendation-engine.md)
