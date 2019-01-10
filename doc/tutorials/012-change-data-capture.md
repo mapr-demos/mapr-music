@@ -219,4 +219,4 @@ public class CdcStatisticService implements StatisticService {
 In the next step you will learn how to use CDC to index documents values from MapR-DB JSON into Elasticseach to provide a Full Text Search feature. 
 
 ---
-Next: [Adding Full Text Search to the Application](013-adding-full-text-search-to-the-application'.md)
+Next: [Adding Full Text Search to the Application](013-adding-full-text-search-to-the-application.md)
