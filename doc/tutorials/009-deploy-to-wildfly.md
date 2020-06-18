@@ -97,7 +97,7 @@ Also, you must create Drill JDBC Driver module to use Drill Data Source from Jav
 #### Drill JDBC Driver module
 
 Get Drill and its JDBC Driver
-* Dowload Apache Drill 1.11 from [Drill Web site](https://drill.apache.org/)
+* Dowload Apache Drill 1.13 from [Drill Web site](https://drill.apache.org/)
 * Unzip Drill
 
 Install JDBC Driver into Wildfly
