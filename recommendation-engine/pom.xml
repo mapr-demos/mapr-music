@@ -15,7 +15,7 @@
         <slf4j.log4j12.version>1.7.25</slf4j.log4j12.version>
         <log4j.core.version>2.9.0</log4j.core.version>
         <exec.plugin.version>1.6.0</exec.plugin.version>
-        <mapr.spark.version>2.2.1-mapr-1904</mapr.spark.version>
+        <mapr.spark.version>2.4.3</mapr.spark.version>
         <mapr.library.version>6.0.0-mapr</mapr.library.version>
         <scala.binary.version>2.11</scala.binary.version>
         <scala.version>2.11.8</scala.version>
