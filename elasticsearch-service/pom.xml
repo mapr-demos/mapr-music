@@ -14,7 +14,7 @@
         <mapr.library.version>6.0.0-mapr</mapr.library.version>
         <slf4j.api.version>1.7.25</slf4j.api.version>
         <slf4j.log4j12.version>1.7.25</slf4j.log4j12.version>
-        <log4j.core.version>2.9.0</log4j.core.version>
+        <log4j.core.version>2.13.2</log4j.core.version>
         <elasticsearch.version>5.6.1</elasticsearch.version>
         <elasticsearch.client.version>5.5.3</elasticsearch.client.version>
         <common.cli.version>1.4</common.cli.version>
