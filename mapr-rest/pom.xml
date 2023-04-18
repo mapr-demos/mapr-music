@@ -25,7 +25,7 @@
         <arquillian.weld.ee.version>1.0.0.CR9</arquillian.weld.ee.version>
         <weld.core.version>2.3.5.Final</weld.core.version>
         <slf4j.simple.version>1.6.4</slf4j.simple.version>
-        <rest.easy.version>3.0.19.Final</rest.easy.version>
+        <rest.easy.version>3.0.20.Final</rest.easy.version>
         <icu4j.version>59.1</icu4j.version>
         <kafka.clients.version>0.9.0.0-mapr-1707</kafka.clients.version>
         <elasticsearch.rest.client.version>5.6.1</elasticsearch.rest.client.version>
